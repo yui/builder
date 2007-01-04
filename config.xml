@@ -1,0 +1,48 @@
+<cruisecontrol>
+    <project name="yui">
+
+        <listeners>
+            <currentbuildstatuslistener file="logs/${project.name}/status.txt"/>
+        </listeners>
+
+        <bootstrappers>
+            <cvsbootstrapper localWorkingCopy="projects/${project.name}" file="yahoo/presentation/2.x" />
+        </bootstrappers>
+
+        <modificationset quietperiod="15">
+            <cvs localWorkingCopy="projects/${project.name}/yahoo/presentation/2.x/build"  />
+            <cvs localWorkingCopy="projects/${project.name}/yahoo/presentation/2.x/docs"   />
+            <cvs localWorkingCopy="projects/${project.name}/yahoo/presentation/2.x/examples" />
+        </modificationset>
+
+        <schedule interval="300">
+            <ant anthome="apache-ant-1.6.5" buildfile="projects/${project.name}/build.xml"/>
+        </schedule>
+
+        <log>
+            <merge dir="projects/${project.name}/target/test-results"/>
+        </log>
+
+        <publishers>
+            <htmlemail mailhost="smtp.yahoo.com"
+                    returnaddress="adamoore@yahoo-inc.com"
+                    buildresultsurl="http://feelbuild-mac.corp.yahoo.com:8080/buildresults/yui/"
+                    skipusers="true" spamwhilebroken="true"
+                    css="webapps/cruisecontrol/css/cruisecontrol.css"
+                    xsldir="webapps/cruisecontrol/xsl"
+                    logdir="logs/yui">
+                <always address="yui-team@yahoo-inc.com"/>
+                <!--
+                <always address="adamoore@yahoo-inc.com"/>
+                <always address="tsha@yahoo-inc.com"/>
+                <always address="miraglia@yahoo-inc.com"/>
+                <failure address="failed-builds@mydomain.com"/>
+                -->
+            </htmlemail>
+            <onsuccess>
+                <artifactspublisher dest="artifacts/${project.name}" dir="projects/${project.name}/target"/>
+            </onsuccess>
+        </publishers>
+
+    </project>
+</cruisecontrol>

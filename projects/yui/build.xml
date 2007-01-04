@@ -1,0 +1,79 @@
+<project name="yui" default="all">
+
+    <property name="build" location="target"/>
+    <property name="src" location="yahoo/presentation/2.x"/>
+
+    <target name="all" depends="compile, test, package"/>
+
+    <target name="compile">
+
+        <!-- clean up build dir and recreate -->
+        <delete dir="${build}"/>
+        <mkdir dir="${build}"/>
+
+        <!-- create yahoo-dom-event.js -->
+        <concat destfile="${src}/build/yahoo-dom-event/yahoo-dom-event.js">
+            <filelist dir="${src}/build" 
+                      files="yahoo/yahoo-min.js,dom/dom-min.js,event/event-min.js"/>
+        </concat>
+
+        <!-- create utilities.js -->
+        <concat destfile="${src}/build/utilities/utilities.js">
+            <filelist dir="${src}/build" 
+                      files="yahoo/yahoo-min.js,dom/dom-min.js,event/event-min.js,connection/connection-min.js,animation/animation-min.js,dragdrop/dragdrop-min.js"/>
+        </concat>
+
+        <!-- copy global README ... @todo extract latest release notes from all components -->
+        <copy file="${src}/README" tofile="${build}/README"/>
+
+        <!-- copy everything in build except the js files -->
+        <copy todir="${build}/build">
+            <fileset dir="${src}/build">
+                <exclude name="**/*.js"/>
+            </fileset>
+        </copy>
+
+        <!-- copy build js files, prepending the copyright info -->
+        <copy todir="${build}/build">
+            <fileset dir="${src}/build">
+                <include name="**/*.js"/>
+            </fileset>
+            <filterchain>
+                <concatfilter prepend="copyright"/>
+            </filterchain>
+        </copy>
+
+        <!-- copy docs, but not the legacy subdirs -->
+        <copy todir="${build}/docs">
+            <fileset dir="${src}/docs">
+             <patternset id="no.subdirs.but.assets">
+                <include name="*.html"/>
+                <include name="*.gif"/>
+                <include name="*.json"/>
+              </patternset>
+            </fileset>
+        </copy>
+
+        <!-- copy doc assets -->
+        <copy todir="${build}/docs/assets">
+            <fileset dir="${src}/docs/assets"/>
+        </copy>
+
+        <!-- copy examples -->
+        <copy todir="${build}/examples">
+            <fileset dir="${src}/examples"/>
+        </copy>
+
+    </target>
+
+    <!-- @todo run tests -->
+    <target name="test" depends="compile">
+
+    </target>
+
+    <!-- zip up everything in the build directory -->
+    <target name="package" depends="compile">
+        <zip destfile="${build}/yui.zip" basedir="${build}" />
+    </target>
+
+</project>
