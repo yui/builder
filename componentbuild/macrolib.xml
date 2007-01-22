@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="YuiMacroLib">
+
+    <macrodef name="jsmin">
+        <attribute name="dir" />
+        <attribute name="file" />
+        <sequential>
+        <echo>Running JSMin on @{dir}/@{file}</echo>
+            <basename file="@{file}" suffix=".js" property="basename" />
+            <java jar="${jsmin.jar}" output="@{dir}/${basename}-min.js" fork="true">
+                <arg file="@{dir}/@{file}" />
+            </java>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="concatsource">
+        <attribute name="destfile" />
+        <attribute name="sourcedir" />
+        <attribute name="sourcefiles" />
+        <attribute name="workingdir" default="${workingdir}" />
+
+        <element name="filters" optional="true" description="Additonal filters to apply to individual files"/>
+
+        <sequential>
+            <delete dir="@{workingdir}" quiet="true"/>
+            <copy todir="@{workingdir}">
+                <filelist dir="@{sourcedir}" files="@{sourcefiles}" />
+                <filterchain>
+                    <filters />
+                    <fixcrlf fixlast="true" eof="remove"/>
+                </filterchain>
+            </copy>
+
+            <concat destfile="@{destfile}" fixlastline="true" >
+                <filelist dir="@{workingdir}" files="@{sourcefiles}" />
+            </concat>
+            
+            <delete dir="${workingdir}" quiet="true"/>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="jslint">
+    <element name="jsfiles" optional="false" />
+    <sequential>
+        <!-- 
+                Need to find a way to convert fileset to args (script?) to 
+           avoid ' ', which will break for files with ' in them
+           
+           Evaluates to the following java execution line...
+           java -r js.jar jslintconsole.js 'file1.js' 'file2.js' 'file3.js'
+        -->
+         <pathconvert pathsep="' '" property="jsfileargs">
+            <jsfiles />
+         </pathconvert>
+        
+            <java jar="${rhino.jar}" fork="true">
+                <arg file="${jslintconsole.js}" />
+                <arg value="${jslintsrc.js}" />
+                <arg line="'${jsfileargs}'" />
+            </java>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="registerversion">
+        <attribute name="module" />
+        <attribute name="classname" />
+        <attribute name="file" />
+        <sequential>
+            <loadfile srcfile="${builddir}/files/versioncode.txt" property="versioncode" >
+                <filterchain>
+                    <replacetokens>
+                      <token key="MODULE" value="@{module}"/>
+                        <token key="CLASSNAME" value="@{classname}"/>
+                    </replacetokens>
+                </filterchain>
+            </loadfile>
+            
+        <echo>Adding Version Registration Code to @{file}</echo>
+            <concat destfile="@{file}" append="true" fixlastline="true">${versioncode}</concat>
+        </sequential>
+    </macrodef>
+
+</project>

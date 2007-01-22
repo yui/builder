@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="YuiBuildProperties">
+    <!-- Supporting Tools -->
+    <property name="jsmin.jar" location="${builddir}/lib/jsmin/jsmin.jar" />
+    <property name="rhino.jar" location="${builddir}/lib/rhino/js.jar" />
+    <property name="jslintconsole.js" location="${builddir}/lib/jslint/jslint-console.js" />
+    <property name="jslintsrc.js" location="${builddir}/lib/jslint/fulljslint.js" />
+
+    <!-- Global Directories -->
+    <property name="global.build.base" location="${srcdir}/build" />
+    <property name="global.build.component" location="${global.build.base}/${component}" />
+    <property name="global.build.component.assets" location="${global.build.component}/assets" />
+
+    <property name="workingdir" location="${component.builddir}/anttemp" />
+</project>
+

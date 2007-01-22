@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="YuiBuild" default="core">
+<!--
+    COMPONENT BUILD FILE
+
+    Expects the following properties to be set from the command line or in 
+    enviroment variables YUI_SRC_HOME, YUI_BUILD_HOME respectively:
+        
+    srcdir          Build Box's Path to source root directory 
+                    (e.g. /home/yuideveloper/sandbox/yahoo/presentation/2.x)
+                
+    builddir        Build Box's Path to base directory for build support files/lib 
+                    (jsmin, jslint, rhino, versioncode)
+-->
+
+    <description>Component Build File</description>
+
+    <!-- !!IMPORTTANT : NEXT 5 LINES NEED TO BE IN YOUR BUILD FILE -->
+    <dirname property="buildfile.dir" file="${ant.file}" />
+    <property environment="env" />
+    <property name="srcdir" value="${env.YUI_SRC_HOME}" />
+    <property name="builddir" value="${env.YUI_BUILD_HOME}" />
+    <property file="${buildfile.dir}/build.properties" />
+
+<!--
+    1. PROPERTY DEFINITIONS
+
+    The following properties can be defined in a build.properties file placed in the same 
+    directory as build.xml (see build.example.properties), or within build.xml itself as shown below
+    
+    If defined in multiple places, they are set to the value which is declared first (viz. the properties file,
+    if it's included in the location above)
+
+    # COMPONENT PROPERTIES (Probably need to change across components)
+
+    component                           Component name, lower-case. Used for build filenames(e.g. component.js, component-min.js)
+    component.module                    Module name, mostly always the same as component
+    component.mainclass                 Main JS class representing the module. Version code will be added to this class
+
+    component.basedir                   Absolute path to the component base directory
+    component.srcdir                    Absolute path to the component source directory
+    component.builddir                  Absolute path to the component build directory
+
+    component.jsfiles.base              Base dir for component.jsfiles. For most components this is component.srcdir or component.srcdir/js		
+    component.jsfiles                   Comma seperated ordered list of source files to be concatenated, relative to component.jsfiles.base. No wildcards allowed
+    component.assetfiles                Comma seperated list of asset files, relative to component.srcdir (can be left undefined for components which don't have assets)
+
+    component.logger.regex              Regex used to strip logger statements 
+    component.logger.regex.byline       If component.logger.regex.byline is false, regex will match against the 
+                                        entire file as opposed to line by line - required for multiline search.
+                                            
+    # BUILDPATH PROPERTIES (defined in buildproperties.xml. Probably don't need to be over-ridden per component, except container_core)
+
+    global.build.base                   Absolute path to global build directory ( e.g. /home/yuideveloper/cvsroot/yahoo/presentation/2.x/build )
+    global.build.component              Absolute path to global component build directory ( e.g. ${global.build.base}/calendar ) 
+    global.build.component.assets       Absolute path to global component assets directory
+
+    # BUILD BOX SPECIFIC PROPERTIES (defined in buildproperties.xml. Probably don't need to be over-ridden per component)
+
+    jsmin.jar                           path to jsmin.jar on the build box
+    rhino.jar                           path to Rhino's js.jar on the build box
+    jslintsrc.js                        path to fulljslint.js file on the build box
+    jslintconsole.js                    path to jslintconsole.js on the build box
+    versioncode.txt                     path to file containing version registration code on the build box
+
+    # MISC PROPERTIES
+    workingdir                          location for temporary files created during build process
+    buildfiles.eol                      eol char to use for build files. Valid values are 'lf' or 'asis'
+
+    2. TARGET DEFINITIONS
+
+    targetlib.xml defines the following main targets which can be invoked via the ant command line 
+    e.g. ant <target> 
+
+    init                Creates the component's local build dir
+    clean               Deletes the local build dir
+
+    corebuild           Creates component.js in the LBD
+    debugbuild          Creates component-debug.js in the LBD
+
+    core [default]      Runs corebuild and creates component-min.js
+    debug               Runs debugbuild
+
+    deploy              Copies built code and assets to global build directory (e.g. 2.x/build)
+    local               Runs core and debug to create component.js, component-min.js, component-debug.js
+    all                 Complete build and deploy. Runs clean, init, core, debug, jslint, examples, deploy
+    -->
+
+    <!-- Component Properties. Any variables not defined in build.properties will get their values below -->
+
+    <property name="component" value="foobarwidget" />
+    <property name="component.module" value="${component}" />
+    <property name="component.mainclass" value="YAHOO.widget.FooBarWidgetMgr" />
+
+    <property name="component.basedir" location="${srcdir}/widget/${component}" />
+    <property name="component.builddir" location="${component.basedir}/build" />
+    <property name="component.srcdir" location="${component.basedir}/src" />
+
+    <property name="component.jsfiles.base" value="${component.srcdir}/js" />
+    <property name="component.jsfiles" value="FooBarWidget.js, FooBarUtils.js, renderer/FooBarWidgetRenderer.js" />
+    <property name="component.assetfiles" value="img/*, css/*" />
+
+    <property name="component.logger.regex" value="^.*?(?:logger|YAHOO.log).*?\([^\)]*?\).*?$\r?\n" />
+    <property name="component.logger.regex.byline" value="false" />
+    <property name="buildfiles.eol" value="lf" />
+
+    <!-- !!IMPORTANT : The Next 2 Lines need to be in your build.xml -->
+    <import file="${builddir}/buildproperties.xml" description="Shared Build Properties - tools, build paths etc." />
+    <import file="${builddir}/targetlib.xml" description="Component Build Targets" />
+
+    <target name="examples" description="Component Specific Over-ride">
+        <echo>CURRENTLY NOT DOING ANYTHING</echo>
+    </target>
+
+</project>
+
