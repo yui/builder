@@ -100,7 +100,7 @@
     <property name="component.jsfiles" value="FooBarWidget.js, FooBarUtils.js, renderer/FooBarWidgetRenderer.js" />
     <property name="component.assetfiles" value="img/*, css/*" />
 
-    <property name="component.logger.regex" value="^.*?(?:logger|YAHOO.log).*?\([^\)]*?\).*?$\r?\n" />
+    <property name="component.logger.regex" value="^.*?(?:logger|YAHOO.log).*?(?:;|\).*;|(?:\r?\n.*?)*?\).*;).*;?.*?\r?\n" />
     <property name="component.logger.regex.byline" value="false" />
     <property name="buildfiles.eol" value="lf" />
 
