@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="YuiBuild" default="core">
+<project name="YuiBuild" default="local">
 <!--
     COMPONENT BUILD FILE
 
     Expects the following properties to be set from the command line or in 
-    enviroment variables YUI_SRC_HOME, YUI_BUILD_HOME respectively:
+    enviroment variables YUI_SRC_DIR, YUI_BUILD_DIR respectively:
         
     srcdir          Build Box's Path to source root directory 
                     (e.g. /home/yuideveloper/sandbox/yahoo/presentation/2.x)
@@ -18,8 +18,8 @@
     <!-- !!IMPORTTANT : NEXT 5 LINES NEED TO BE IN YOUR BUILD FILE -->
     <dirname property="buildfile.dir" file="${ant.file}" />
     <property environment="env" />
-    <property name="srcdir" value="${env.YUI_SRC_HOME}" />
-    <property name="builddir" value="${env.YUI_BUILD_HOME}" />
+    <property name="srcdir" value="${env.YUI_SRC_DIR}" />
+    <property name="builddir" value="${env.YUI_BUILD_DIR}" />
     <property file="${buildfile.dir}/build.properties" />
 
 <!--
@@ -48,6 +48,9 @@
     component.logger.regex              Regex used to strip logger statements 
     component.logger.regex.byline       If component.logger.regex.byline is false, regex will match against the 
                                         entire file as opposed to line by line - required for multiline search.
+    component.logger.regex.flags        The set of standard Perl5 regex flags which apply.Defaults to mg if not provided[ imgs ]
+    component.logger.regex.replace      The replacement string to use. An empty property is used for empty string. Defaults to empty string
+                                        
                                             
     # BUILDPATH PROPERTIES (defined in buildproperties.xml. Probably don't need to be over-ridden per component, except container_core)
 
@@ -70,7 +73,7 @@
     2. TARGET DEFINITIONS
 
     targetlib.xml defines the following main targets which can be invoked via the ant command line 
-    e.g. ant <target> 
+    e.g. ant <target>. 'local' is the default target, which builds all 3 component files and runs jslint on them
 
     init                Creates the component's local build dir
     clean               Deletes the local build dir
@@ -78,12 +81,13 @@
     corebuild           Creates component.js in the LBD
     debugbuild          Creates component-debug.js in the LBD
 
-    core [default]      Runs corebuild and creates component-min.js
+    core                Runs corebuild and creates component-min.js
     debug               Runs debugbuild
 
     deploy              Copies built code and assets to global build directory (e.g. 2.x/build)
-    local               Runs core and debug to create component.js, component-min.js, component-debug.js
     all                 Complete build and deploy. Runs clean, init, core, debug, jslint, examples, deploy
+    
+    local    [default]  Runs core, debug and jslint to create and test component.js, component-min.js, component-debug.js
     -->
 
     <!-- Component Properties. Any variables not defined in build.properties will get their values below -->

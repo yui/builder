@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="YuiBuildProperties">
+
+    <!-- Default Logger Regex values if not provided -->
+    <property name="component.logger.regex.replace" value="" />
+    <property name="component.logger.regex.flags" value="mg" />
+
     <!-- Supporting Tools -->
     <property name="jsmin.jar" location="${builddir}/lib/jsmin/jsmin.jar" />
     <property name="rhino.jar" location="${builddir}/lib/rhino/js.jar" />

@@ -19,10 +19,16 @@
         <attribute name="sourcedir" />
         <attribute name="sourcefiles" />
         <attribute name="workingdir" default="${workingdir}" />
-
+        
         <element name="filters" optional="true" description="Additonal filters to apply to individual files"/>
 
         <sequential>
+        
+            <echo>Concatenating</echo>
+            <echo>    Source Files : @{sourcefiles}</echo>
+            <echo>    In Source Dir : @{sourcedir}</echo>
+            <echo>    To : @{destfile}</echo>
+        
             <delete dir="@{workingdir}" quiet="true"/>
             <copy todir="@{workingdir}">
                 <filelist dir="@{sourcedir}" files="@{sourcefiles}" />
@@ -44,21 +50,21 @@
     <element name="jsfiles" optional="false" />
     <sequential>
         <!-- 
-                Need to find a way to convert fileset to args (script?) to 
+           Need to find a way to convert fileset to args (script?) to 
            avoid ' ', which will break for files with ' in them
            
            Evaluates to the following java execution line...
            java -r js.jar jslintconsole.js 'file1.js' 'file2.js' 'file3.js'
         -->
-         <pathconvert pathsep="' '" property="jsfileargs">
+        <pathconvert pathsep="' '" property="jsfileargs">
             <jsfiles />
-         </pathconvert>
+        </pathconvert>
         
-            <java jar="${rhino.jar}" fork="true">
-                <arg file="${jslintconsole.js}" />
-                <arg value="${jslintsrc.js}" />
-                <arg line="'${jsfileargs}'" />
-            </java>
+        <java jar="${rhino.jar}" fork="true">
+            <arg file="${jslintconsole.js}" />
+            <arg value="${jslintsrc.js}" />
+            <arg line="'${jsfileargs}'" />
+        </java>
         </sequential>
     </macrodef>
 

@@ -4,24 +4,26 @@
 
     <echo>Starting Build For ${component}</echo>
 
-    <echo>Ant Home : ${ant.home}</echo>
-    <echo>Ant Version : ${ant.version}</echo>
-    <echo>Build File : ${ant.file}</echo>
-    <echo>srcdir : ${srcdir}</echo>
-    <echo>builddir : ${builddir}</echo>
-    <echo>Build Properties</echo>
-    <echo>component : ${component}</echo>
-    <echo>component.basedir : ${component.basedir}</echo>
-    <echo>component.srcdir : ${component.srcdir}</echo>
-    <echo>component.builddir : ${component.builddir}</echo>
-    <echo>global.build.base : ${global.build.base}</echo>
-    <echo>global.build.component : ${global.build.component}</echo>
-    <echo>global.build.component.assets : ${global.build.component.assets}</echo>
+    <echo>Ant Properties</echo>
+    <echo>    Home : ${ant.home}</echo>
+    <echo>    Ant Version : ${ant.version}</echo>
+    <echo>    Build File : ${ant.file}</echo>
+    <echo>Local Build Properties</echo>
+    <echo>    srcdir : ${srcdir}</echo>
+    <echo>    builddir : ${builddir}</echo>
+    <echo>    component : ${component}</echo>
+    <echo>    component.basedir : ${component.basedir}</echo>
+    <echo>    component.srcdir : ${component.srcdir}</echo>
+    <echo>    component.builddir : ${component.builddir}</echo>
+    <echo>Global Build Properties</echo>
+    <echo>    global.build.base : ${global.build.base}</echo>
+    <echo>    global.build.component : ${global.build.component}</echo>
+    <echo>    global.build.component.assets : ${global.build.component.assets}</echo>
 
     <import file="${builddir}/macrolib.xml" description="Macrodef definitions - jslint, jsmin, registerversion" />
 
-    <target name="all" depends="local, jslint, examples, deploy" description="Build and Deploy to Global Build Directory" />
-    <target name="local" depends="clean, core, debug" description="Build and Deploy to Local Build Directory" />
+    <target name="all" depends="local, examples, deploy" description="Build and Deploy to Global Build Directory" />
+    <target name="local" depends="clean, core, debug, jslint" description="Build and Deploy to Local Build Directory" />
     <target name="core" depends="corebuild, jsmin" description="Core Build" />
     <target name="debug" depends="debugbuild" description="Debug Build" />
 
@@ -30,37 +32,35 @@
         <mkdir dir="${component.builddir}" />
     </target>
 
-    <target name="corebuild" depends="init" description="Create component.js">
-        <concatsource destfile="${component.builddir}/${component}.js" 
-                          sourcedir="${component.jsfiles.base}" sourcefiles="${component.jsfiles}" />
-        
-        <replaceregexp file="${component.builddir}/${component}.js" 
-                            byline="${component.logger.regex.byline}" 
-                            match="${component.logger.regex}" 
-                            replace="" 
-                            flags="mg" />
-        
-        <registerversion classname="${component.mainclass}" 
-                            module="${component.module}" file="${component.builddir}/${component}.js" />
-        
+    <target name="corebuild" depends="init, -concatcore, -loggerregex" description="Create component.js">
+        <registerversion classname="${component.mainclass}" module="${component.module}" file="${component.builddir}/${component}.js" />
         <fixcrlf srcdir="${component.builddir}" includes="${component}.js" eol="${buildfiles.eol}" />
     </target>
 
+    <target name="-concatcore">
+        <concatsource destfile="${component.builddir}/${component}.js" sourcedir="${component.jsfiles.base}" sourcefiles="${component.jsfiles}" />
+    </target>
+    
+    <target name="-loggerregex" if="component.logger.regex">
+        <echo>Replacing Logger Statements in ${component.builddir}/${component}.js</echo>
+        <replaceregexp file="${component.builddir}/${component}.js" 
+                            byline="${component.logger.regex.byline}" 
+                            match="${component.logger.regex}" 
+                            replace="${component.logger.regex.replace}" 
+                            flags="${component.logger.regex.flags}" />
+    </target>
+    
     <target name="debugbuild" depends="init" description="Create component-debug.js">
-        <concatsource destfile="${component.builddir}/${component}-debug.js" 
-                          sourcedir="${component.jsfiles.base}" sourcefiles="${component.jsfiles}" />
-        
-        <registerversion classname="${component.mainclass}" 
-                            module="${component.module}" file="${component.builddir}/${component}-debug.js" />
-        
+        <concatsource destfile="${component.builddir}/${component}-debug.js" sourcedir="${component.jsfiles.base}" sourcefiles="${component.jsfiles}" />
+        <registerversion classname="${component.mainclass}" module="${component.module}" file="${component.builddir}/${component}-debug.js" />
         <fixcrlf srcdir="${component.builddir}" includes="${component}-debug.js" eol="${buildfiles.eol}" />
     </target>
 
-    <target name="jsmin" description="Create component-min.js">
+    <target name="jsmin" description="Create component-min.js from component.js">
         <jsmin dir="${component.builddir}" file="${component}.js" />
     </target>
 
-    <target name="jslint" description="Run jslint over the build files (default settings)">
+    <target name="jslint" description="Run jslint over the local build files (default settings)">
         <jslint>
             <jsfiles>
                 <fileset dir="${component.builddir}" includes="*.js" />
@@ -68,17 +68,17 @@
         </jslint>
     </target>
 
-    <target name="deploy" description="Move files to 2.x/build" depends="copyassets">
+    <target name="deploy" description="Move files to 2.x/build" depends="-copyassets">
         <copy todir="${global.build.component}">
             <fileset dir="${component.builddir}" includes="*.js" />
         </copy>
     </target>
-	
-	<target name="copyassets" if="component.assetfiles" description="Copy assets if set">
-   	<copy todir="${global.build.component.assets}" flatten="true">
-       	<fileset dir="${component.srcdir}" includes="${component.assetfiles}"  />
-   	</copy>
-	</target>
+    
+    <target name="-copyassets" if="component.assetfiles">
+        <copy todir="${global.build.component.assets}" flatten="true">
+            <fileset dir="${component.srcdir}" includes="${component.assetfiles}"  />
+        </copy>
+    </target>
 
     <target name="clean" description="Clean Local Build Directory (not 2.x/build)">
         <delete dir="${component.builddir}" />
