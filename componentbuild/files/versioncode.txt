@@ -1,1 +1,1 @@
-// YAHOO.register("@MODULE@", @CLASSNAME@, {version: @VERSION@, build: @BUILD@});
+YAHOO.register("@MODULE@", @CLASSNAME@, {version: "@VERSION@", build: "@BUILD@"});
