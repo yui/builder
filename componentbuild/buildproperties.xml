@@ -17,5 +17,7 @@
     <property name="global.build.component.assets" location="${global.build.component}/assets" />
 
     <property name="workingdir" location="${component.builddir}/anttemp" />
+
+    <available file="${component.basedir}/README" property="readme.exists"></available>
 </project>
 

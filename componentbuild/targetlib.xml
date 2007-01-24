@@ -22,8 +22,8 @@
 
     <import file="${builddir}/macrolib.xml" description="Macrodef definitions - jslint, jsmin, registerversion" />
 
-    <target name="all" depends="local, examples, deploy" description="Build and Deploy to Global Build Directory" />
-    <target name="local" depends="clean, core, debug, jslint" description="Build and Deploy to Local Build Directory" />
+    <target name="all" depends="local, deploy" description="Build and Deploy to Global Build Directory" />
+    <target name="local" depends="clean, core, debug, customlocal, jslint" description="Build and Deploy to Local Build Directory" />
     <target name="core" depends="corebuild, jsmin" description="Core Build" />
     <target name="debug" depends="debugbuild" description="Debug Build" />
 
@@ -31,6 +31,10 @@
         <tstamp/>
         <mkdir dir="${component.builddir}" />
     </target>
+
+   <target name="clean" description="Clean Local Build Directory (not 2.x/build)" unless="never.clean">
+       <delete dir="${component.builddir}" />
+   </target>
 
     <target name="corebuild" depends="init, -concatcore, -loggerregex" description="Create component.js">
         <registerversion classname="${component.mainclass}" module="${component.module}" file="${component.builddir}/${component}.js" />
@@ -49,7 +53,7 @@
                             replace="${component.logger.regex.replace}" 
                             flags="${component.logger.regex.flags}" />
     </target>
-    
+
     <target name="debugbuild" depends="init" description="Create component-debug.js">
         <concatsource destfile="${component.builddir}/${component}-debug.js" sourcedir="${component.jsfiles.base}" sourcefiles="${component.jsfiles}" />
         <registerversion classname="${component.mainclass}" module="${component.module}" file="${component.builddir}/${component}-debug.js" />
@@ -68,7 +72,7 @@
         </jslint>
     </target>
 
-    <target name="deploy" description="Move files to 2.x/build" depends="-copyassets">
+    <target name="deploy" description="Move files to 2.x/build" depends="-copyassets, examples, readme">
         <copy todir="${global.build.component}">
             <fileset dir="${component.builddir}" includes="*.js" />
         </copy>
@@ -80,16 +84,19 @@
         </copy>
     </target>
 
-    <target name="clean" description="Clean Local Build Directory (not 2.x/build)">
-        <delete dir="${component.builddir}" />
+    <target name="readme" if="readme.exists">
+        <copy file="${component.basedir}/README" todir="${global.build.component}" /> 
     </target>
 
+    <!-- Stub, to be over-ridden by components, since everyone seems to have their own way of building examples -->
     <target name="examples">
-        <!--
-            TODO
-            For most components, this maybe as simple copying files or running PHP commandline as an external call
-            but need to figure out what to do with the Calendar/Container example setup 
-        -->
+    <!--
+        For most components, this maybe as simple copying files or running PHP commandline as an external call
+        but need to figure out what to do with the Calendar/Container example setup 
+    -->
     </target>
+
+    <!-- Stub, to be over-ridden by components if the need custom work in local (e.g. container builds container_core using this) -->
+    <target name="customlocal" />
 
 </project>

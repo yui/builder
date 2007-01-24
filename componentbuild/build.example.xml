@@ -60,15 +60,17 @@
 
     # BUILD BOX SPECIFIC PROPERTIES (defined in buildproperties.xml. Probably don't need to be over-ridden per component)
 
-    jsmin.jar                           path to jsmin.jar on the build box
-    rhino.jar                           path to Rhino's js.jar on the build box
-    jslintsrc.js                        path to fulljslint.js file on the build box
-    jslintconsole.js                    path to jslintconsole.js on the build box
-    versioncode.txt                     path to file containing version registration code on the build box
+    jsmin.jar                           Path to jsmin.jar on the build box
+    rhino.jar                           Path to Rhino's js.jar on the build box
+    jslintsrc.js                        Path to fulljslint.js file on the build box
+    jslintconsole.js                    Path to jslintconsole.js on the build box
+    versioncode.txt                     Path to file containing version registration code on the build box
 
     # MISC PROPERTIES
-    workingdir                          location for temporary files created during build process
-    buildfiles.eol                      eol char to use for build files. Valid values are 'lf' or 'asis'
+    
+    workingdir                          Location for temporary files created during build process
+    buildfiles.eol                      EOL char to use for build files. Valid values are 'lf' or 'asis'
+    never.clean                         Set to true, to stop build from ever deleting your local build directory
 
     2. TARGET DEFINITIONS
 
@@ -84,10 +86,12 @@
     core                Runs corebuild and creates component-min.js
     debug               Runs debugbuild
 
-    deploy              Copies built code and assets to global build directory (e.g. 2.x/build)
-    all                 Complete build and deploy. Runs clean, init, core, debug, jslint, examples, deploy
+    deploy              Copies built code, assets, examples and readme to global build directory (e.g. 2.x/build)
+    all                 Complete build and deploy. Effectively, runs clean, init, core, debug, jslint, deploy
     
-    local    [default]  Runs core, debug and jslint to create and test component.js, component-min.js, component-debug.js
+    local    [default]  Runs core, debug and jslint to create and test component.js, component-min.js, component-debug.js in the LBD
+    
+    customlocal         Stub. The default implementation does nothing, but can be used to add additional build steps to local, after core and debug, but before jslint
     -->
 
     <!-- Component Properties. Any variables not defined in build.properties will get their values below -->
