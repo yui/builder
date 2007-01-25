@@ -73,19 +73,19 @@
     </target>
 
     <target name="deploy" description="Move files to 2.x/build" depends="-copyassets, examples, readme">
-        <copy todir="${global.build.component}">
+        <copy todir="${global.build.component}" preservelastmodified="true">
             <fileset dir="${component.builddir}" includes="*.js" />
         </copy>
     </target>
     
     <target name="-copyassets" if="component.assetfiles">
-        <copy todir="${global.build.component.assets}" flatten="true">
+        <copy todir="${global.build.component.assets}" flatten="true" preservelastmodified="true">
             <fileset dir="${component.srcdir}" includes="${component.assetfiles}"  />
         </copy>
     </target>
 
     <target name="readme" if="readme.exists">
-        <copy file="${component.basedir}/README" todir="${global.build.component}" /> 
+        <copy file="${component.basedir}/README" todir="${global.build.component}" preservelastmodified="true" /> 
     </target>
 
     <!-- Stub, to be over-ridden by components, since everyone seems to have their own way of building examples -->
