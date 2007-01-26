@@ -32,7 +32,7 @@
         <mkdir dir="${component.builddir}" />
     </target>
 
-   <target name="clean" description="Clean Local Build Directory (not 2.x/build)" unless="never.clean">
+   <target name="clean" description="Clean Local Build Directory (not 2.x/build)" unless="skip.clean">
        <delete dir="${component.builddir}" />
    </target>
 
@@ -64,7 +64,7 @@
         <jsmin dir="${component.builddir}" file="${component}.js" />
     </target>
 
-    <target name="jslint" description="Run jslint over the local build files (default settings)">
+    <target name="jslint" description="Run jslint over the local build files (default settings)" unless="skip.jslint">
         <jslint>
             <jsfiles>
                 <fileset dir="${component.builddir}" includes="*.js" />
