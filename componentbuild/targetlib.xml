@@ -72,7 +72,7 @@
         </jslint>
     </target>
 
-    <target name="deploy" description="Move files to 2.x/build" depends="-copyassets, examples, readme">
+    <target name="deploy" description="Move files to 2.x/build" depends="customassets, -copyassets, examples, readme">
         <copy todir="${global.build.component}" preservelastmodified="true">
             <fileset dir="${component.builddir}" includes="*.js" />
         </copy>
@@ -98,5 +98,8 @@
 
     <!-- Stub, to be over-ridden by components if the need custom work in local (e.g. container builds container_core using this) -->
     <target name="customlocal" />
+
+   <!-- Stub, to be over-ridden by components if the need custom work in assets (e.g. concatenation of css files). Called before assets are copied -->
+   <target name="customassets" />
 
 </project>
