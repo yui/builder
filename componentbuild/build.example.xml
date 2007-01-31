@@ -36,6 +36,8 @@
     component                           Component name, lower-case. Used for build filenames(e.g. component.js, component-min.js)
     component.module                    Module name, mostly always the same as component
     component.mainclass                 Main JS class representing the module. Version code will be added to this class
+    component.releasetype               The release type for the component (alpha, beta, experimental etc.). Used to name built files. e.g. component-beta.js, component-beta-min.js
+                                        Remove this entry for components with regular release types
 
     component.basedir                   Absolute path to the component base directory
     component.srcdir                    Absolute path to the component source directory

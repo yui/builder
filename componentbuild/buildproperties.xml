@@ -19,5 +19,9 @@
     <property name="workingdir" location="${component.builddir}/anttemp" />
 
     <available file="${component.basedir}/README" property="readme.exists"></available>
+
+    <condition property="component.basefilename" value="${component}-${component.releasetype}" else="${component}">
+        <isset property="component.releasetype"/>
+    </condition>
 </project>
 
