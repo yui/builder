@@ -9,9 +9,11 @@
             <cvsbootstrapper localWorkingCopy="projects/${project.name}" file="yahoo/presentation/2.x" />
         </bootstrappers>
 
-        <modificationset quietperiod="15">
+        <modificationset quietperiod="25">
             <cvs localWorkingCopy="projects/${project.name}/yahoo/presentation/2.x/build"  />
+            <!--
             <cvs localWorkingCopy="projects/${project.name}/yahoo/presentation/2.x/docs"   />
+            -->
             <cvs localWorkingCopy="projects/${project.name}/yahoo/presentation/2.x/examples" />
         </modificationset>
 
@@ -43,6 +45,6 @@
                 <artifactspublisher dest="artifacts/${project.name}" dir="projects/${project.name}/target"/>
             </onsuccess>
         </publishers>
-
+        <labelincrementer defaultLabel="yui.59"/>
     </project>
 </cruisecontrol>

@@ -1,15 +1,17 @@
 <project name="yui" default="all">
 
     <property name="build" location="target"/>
+    <property name="yui" location="target/yui"/>
     <property name="src" location="yahoo/presentation/2.x"/>
     <property name="verify" location="verify"/>
-    <property name="akamai" location="akamai"/>
     <property name="tmp" location="tmp"/>
     <loadfile property="version.internal" srcFile="./version.internal.txt">
         <filterchain>
             <striplinebreaks/>
         </filterchain>
     </loadfile>
+    <property name="akamai" location="target/akamai/${version.internal}"/>
+    <property name="makeover" location="target/makeover/${version.internal}"/>
 
     <target name="all" depends="compile, test, package, verify, akamai, makeover"/>
 
@@ -20,61 +22,54 @@
         <delete dir="${tmp}"/>
         <mkdir dir="${build}"/>
         <mkdir dir="${tmp}"/>
+        <mkdir dir="${akamai}"/>
+        <mkdir dir="${makeover}"/>
 
         <!-- create yahoo-dom-event.js -->
         <concat destfile="${src}/build/yahoo-dom-event/yahoo-dom-event.js">
             <filelist dir="${src}/build" 
-                      files="yahoo/yahoo.js,dom/dom.js,event/event.js"/>
-        </concat>
-
-        <concat destfile="${src}/build/yahoo-dom-event/yahoo-dom-event-min.js">
-            <filelist dir="${src}/build" 
                       files="yahoo/yahoo-min.js,dom/dom-min.js,event/event-min.js"/>
-        </concat>
-
-        <concat destfile="${src}/build/yahoo-dom-event/yahoo-dom-event-debug.js">
-            <filelist dir="${src}/build" 
-                      files="yahoo/yahoo-debug.js,dom/dom-debug.js,event/event-debug.js"/>
         </concat>
 
         <!-- create utilities.js -->
         <concat destfile="${src}/build/utilities/utilities.js">
             <filelist dir="${src}/build" 
-                      files="yahoo/yahoo.js,dom/dom.js,event/event.js,connection/connection.js,animation/animation.js,dragdrop/dragdrop.js"/>
-        </concat>
-
-        <concat destfile="${src}/build/utilities/utilities-min.js">
-            <filelist dir="${src}/build" 
-                      files="yahoo/yahoo-min.js,dom/dom-min.js,event/event-min.js,connection/connection-min.js,animation/animation-min.js,dragdrop/dragdrop-min.js"/>
-        </concat>
-
-        <concat destfile="${src}/build/utilities/utilities-debug.js">
-            <filelist dir="${src}/build" 
-                      files="yahoo/yahoo-debug.js,dom/dom-debug.js,event/event-debug.js,connection/connection-debug.js,animation/animation-debug.js,dragdrop/dragdrop-debug.js"/>
+                      files="yahoo/yahoo-min.js,dom/dom-min.js,event/event-min.js,connection/connection-min.js,animation/animation-min.js,dragdrop/dragdrop-min.js,element/element-beta-min.js"/>
         </concat>
 
         <!-- copy global README ... @todo extract latest release notes from all components -->
-        <copy file="${src}/README" tofile="${build}/README" preservelastmodified="true" />
+        <copy file="${src}/README" tofile="${yui}/README" preservelastmodified="true" />
 
         <!-- copy everything in build except the js files -->
-        <copy todir="${build}/build"  preservelastmodified="true">
+        <copy todir="${yui}/build"  preservelastmodified="true">
             <fileset dir="${src}/build">
                 <exclude name="**/*.js"/>
             </fileset>
         </copy>
-
-        <!-- copy build js files, prepending the copyright info -->
-        <copy todir="${build}/build" preservelastmodified="true">
+        
+        <!-- copy build js files, updating version token and prepending the copyright info -->
+        <copy todir="${yui}/build" preservelastmodified="true">
             <fileset dir="${src}/build">
                 <include name="**/*.js"/>
             </fileset>
             <filterchain>
                 <concatfilter prepend="copyright.txt"/>
+                <replacetokens>
+                    <token key="VERSION" value="${version.internal}"/>
+                    <token key="BUILD" value="${label}"/>
+                </replacetokens>
             </filterchain>
         </copy>
 
+        <!-- Generate docs -->
+        <exec dir="." executable="caboodle.sh" />
+        <copy todir="${yui}/docs" preservelastmodified="true">
+            <fileset dir="${tmp}/docs" />
+        </copy>
+
         <!-- copy docs, but not the legacy subdirs -->
-        <copy todir="${build}/docs" preservelastmodified="true">
+        <!--
+        <copy todir="${yui}/docs" preservelastmodified="true">
             <fileset dir="${src}/docs">
              <patternset id="no.subdirs.but.assets">
                 <include name="*.html"/>
@@ -83,14 +78,17 @@
               </patternset>
             </fileset>
         </copy>
+        -->
 
         <!-- copy doc assets -->
-        <copy todir="${build}/docs/assets" preservelastmodified="true">
+        <!--
+        <copy todir="${yui}/docs/assets" preservelastmodified="true">
             <fileset dir="${src}/docs/assets"/>
         </copy>
+        -->
 
         <!-- copy examples -->
-        <copy todir="${build}/examples" preservelastmodified="true">
+        <copy todir="${yui}/examples" preservelastmodified="true">
             <fileset dir="${src}/examples"/>
         </copy>
 
@@ -115,307 +113,33 @@
 
     <target name="akamai" depends="compile">
         <!-- copy the build files adding the akamai extension -->
-        <copy todir="${build}/akamai">
-            <fileset dir="${build}/build"/>
-            <chainedmapper>
-                <flattenmapper />
-                <globmapper from="*-min.js" to="*_${version.internal}.js"/>
-            </chainedmapper>
+        <copy todir="${akamai}/build">
+            <fileset dir="${yui}/build">
+              <patternset id="just.min">
+                <include name="**/*-min.js"/>
+                <include name="**/utilities*"/>
+                <include name="**/yahoo-dom-event*"/>
+                <include name="**/assets/**"/>
+              </patternset>
+            </fileset>
         </copy>
 
-        <!--
-        <copy file="${build}/build/utilities/utilities.js"
-              tofile="${build}/akamai/utilities_${version.internal}.js" />
+        <!-- deal with makefiles? -->
 
-        <copy file="${build}/build/yahoo-dom-event/yahoo-dom-event.js"
-              tofile="${build}/akamai/yahoo-dom-event_${version.internal}.js" />
-        --> 
+        <!-- generate script to make all of the subdirs -->
 
-        <!-- first all css files -->
-        <copy todir="${build}/akamai">
-            <fileset dir="${build}/build"/>
-            <chainedmapper>
-                <flattenmapper />
-                <globmapper from="*.css" to="*_${version.internal}.css"/>
-            </chainedmapper>
-        </copy>
+        <copy file="push_all.py" tofile="${build}/akamai/push_all.py" preservelastmodified="true" />
 
-        <!-- next just the -min files for fonts, reset, grids -->
-        <copy todir="${build}/akamai">
-            <fileset dir="${build}/build"/>
-            <chainedmapper>
-                <flattenmapper />
-                <globmapper from="*-min.css" to="*_${version.internal}.css"/>
-            </chainedmapper>
-        </copy>
-
-        <!-- remove the extra -min fonts, reset, grids -->
-        <delete>
-            <fileset dir="${build}/akamai" includes="*-min*"/>
-        </delete>
-
-        <!-- treeview for akamai is messed up -->
-        <delete>
-            <fileset dir="${build}/akamai" includes="tree*.css"/>
-        </delete>
-
-        <move todir="${build}/akamai/utils/2">
-            <fileset dir="${build}/akamai">
-                <include name="yahoo*.js"/>
-                <include name="event*.js"/>
-                <include name="dom*.js"/>
-                <include name="dragdrop*.js"/>
-                <include name="connection*.js"/>
-                <include name="animation*.js"/>
-                <include name="utilities*.js"/>
-            </fileset>
-        </move>
- 
-        <move todir="${build}/akamai/css">
-            <fileset dir="${build}/akamai">
-                <include name="reset*.css"/>
-                <include name="fonts*.css"/>
-                <include name="grids*.css"/>
-            </fileset>
-        </move>
-      
-        <move todir="${build}/akamai/widgets/2/autocomplete">
-            <fileset dir="${build}/akamai">
-                <include name="autocomplete*.js"/>
-            </fileset>
-        </move>
-
-        <move todir="${build}/akamai/widgets/2/logger">
-            <fileset dir="${build}/akamai">
-                <include name="logger*.js"/>
-            </fileset>
-        </move>
-
-        <move todir="${build}/akamai/widgets/2/logger/css">
-            <fileset dir="${build}/akamai">
-                <include name="logger*.css"/>
-            </fileset>
-        </move>
-
-        <move todir="${build}/akamai/widgets/2/menu">
-            <fileset dir="${build}/akamai">
-                <include name="menu*.js"/>
-            </fileset>
-        </move>
-
-        <move todir="${build}/akamai/widgets/2/menu/css">
-            <fileset dir="${build}/akamai">
-                <include name="menu*.css"/>
-            </fileset>
-        </move>
-
-        <move todir="${build}/akamai/widgets/2/container">
-            <fileset dir="${build}/akamai">
-                <include name="container*.js"/>
-            </fileset>
-        </move>
-
-        <move todir="${build}/akamai/widgets/2/container/css">
-            <fileset dir="${build}/akamai">
-                <include name="container*.css"/>
-            </fileset>
-        </move>
-
-        <move todir="${build}/akamai/widgets/2/calendar">
-            <fileset dir="${build}/akamai">
-                <include name="calendar*.js"/>
-            </fileset>
-        </move>
-
-        <move todir="${build}/akamai/widgets/2/calendar/css">
-            <fileset dir="${build}/akamai">
-                <include name="calendar*.css"/>
-            </fileset>
-        </move>
-
-        <move todir="${build}/akamai/widgets/2/slider">
-            <fileset dir="${build}/akamai">
-                <include name="slider*.js"/>
-            </fileset>
-        </move>
-
-        <move todir="${build}/akamai/widgets/2/tabview">
-            <fileset dir="${build}/akamai">
-                <include name="tab*.js"/>
-            </fileset>
-        </move>
-
-        <move todir="${build}/akamai/widgets/2/tabview/css">
-            <fileset dir="${build}/akamai">
-                <include name="*tab*.css"/>
-            </fileset>
-        </move>
-
-        <move todir="${build}/akamai/widgets/2/treeview">
-            <fileset dir="${build}/akamai">
-                <include name="tree*.js"/>
-            </fileset>
-        </move>
-   
-        <copy file="${src}/widget/treeview/src/css/default/tree.css"
-              tofile="${build}/akamai/widgets/2/treeview/css/default/treeview_${version.internal}.css" />
-
-        <zip destfile="${build}/akamai.zip" basedir="${build}/akamai/" />
+        <zip destfile="${build}/akamai.zip" basedir="${build}/akamai" />
 
     </target>
 
     <target name="makeover" depends="compile">
-        <!-- copy the build files adding the makeover extension -->
-        <copy todir="${build}/makeover">
-            <fileset dir="${build}/build"/>
-            <chainedmapper>
-                <flattenmapper />
-                <globmapper from="*.js" to="*_${version.internal}.js"/>
-            </chainedmapper>
+        <copy todir="${makeover}/build">
+            <fileset dir="${yui}/build"/>
         </copy>
 
-        <delete>
-            <fileset dir="${build}/makeover" includes="*debug*.js"/>
-        </delete>
-
-        <copy todir="${build}/makeover">
-            <fileset dir="${build}/build"/>
-            <chainedmapper>
-                <flattenmapper />
-                <globmapper from="*-debug.js" to="*_${version.internal}-debug.js"/>
-            </chainedmapper>
-        </copy>
-
-
-        <!-- first all css files -->
-        <copy todir="${build}/makeover">
-            <fileset dir="${build}/build"/>
-            <chainedmapper>
-                <flattenmapper />
-                <globmapper from="*.css" to="*_${version.internal}.css"/>
-            </chainedmapper>
-        </copy>
-
-        <!-- treeview for makeover is messed up -->
-        <delete>
-            <fileset dir="${build}/makeover" includes="tree*.css"/>
-        </delete>
-
-        <delete>
-            <fileset dir="${build}/makeover" includes="*-min*"/>
-        </delete>
-
-        <!--
-        <copy file="${build}/build/utilities/utilities.js"
-              tofile="${build}/makeover/utilities_${version.internal}-debug.js" />
-
-        <copy file="${build}/build/yahoo-dom-event/yahoo-dom-event.js"
-              tofile="${build}/makeover/yahoo-dom-event_${version.internal}-debug.js" />
-        -->
-
-        <move todir="${build}/makeover/utils/2">
-            <fileset dir="${build}/makeover">
-                <include name="yahoo*.js"/>
-                <include name="event*.js"/>
-                <include name="dom*.js"/>
-                <include name="dragdrop*.js"/>
-                <include name="connection*.js"/>
-                <include name="animation*.js"/>
-                <include name="utilities*.js"/>
-            </fileset>
-        </move>
- 
-        <move todir="${build}/makeover/css">
-            <fileset dir="${build}/makeover">
-                <include name="reset*.css"/>
-                <include name="fonts*.css"/>
-                <include name="grids*.css"/>
-            </fileset>
-        </move>
-      
-        <move todir="${build}/makeover/widgets/2/autocomplete">
-            <fileset dir="${build}/makeover">
-                <include name="autocomplete*.js"/>
-            </fileset>
-        </move>
-
-        <move todir="${build}/makeover/widgets/2/logger">
-            <fileset dir="${build}/makeover">
-                <include name="logger*.js"/>
-            </fileset>
-        </move>
-
-        <move todir="${build}/makeover/widgets/2/logger/css">
-            <fileset dir="${build}/makeover">
-                <include name="logger*.css"/>
-            </fileset>
-        </move>
-
-        <move todir="${build}/makeover/widgets/2/menu">
-            <fileset dir="${build}/makeover">
-                <include name="menu*.js"/>
-            </fileset>
-        </move>
-
-        <move todir="${build}/makeover/widgets/2/menu/css">
-            <fileset dir="${build}/makeover">
-                <include name="menu*.css"/>
-            </fileset>
-        </move>
-
-        <move todir="${build}/makeover/widgets/2/container">
-            <fileset dir="${build}/makeover">
-                <include name="container*.js"/>
-            </fileset>
-        </move>
-
-        <move todir="${build}/makeover/widgets/2/container/css">
-            <fileset dir="${build}/makeover">
-                <include name="container*.css"/>
-            </fileset>
-        </move>
-
-        <move todir="${build}/makeover/widgets/2/calendar">
-            <fileset dir="${build}/makeover">
-                <include name="calendar*.js"/>
-            </fileset>
-        </move>
-
-        <move todir="${build}/makeover/widgets/2/calendar/css">
-            <fileset dir="${build}/makeover">
-                <include name="calendar*.css"/>
-            </fileset>
-        </move>
-
-        <move todir="${build}/makeover/widgets/2/slider">
-            <fileset dir="${build}/makeover">
-                <include name="slider*.js"/>
-            </fileset>
-        </move>
-
-        <move todir="${build}/makeover/widgets/2/tabview">
-            <fileset dir="${build}/makeover">
-                <include name="tab*.js"/>
-            </fileset>
-        </move>
-
-        <move todir="${build}/makeover/widgets/2/tabview/css">
-            <fileset dir="${build}/makeover">
-                <include name="*tab*.css"/>
-            </fileset>
-        </move>
-
-        <move todir="${build}/makeover/widgets/2/treeview">
-            <fileset dir="${build}/makeover">
-                <include name="tree*.js"/>
-            </fileset>
-        </move>
-   
-        <copy file="${src}/widget/treeview/src/css/default/tree.css"
-              tofile="${build}/makeover/widgets/2/treeview/css/default/treeview_${version.internal}.css" />
-
-        <zip destfile="${build}/makeover.zip" basedir="${build}/makeover/" />
-
+        <zip destfile="${build}/makeover.zip" basedir="${build}/makeover" />
     </target>
 
 </project>
