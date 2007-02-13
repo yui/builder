@@ -9,7 +9,7 @@
             <cvsbootstrapper localWorkingCopy="projects/${project.name}" file="yahoo/presentation/2.x" />
         </bootstrappers>
 
-        <modificationset quietperiod="25">
+        <modificationset quietperiod="25" ignoreFiles="utilities*,yahoo-dom-event*">
             <cvs localWorkingCopy="projects/${project.name}/yahoo/presentation/2.x/build"  />
             <!--
             <cvs localWorkingCopy="projects/${project.name}/yahoo/presentation/2.x/docs"   />
@@ -28,12 +28,13 @@
         <publishers>
             <htmlemail mailhost="smtp.yahoo.com"
                     returnaddress="adamoore@yahoo-inc.com"
-                    buildresultsurl="http://feelbuild-mac.corp.yahoo.com:8080/buildresults/yui/"
+                    buildresultsurl="http://fencesafety.corp.yahoo.com:8080/buildresults/yui/"
                     skipusers="true" spamwhilebroken="true"
                     css="webapps/cruisecontrol/css/cruisecontrol.css"
                     xsldir="webapps/cruisecontrol/xsl"
                     logdir="logs/yui">
-                <always address="yui-team@yahoo-inc.com"/>
+                <failure address="adamoore@yahoo-inc.com"/>
+                <success address="yui-team@yahoo-inc.com"/>
                 <!--
                 <always address="adamoore@yahoo-inc.com"/>
                 <always address="tsha@yahoo-inc.com"/>
@@ -43,6 +44,9 @@
             </htmlemail>
             <onsuccess>
                 <artifactspublisher dest="artifacts/${project.name}" dir="projects/${project.name}/target"/>
+                <antpublisher anthome="apache-ant-1.6.5" 
+                              buildfile="projects/${project.name}/build.xml"
+                              target="updatecvs" />
             </onsuccess>
         </publishers>
         <labelincrementer defaultLabel="yui.59"/>

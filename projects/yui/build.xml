@@ -1,21 +1,47 @@
 <project name="yui" default="all">
+    <!--
+    This is the master build for yui.  It generates rollup files, the API docs, the 
+    zip distribution, and the files that go to akamai and makeover. 
 
-    <property name="build" location="target"/>
-    <property name="yui" location="target/yui"/>
-    <property name="src" location="yahoo/presentation/2.x"/>
-    <property name="verify" location="verify"/>
-    <property name="tmp" location="tmp"/>
-    <loadfile property="version.internal" srcFile="./version.internal.txt">
+    Requires ant 1.6.5+
+    Requires ant-contrib tasks: http://ant-contrib.sourceforge.net/
+    -->
+
+    <property name="cvs.root" value="vault.yahoo.com:/CVSROOT" />
+    <property name="cvs.rsh" value="yssh" />
+
+    <property name="basedir" location="."/>
+
+    <property name="build" location="${basedir}/target"/>
+    <property name="yui" location="${build}/yui"/>
+    <property name="src" location="${basedir}/yahoo/presentation/2.x"/>
+    <property name="verify" location="${basedir}/verify"/>
+    <property name="tmp" location="${basedir}/tmp"/>
+    <loadfile property="version.internal" srcFile="${basedir}/version.internal.txt">
         <filterchain>
             <striplinebreaks/>
         </filterchain>
     </loadfile>
-    <property name="akamai" location="target/akamai/${version.internal}"/>
-    <property name="makeover" location="target/makeover/${version.internal}"/>
+    <property name="akamai" location="${build}/akamai/${version.internal}"/>
+    <property name="makeover" location="${build}/makeover/${version.internal}"/>
 
-    <target name="all" depends="compile, test, package, verify, akamai, makeover"/>
+    <taskdef resource="net/sf/antcontrib/antcontrib.properties">
+      <classpath>
+        <pathelement location="lib/ant-contrib-1.0b3.jar"/>
+      </classpath>
+    </taskdef>
+
+    <target name="all" depends="test,compile, package, verify, akamai, makeover"/>
 
     <target name="compile">
+
+        <!-- label property ex: build.78 ... strip "build." for YAHOO.register -->
+        <propertyregex property="version.build"
+              input="${label}"
+              regexp="build\.(.*)"
+              replace="\1"
+              casesensitive="false" 
+              defaultValue="" />
 
         <!-- clean up build dir and recreate -->
         <delete dir="${build}"/>
@@ -56,13 +82,13 @@
                 <concatfilter prepend="copyright.txt"/>
                 <replacetokens>
                     <token key="VERSION" value="${version.internal}"/>
-                    <token key="BUILD" value="${label}"/>
+                    <token key="BUILD" value="${version.build}"/>
                 </replacetokens>
             </filterchain>
         </copy>
 
-        <!-- Generate docs -->
-        <exec dir="." executable="caboodle.sh" />
+        <!-- Generate docs and copy to the yui zip dir -->
+        <exec dir="." executable="./caboodle.sh" outputproperty="docgen.output" />
         <copy todir="${yui}/docs" preservelastmodified="true">
             <fileset dir="${tmp}/docs" />
         </copy>
@@ -95,13 +121,23 @@
     </target>
 
     <!-- @todo run tests -->
-    <target name="test" depends="compile">
+    <target name="test">
+
+	<java jar="lib/crosscheck.jar" fork="true" failonerror="true" maxmemory="128m" >
+         <arg value="-h"/>
+         <classpath>
+           <pathelement location="lib/crosscheck.jar"/>
+           <pathelement path="${java.class.path}"/>
+         </classpath>
+	 <arg value="tests" />
+       </java>
 
     </target>
 
     <!-- zip up everything in the build directory -->
     <target name="package" depends="compile">
-        <zip destfile="${build}/yui.zip" basedir="${build}" />
+        <zip destfile="${build}/yui_${version.internal}.zip" basedir="${build}" />
+        <checksum file="${build}/yui_${version.internal}.zip" />
     </target>
 
     <target name="verify" depends="compile">
@@ -112,7 +148,7 @@
     </target>
 
     <target name="akamai" depends="compile">
-        <!-- copy the build files adding the akamai extension -->
+        <!-- copy only the build files that belong on akamai -->
         <copy todir="${akamai}/build">
             <fileset dir="${yui}/build">
               <patternset id="just.min">
@@ -140,6 +176,57 @@
         </copy>
 
         <zip destfile="${build}/makeover.zip" basedir="${build}/makeover" />
+    </target>
+
+    <target name="updatecvs">
+
+        <!-- periods are not allowed in cvs labels -->
+        <propertyregex property="label.scrubbed"
+              input="${label}"
+              regexp="build\.(.*)"
+              replace="yui\1"
+              casesensitive="false" 
+              defaultValue="" />
+
+        <!-- committing these files to this location will cause another
+             build to happen unless I specifically itemize all of the
+             directories I want to monitor.  Added ignorFiles in
+             config.xml that will hopefully take care of this -->
+
+        <echo message="Build successful, committing rollups" />
+
+        <cvs cvsroot="${cvs.root}" cvsrsh="${cvs.rsh}" dest=".">
+            <commandline>
+                <argument value="commit"/>
+                <argument value="-m"/>
+                <argument value="${label.scrubbed}"/>
+                <argument value="yahoo/presentation/2.x/build/utilities"/>
+            </commandline>
+        </cvs>
+        <cvs cvsroot="${cvs.root}" cvsrsh="${cvs.rsh}" dest=".">
+            <commandline>
+                <argument value="commit"/>
+                <argument value="-m"/>
+                <argument value="${label.scrubbed}"/>
+                <argument value="yahoo/presentation/2.x/build/yahoo-dom-event"/>
+            </commandline>
+        </cvs>
+
+        <echo message="labeling cvs" />
+        <cvs cvsroot="${cvs.root}" cvsrsh="${cvs.rsh}" dest=".">
+            <commandline>
+                <argument value="tag"/>
+                <argument value="${label.scrubbed}"/>
+                <argument value="yahoo/presentation/2.x/build"/>
+            </commandline>
+        </cvs>
+        <cvs cvsroot="${cvs.root}" cvsrsh="${cvs.rsh}" dest=".">
+            <commandline>
+                <argument value="tag"/>
+                <argument value="${label.scrubbed}"/>
+                <argument value="yahoo/presentation/2.x/examples"/>
+            </commandline>
+        </cvs>
     </target>
 
 </project>

@@ -11,24 +11,25 @@ widget=$basedir/widget
 
 # The location of the files to parse.  Parses subdirectories, but will fail if
 # there are duplicate file names in these directories.
-parser_in="$util/yahoo/src/js \
-          $util/event/src/js \
-          $util/connection/src/js \
-          $util/dom/src/js \
-          $util/element/src/js \
-          $util/history/src/js \
-          $util/animation/src/js \
-          $util/dragdrop/src/js \
-          $widget/tabview/src/js \
-          $widget/button/src/js \
-          $widget/datatable/src/js \
-          $widget/treeview/src/js \
-          $widget/container/src/js \
-          $widget/calendar/src/js \
-          $widget/logger/src/js \
+parser_in="$util/animation/src/js \
           $widget/autocomplete/src/js \
+          $widget/button/src/js \
+          $widget/calendar/src/js \
+          $util/connection/src/js \
+          $widget/container/src/js \
+          $util/datasource/src/js \
+          $widget/datatable/src/js \
+          $util/dom/src/js \
+          $util/dragdrop/src/js \
+          $util/element/src/js \
+          $util/event/src/js \
+          $util/history/src/js \
+          $widget/logger/src/js \
           $widget/menu/src/js \
-          $widget/slider/src/js"
+          $widget/slider/src/js \
+          $widget/tabview/src/js \
+          $widget/treeview/src/js \
+          $util/yahoo/src/js"
 
 # The location to output the parser data.  This output is a file containing a 
 # json string, and copies of the parsed files.
