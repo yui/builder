@@ -136,7 +136,9 @@
 
     <!-- zip up everything in the build directory -->
     <target name="package" depends="compile">
-        <zip destfile="${build}/yui_${version.internal}.zip" basedir="${build}" />
+        <zip destfile="${build}/yui_${version.internal}.zip" 
+		basedir="${build}" 
+		includes="yui/**" />
         <checksum file="${build}/yui_${version.internal}.zip" />
     </target>
 
