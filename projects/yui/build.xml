@@ -66,17 +66,22 @@
         <!-- copy global README ... @todo extract latest release notes from all components -->
         <copy file="${src}/README" tofile="${yui}/README" preservelastmodified="true" />
 
-        <!-- copy everything in build except the js files -->
+        <!-- copy everything in build except the js/css files -->
         <copy todir="${yui}/build"  preservelastmodified="true">
             <fileset dir="${src}/build">
                 <exclude name="**/*.js"/>
+                <exclude name="**/*.css"/>
             </fileset>
         </copy>
         
-        <!-- copy build js files, updating version token and prepending the copyright info -->
-        <copy todir="${yui}/build" preservelastmodified="true">
+        <!-- copy build js/css files, updating version token and prepending the copyright info 
+             do NOT preservelastmodified because the file is being modified with the current
+             build number
+        -->
+        <copy todir="${yui}/build">
             <fileset dir="${src}/build">
                 <include name="**/*.js"/>
+                <include name="**/*.css"/>
             </fileset>
             <filterchain>
                 <concatfilter prepend="copyright.txt"/>
@@ -91,6 +96,13 @@
         <exec dir="." executable="./caboodle.sh" outputproperty="docgen.output" />
         <copy todir="${yui}/docs" preservelastmodified="true">
             <fileset dir="${tmp}/docs" />
+        </copy>
+
+        <!-- copy the cheat sheets too -->
+        <copy todir="${yui}/docs/assets" preservelastmodified="true">
+            <fileset dir="${src}/docs/assets">
+                <include name="**/*.zip"/>
+            </fileset>
         </copy>
 
         <!-- copy docs, but not the legacy subdirs -->
@@ -155,8 +167,10 @@
             <fileset dir="${yui}/build">
               <patternset id="just.min">
                 <include name="**/*-min.js"/>
+                <include name="**/*-min.css"/>
                 <include name="**/utilities*"/>
                 <include name="**/yahoo-dom-event*"/>
+                <include name="**/reset-fonts-grids*"/>
                 <include name="**/assets/**"/>
               </patternset>
             </fileset>
@@ -227,6 +241,27 @@
                 <argument value="tag"/>
                 <argument value="${label.scrubbed}"/>
                 <argument value="yahoo/presentation/2.x/examples"/>
+            </commandline>
+        </cvs>
+        <cvs cvsroot="${cvs.root}" cvsrsh="${cvs.rsh}" dest=".">
+            <commandline>
+                <argument value="tag"/>
+                <argument value="${label.scrubbed}"/>
+                <argument value="yahoo/presentation/2.x/util"/>
+            </commandline>
+        </cvs>
+        <cvs cvsroot="${cvs.root}" cvsrsh="${cvs.rsh}" dest=".">
+            <commandline>
+                <argument value="tag"/>
+                <argument value="${label.scrubbed}"/>
+                <argument value="yahoo/presentation/2.x/widget"/>
+            </commandline>
+        </cvs>
+        <cvs cvsroot="${cvs.root}" cvsrsh="${cvs.rsh}" dest=".">
+            <commandline>
+                <argument value="tag"/>
+                <argument value="${label.scrubbed}"/>
+                <argument value="yahoo/presentation/2.x/css"/>
             </commandline>
         </cvs>
     </target>

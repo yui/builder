@@ -11,13 +11,10 @@
 
         <modificationset quietperiod="25" ignoreFiles="utilities*,yahoo-dom-event*">
             <cvs localWorkingCopy="projects/${project.name}/yahoo/presentation/2.x/build"  />
-            <!--
-            <cvs localWorkingCopy="projects/${project.name}/yahoo/presentation/2.x/docs"   />
-            -->
             <cvs localWorkingCopy="projects/${project.name}/yahoo/presentation/2.x/examples" />
         </modificationset>
 
-        <schedule interval="1800">
+        <schedule interval="3000">
             <ant anthome="apache-ant-1.6.5" buildfile="projects/${project.name}/build.xml"/>
         </schedule>
 

@@ -3,6 +3,7 @@
 ##############################################################################
 
 # The location of your yuidoc install
+# yuidoc_home=yahoo/presentation/tools/yuidoc
 yuidoc_home=~/www/yuidoc/yuidoc
 
 basedir=yahoo/presentation/2.x
