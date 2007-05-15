@@ -9,6 +9,7 @@ yuidoc_home=~/www/yuidoc/yuidoc
 basedir=yahoo/presentation/2.x
 util=$basedir/util
 widget=$basedir/widget
+tool=$basedir/tool
 
 # The location of the files to parse.  Parses subdirectories, but will fail if
 # there are duplicate file names in these directories.
@@ -30,7 +31,8 @@ parser_in="$util/animation/src/js \
           $widget/slider/src/js \
           $widget/tabview/src/js \
           $widget/treeview/src/js \
-          $util/yahoo/src/js"
+          $util/yahoo/src/js \
+          $tool/yuitest/src/js"
 
 # The location to output the parser data.  This output is a file containing a 
 # json string, and copies of the parsed files.

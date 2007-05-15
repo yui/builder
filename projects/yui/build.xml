@@ -36,9 +36,10 @@
     <target name="compile">
 
         <!-- label property ex: build.78 ... strip "build." for YAHOO.register -->
+        <!-- 20070416, changed - label property ex: yui.78 ... strip "yui." for YAHOO.register -->
         <propertyregex property="version.build"
               input="${label}"
-              regexp="build\.(.*)"
+              regexp="yui\.(.*)"
               replace="\1"
               casesensitive="false" 
               defaultValue="" />
@@ -135,6 +136,7 @@
     <!-- @todo run tests -->
     <target name="test">
 
+    <!--
 	<java jar="lib/crosscheck.jar" fork="true" failonerror="true" maxmemory="128m" >
          <arg value="-h"/>
          <classpath>
@@ -143,6 +145,7 @@
          </classpath>
 	 <arg value="tests" />
        </java>
+     -->
 
     </target>
 
@@ -180,9 +183,9 @@
 
         <!-- generate script to make all of the subdirs -->
 
-        <copy file="push_all.py" tofile="${build}/akamai/push_all.py" preservelastmodified="true" />
+        <copy file="push_all.py" tofile="${build}/akamai/${version.internal}/push_all.py" preservelastmodified="true" />
 
-        <zip destfile="${build}/akamai.zip" basedir="${build}/akamai" />
+        <zip destfile="${build}/akamai_${version.internal}.zip" basedir="${build}/akamai" />
 
     </target>
 
@@ -191,15 +194,16 @@
             <fileset dir="${yui}/build"/>
         </copy>
 
-        <zip destfile="${build}/makeover.zip" basedir="${build}/makeover" />
+        <zip destfile="${build}/makeover_${version.internal}.zip" basedir="${build}/makeover" />
     </target>
 
     <target name="updatecvs">
 
         <!-- periods are not allowed in cvs labels -->
+
         <propertyregex property="label.scrubbed"
               input="${label}"
-              regexp="build\.(.*)"
+              regexp="yui\.(.*)"
               replace="yui\1"
               casesensitive="false" 
               defaultValue="" />
@@ -233,35 +237,7 @@
             <commandline>
                 <argument value="tag"/>
                 <argument value="${label.scrubbed}"/>
-                <argument value="yahoo/presentation/2.x/build"/>
-            </commandline>
-        </cvs>
-        <cvs cvsroot="${cvs.root}" cvsrsh="${cvs.rsh}" dest=".">
-            <commandline>
-                <argument value="tag"/>
-                <argument value="${label.scrubbed}"/>
-                <argument value="yahoo/presentation/2.x/examples"/>
-            </commandline>
-        </cvs>
-        <cvs cvsroot="${cvs.root}" cvsrsh="${cvs.rsh}" dest=".">
-            <commandline>
-                <argument value="tag"/>
-                <argument value="${label.scrubbed}"/>
-                <argument value="yahoo/presentation/2.x/util"/>
-            </commandline>
-        </cvs>
-        <cvs cvsroot="${cvs.root}" cvsrsh="${cvs.rsh}" dest=".">
-            <commandline>
-                <argument value="tag"/>
-                <argument value="${label.scrubbed}"/>
-                <argument value="yahoo/presentation/2.x/widget"/>
-            </commandline>
-        </cvs>
-        <cvs cvsroot="${cvs.root}" cvsrsh="${cvs.rsh}" dest=".">
-            <commandline>
-                <argument value="tag"/>
-                <argument value="${label.scrubbed}"/>
-                <argument value="yahoo/presentation/2.x/css"/>
+                <argument value="yahoo/presentation/2.x"/>
             </commandline>
         </cvs>
     </target>
