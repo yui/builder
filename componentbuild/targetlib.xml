@@ -20,6 +20,8 @@
     <echo>    global.build.base : ${global.build.base}</echo>
     <echo>    global.build.component : ${global.build.component}</echo>
     <echo>    global.build.component.assets : ${global.build.component.assets}</echo>
+    <echo>    global.src.base : ${global.src.base}</echo>
+    <echo>    global.src.component : ${global.src.component}</echo>
 
     <import file="${builddir}/macrolib.xml" description="Macrodef definitions - jslint, jsmin, registerversion" />
 
@@ -73,15 +75,21 @@
         </jslint>
     </target>
 
-    <target name="deploy" description="Move files to 2.x/build" depends="customassets, -copyassets, examples, readme">
+    <target name="deploy" description="Move files to 2.x/build, 2.x/src" depends="customassets, -copyassets, examples, readme, deploysrc">
         <copy todir="${global.build.component}" preservelastmodified="true">
             <fileset dir="${component.builddir}" includes="*.js" />
         </copy>
     </target>
-    
+
     <target name="-copyassets" if="component.assetfiles">
         <copy todir="${global.build.component.assets}" flatten="true" preservelastmodified="true">
             <fileset dir="${component.srcdir}" includes="${component.assetfiles}"  />
+        </copy>
+    </target>
+
+    <target name="deploysrc">
+        <copy todir="${global.src.component}" preservelastmodified="true">
+            <fileset dir="${component.jsfiles.base}" includes="${component.jsfiles}" />
         </copy>
     </target>
 

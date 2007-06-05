@@ -16,6 +16,9 @@
     <property name="global.build.component" location="${global.build.base}/${component}" />
     <property name="global.build.component.assets" location="${global.build.component}/assets" />
 
+   <property name="global.src.base" location="${srcdir}/src" />
+   <property name="global.src.component" location="${global.src.base}/${component}" />
+
     <property name="workingdir" location="${component.builddir}/anttemp" />
 
     <available file="${component.basedir}/README" property="readme.exists"></available>
@@ -23,5 +26,6 @@
     <condition property="component.basefilename" value="${component}-${component.releasetype}" else="${component}">
         <isset property="component.releasetype"/>
     </condition>
+    
 </project>
 

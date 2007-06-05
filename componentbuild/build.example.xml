@@ -60,6 +60,9 @@
     global.build.component              Absolute path to global component build directory ( e.g. ${global.build.base}/calendar ) 
     global.build.component.assets       Absolute path to global component assets directory
 
+    global.src.base                     Absolute path to global src directory, from which docs are generated ( e.g. /home/yuideveloper/cvsroot/yahoo/presentation/2.x/src )
+    global.src.component                Absolute path to global component src directory ( e.g. ${global.src.base}/calendar ) 
+
     # BUILD BOX SPECIFIC PROPERTIES (defined in buildproperties.xml. Probably don't need to be over-ridden per component)
 
     jsmin.jar                           Path to jsmin.jar on the build box
@@ -88,7 +91,8 @@
     core                Runs corebuild and creates component-min.js
     debug               Runs debugbuild
 
-    deploy              Copies built code, assets, examples and readme to global build directory (e.g. 2.x/build)
+    deploy              Copies built code, source, assets, examples and readme to global build directory (e.g. 2.x/build, 2.x/src)
+    deploysrc           Copies built src files to global source directory (e.g. 2.x/src), used to generate documentation. Invoked by deploy
     all                 Complete build and deploy. Effectively, runs clean, init, core, debug, jslint, deploy
     
     local    [default]  Runs core, debug and jslint to create and test component.js, component-min.js, component-debug.js in the LBD
