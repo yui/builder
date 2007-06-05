@@ -1,0 +1,107 @@
+The YUI Team uses ANT to create component build files from individual 
+source files. 
+
+Each component has it's own ANT build script residing in the component's 
+base folder, with an associated properties file used to configure the 
+default build properties. 
+
+The component build scripts will automate the conversion from component 
+source to <component>.js, <component>-min.js, <component>-debug.js by: 
+
+   a). Concatenating source files
+   b). Stripping logger statements
+   c). Running jsmin 
+   d). Running jslint all 3 built files
+   e). Attaching the appropriate suffix (e.g. beta, experimental etc.)
+   f). Adding version registration code
+   g). Deploying local built files to <2.x>/build
+   h). Deploying assets to <2.x>/build
+   i). Deploying src files to <2.x>/src, for Documentation parsing
+
+NOTE: The scripts currently do not checkin any code to CVS 
+
+Below is a step-by-step guide to getting things setup for a new 
+component. 
+
+GETTING STARTED 
+
+0). If you have any work in progress, especially in your build 
+    directories, back it up before trying this. 
+
+1). Download and install ANT 1.7 (http://ant.apache.org/bindownload.cgi) 
+
+2). Run cvs update -D under yahoo/presentation/tools/builder. You'll 
+    pickup the componentbuild directory, if it's not there already. 
+
+3). Set ANT_HOME to point to your ANT install root and add 
+    $ANT_HOME/bin/ant to your PATH 
+
+4). Set the following two environment variables, to point to your local 
+    working directory 
+
+   YUI_SRC_DIR = <CVSROOT>/yahoo/presentation/2.x
+   YUI_BUILD_DIR = <CVSROOT>/yahoo/presentation/tools/builder/componentbuild
+
+   If you don't work directly in your CVS tree, wherever it is that you 
+   copy the yahoo/presentation code to. 
+
+5). To start with, copy $YUI_BUILD_DIR/build.common.xml and 
+    $YUI_BUILD_DIR/build.common.properties to your own component's 
+    base directory (the folder containing your src/asset files)
+
+    NOTE: You can also look at $YUI_BUILD_DIR/build.example.xml, 
+    build.example.properties. They're essentially READMEs and have 
+    detailed information about the full set of variables available.
+
+6). Modify your version of build.properties to reflect your component 
+    requirements
+
+    IMPORTANT NOTES: 
+
+    a). By default the local build location is set to the "build" 
+    directory under the component's base directory:
+
+       component.basedir=${srcdir}/widget/${component} 
+       component.builddir=${component.basedir}/build
+
+    This directory gets created/over-ridden everytime you build.
+    
+    If your component has a persistant local "build" directory, you can 
+    specify another transient directory for ANT to use, using the 
+    above property.
+
+    b). The logger.regex properties are designed to strip lines 
+    containing "logger"|"YAHOO.log", including multiline calls. 
+    
+    If using the default regex, you need to make sure your logger 
+    statements are on their own lines and end in semi-colons otherwise
+    and code on the same line as the logger statement will be stipped.
+
+    Also, the default regex may not be appropriate for certain 
+    components. For example the Logger component or YAHOO may need 
+    to modify this regex to suit their needs.
+    
+    Individual component owners can define their own regex, based on 
+    their coding styles.
+
+7). cd to your component's base directory and type "ant" at the command 
+    line.
+    
+    With no arguments, ANT will run look for a "build.xml" in the current 
+    folder, and invoke it's default target
+
+8). If all is good, this should run the "local" target which will create 
+    <component>.js and <component>-min.js in the local build directory 
+    specified by ${component.builddir}
+
+You can run other targets also by specifying them on the command line 
+using "ant <target>". 
+
+If interested, you can also look at 
+
+   $YUI_BUILD_DIR/targetlib.xml : Target definitions
+   $YUI_BUILD_DIR/buildproperties.xml : Default property values
+   $YUI_BUILD_DIR/macrolib.xml : Macro tasks
+
+You can contact sdesai@yahoo-inc.com or yui-team@yahoo-inc.com for help, 
+information or to report issues with this infrastructure
