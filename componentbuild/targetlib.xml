@@ -35,19 +35,22 @@
         <mkdir dir="${component.builddir}" />
     </target>
 
-   <target name="clean" description="Clean Local Build Directory (not 2.x/build)" unless="skip.clean">
+   	<target name="clean" description="Clean Local Build Directory (not 2.x/build)" unless="skip.clean">
        <delete dir="${component.builddir}" />
-   </target>
+   	</target>
 
-    <target name="corebuild" depends="init, -concatcore, -loggerregex" description="Create component.js">
-        <registerversion classname="${component.mainclass}" module="${component.module}" file="${component.builddir}/${component.basefilename}.js" />
+    <target name="corebuild" depends="init, -concatcore, -loggerregex, -registercore" description="Create component.js">
         <fixcrlf srcdir="${component.builddir}" includes="${component.basefilename}.js" eol="${buildfiles.eol}" />
     </target>
 
+	<target name="-registercore" unless="skip.registerversion">
+    	<registerversion classname="${component.mainclass}" module="${component.module}" file="${component.builddir}/${component.basefilename}.js" />
+	</target>
+	
     <target name="-concatcore">
         <concatsource destfile="${component.builddir}/${component.basefilename}.js" sourcedir="${component.jsfiles.base}" sourcefiles="${component.jsfiles}" />
     </target>
-    
+	
     <target name="-loggerregex" if="component.logger.regex">
         <echo>Replacing Logger Statements in ${component.builddir}/${component.basefilename}.js</echo>
         <replaceregexp file="${component.builddir}/${component.basefilename}.js" 
@@ -57,11 +60,17 @@
                             flags="${component.logger.regex.flags}" />
     </target>
 
-    <target name="debugbuild" depends="init" description="Create component-debug.js">
-        <concatsource destfile="${component.builddir}/${component.basefilename}-debug.js" sourcedir="${component.jsfiles.base}" sourcefiles="${component.jsfiles}" />
-        <registerversion classname="${component.mainclass}" module="${component.module}" file="${component.builddir}/${component.basefilename}-debug.js" />
+    <target name="debugbuild" depends="init, -concatdebug, -registerdebug" description="Create component-debug.js">
         <fixcrlf srcdir="${component.builddir}" includes="${component.basefilename}-debug.js" eol="${buildfiles.eol}" />
     </target>
+	
+    <target name="-concatdebug">
+    	<concatsource destfile="${component.builddir}/${component.basefilename}-debug.js" sourcedir="${component.jsfiles.base}" sourcefiles="${component.jsfiles}" />
+	</target>
+	
+	<target name="-registerdebug" unless="skip.registerversion">
+	    <registerversion classname="${component.mainclass}" module="${component.module}" file="${component.builddir}/${component.basefilename}-debug.js" />
+	</target>
 
     <target name="jsmin" description="Create component-min.js from component.js">
         <jsmin dir="${component.builddir}" file="${component.basefilename}.js" />
@@ -108,7 +117,7 @@
     <!-- Stub, to be over-ridden by components if the need custom work in local (e.g. container builds container_core using this) -->
     <target name="customlocal" />
 
-   <!-- Stub, to be over-ridden by components if the need custom work in assets (e.g. concatenation of css files). Called before assets are copied -->
-   <target name="customassets" />
+   	<!-- Stub, to be over-ridden by components if the need custom work in assets (e.g. concatenation of css files). Called before assets are copied -->
+    <target name="customassets" />
 
 </project>
