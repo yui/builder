@@ -1,8 +1,6 @@
 #!/home/y/bin/php -d open_basedir= 
 <?php
 
-include('../../../../templates/examples/data/examplesInfo.php');
-
 // Input Args default values
 
 $templatesBaseUrl = "http://localhost/templates";
@@ -20,6 +18,8 @@ if ($argc > 1) {
 		if (isset($args["t"])) { $templatesRoot = $args["t"]; }
 	}
 }
+
+include("$templatesRoot/examples/data/examplesInfo.php");
 
 echo "\nCreating Static Dist Examples\n\n";
 
@@ -50,10 +50,14 @@ echo "\n\nDone\n";
 
 return;
 
+
 #######################################################################
 # Function Definitions
 #######################################################################
 
+/**
+ * Create top level folders under dist root
+ */
 function createFolders($modules) {
 
 	global $yuiDistRoot;
@@ -88,29 +92,75 @@ function createFolders($modules) {
 	}
 }
 
+
+/**
+ * Copies top level assets
+ */
 function copyAssets() {
 
 	global $yuiDistRoot;
 	global $templatesRoot;
 
 	echo "\n=================================";
-	echo "\nCopying Assets";
+	echo "\nCopying Top Level Assets";
 	echo "\n=================================";
-	echo "\nCopying $templatesRoot/assets/*.* to $yuiDistRoot/assets";
 
-        // TODO: Copying flat for now, to avoid CVS. 
-        // Update to recurse, without copying CVS.
-	
-	$cmd = "cp $templatesRoot/assets/*.* $yuiDistRoot/assets"; 
-	exec ($cmd, $out, $ret);
+	$src = "$templatesRoot/assets"; 
+	$dest = "$yuiDistRoot/"; 
 
-	if ($ret > 0) {
-		echo " - Failed";
+        copyDirectory($src, $dest);
+}
+
+
+/**
+ * Copies Module Assets from Templates Root to Dist
+ */
+function copyModuleAssets($moduleKey) {
+
+	global $yuiDistRoot;
+	global $templatesRoot;
+
+	$src = "$templatesRoot/examples/$moduleKey/assets";
+	$dest = "$yuiDistRoot/examples/$moduleKey/"; 
+
+	copyDirectory($src, $dest);
+}
+
+
+/**
+ * Copies one directory to another, using rsync -r --exclude=CVS 
+ */
+function copyDirectory($s, $d) {
+
+       	// NOTE: Deciding to use rsync as opposed to DirectoryIterator, 
+	// to save checking for CVS files. Also using --exclude
+	// to limit exclusion to just the CVS dir. 
+	// Could use -C if we wanted to exclude everything in 
+	// CVSIGNORE, but thought this maybe too much (*.out, *.bak etc..) 
+	// and also introduces ENV dependancies.
+
+	if (file_exists($s)) {
+		echo "\nCopying Directory $s to $d";
+
+		$cmd = "rsync -r --exclude=CVS $s $d";
+		exec($cmd, $out, $ret);
+
+		if ($ret > 0) {
+			echo " - Failed";
+		} else {
+			echo " - OK";
+		}
 	} else {
-		echo " - OK";
+		echo "No $s to copy - OK";
 	}
 }
 
+
+/**
+ * Generates a file with the given filename/path under dist root
+ * from the given output of the given URL. The path needs to be the 'real'
+ * non-symlinked path.
+ */
 function generateExampleFile($srcUrl, $fileName) {
 
 	global $yuiDistRoot;
@@ -136,6 +186,11 @@ function generateExampleFile($srcUrl, $fileName) {
 	}
 }
 
+
+/**
+ * Generates the set of static example HTML files under dist root, 
+ * by iterating over the module/examples arrays
+ */
 function generateExamples($modules, $examples) {
 
 	// MAKE CONSTANT?
@@ -152,7 +207,9 @@ function generateExamples($modules, $examples) {
 			echo "\n=================================";
 
 			generateExampleFile("examples/module/examplesModuleIndex.php?module=$moduleKey", 
-									"examples/$moduleKey/index.html");
+						"examples/$moduleKey/index.html");
+
+			copyModuleAssets($moduleKey);
 
 			$moduleExamples = getExamplesByModule($moduleKey, $examples);
 	
@@ -163,24 +220,24 @@ function generateExamples($modules, $examples) {
 	
 					// Default Presentation (XXX.html)
 					generateExampleFile("examples/module/example.php?name=$exampleKey",
-									"examples/$moduleKey/$exampleKey".".html");
+								"examples/$moduleKey/$exampleKey".".html");
 
 					// Requires New Window (XXX_source.html)
 					if ($example["newWindow"] == "require") {
 						generateExampleFile("examples/data/src/$moduleKey/$exampleKey"."_source.php", 
-												"examples/$moduleKey/$exampleKey"."_source.html");
+									"examples/$moduleKey/$exampleKey"."_source.html");
 					}
 					
 					// Supports New Window (XXX_clean.html)
 					if ($example["newWindow"] != "require" && $example["newWindow"] != "suppress") {
 						generateExampleFile("examples/module/example.php?name=$exampleKey&clean=true", 
-												"examples/$moduleKey/$exampleKey"."_clean.html");
+									"examples/$moduleKey/$exampleKey"."_clean.html");
 					} 
 					
 					// Supports Logging (XXX_log.html)
 					if ($example["loggerInclude"] != "require" && $example["loggerInclude"] != "suppress") {
 						generateExampleFile("examples/module/example.php?name=$exampleKey&log=true", 
-												"examples/$moduleKey/$exampleKey"."_log.html");
+									"examples/$moduleKey/$exampleKey"."_log.html");
 					}
 				}
 			}
@@ -188,6 +245,11 @@ function generateExamples($modules, $examples) {
 	}
 }
 
+
+/**
+ * Parses input args into a hashmap with argname => argvalue key/value
+ * pairs (argname is saved without the -)
+ */ 
 function parseArgs($argsArray) {
 
     $arr = array();
@@ -209,6 +271,10 @@ function parseArgs($argsArray) {
     return $arr;
 }
 
+
+/**
+ * Prints help
+ */ 
 function printHelp() {
 	echo "\nUsage: ./gendistexamples.php [-u templatesurl] [-d yuidistroot] [-t templatesroot]";
 
