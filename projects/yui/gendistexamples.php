@@ -210,7 +210,7 @@ function parseArgs($argsArray) {
 }
 
 function printHelp() {
-	echo "\nUsage: ./gendistexamples.php [-u templatesurl] [-d yuidistroot] [-t templatesroot]\n";
+	echo "\nUsage: ./gendistexamples.php [-u templatesurl] [-d yuidistroot] [-t templatesroot]";
 
 	echo "\n\ntemplatesurl\n\tThe absolute URL for the templates folder"
 		."\n\ton a server hosting the yui build.\n\tDefaults to 'http://localhost/templates'";
@@ -218,9 +218,9 @@ function printHelp() {
 		."\n\tNeeds to be the 'real' non-symlinked path, due to php limitations with fopen."
 		."\n\tDefaults to './yuidist'";
 	echo "\n\ntemplatesroot\n\tThe path to the templates folder."
-		."\n\tCan be relative to gendistexamples.php.\n\tDefaults to '../../../../templates'\n\n";
+		."\n\tCan be relative to gendistexamples.php.\n\tDefaults to '../../../../templates'";
 
-	echo "\n\nNOTE: All paths should be specified without trailing slashes.";
+	echo "\n\nNOTE: All paths should be specified without trailing slashes.\n\n";
 } 
 
 ?>
