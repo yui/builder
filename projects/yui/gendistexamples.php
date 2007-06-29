@@ -5,7 +5,8 @@
 
 $templatesBaseUrl = "http://localhost/templates";
 $yuiDistRoot = "./yuidist";
-$templatesRoot = "../../../../templates"; 
+$templatesRoot = "../../../../templates";
+$useBuildPath = true;
 
 if ($argc > 1) {
 	if ($argv[1] == "-h") {
@@ -16,16 +17,18 @@ if ($argc > 1) {
 		if (isset($args["u"])) { $templatesBaseUrl = $args["u"]; }
 		if (isset($args["d"])) { $yuiDistRoot = $args["d"]; }
 		if (isset($args["t"])) { $templatesRoot = $args["t"]; }
+		if (isset($args["b"])) { $useBuildPath = $args["b"]; }
 	}
 }
-
-include("$templatesRoot/examples/data/examplesInfo.php");
 
 echo "\nCreating Static Dist Examples\n\n";
 
 echo "Using Template Base URL: $templatesBaseUrl\n";
 echo "Using YUI Dist Root: $yuiDistRoot\n";
 echo "Using Template Root: $templatesRoot\n";
+echo "Using Dist Build Path For Loader: $useBuildPath\n";
+
+include("$templatesRoot/examples/data/examplesInfo.php");
 
 // 0. Create folders
 createFolders($modules);
@@ -35,10 +38,10 @@ echo "\nCreating Uber Index Pages";
 echo "\n=================================";
 
 // 1. Main Landing Page (Mega Uber List)
-generateExampleFile("index.php", "index.html");
+generateExampleFile("index.php", "index.html", false);
 
 // 2. Per Example Landing Page (Not so Uber List)
-generateExampleFile("examples/index.php", "examples/index.html");
+generateExampleFile("examples/index.php", "examples/index.html", false);
 
 // 3. Generate Examples
 generateExamples($modules, $examples);
@@ -56,7 +59,7 @@ return;
 #######################################################################
 
 /**
- * Create top level folders under dist root
+ * Create top level example folders under Dist
  */
 function createFolders($modules) {
 
@@ -94,7 +97,7 @@ function createFolders($modules) {
 
 
 /**
- * Copies top level assets
+ * Copies shared assets from Templates to Dist
  */
 function copyAssets() {
 
@@ -113,7 +116,7 @@ function copyAssets() {
 
 
 /**
- * Copies Module Assets from Templates Root to Dist
+ * Copies module assets from Templates to Dist
  */
 function copyModuleAssets($moduleKey) {
 
@@ -151,23 +154,30 @@ function copyDirectory($s, $d) {
 			echo " - OK";
 		}
 	} else {
-		echo "No $s to copy - OK";
+		echo "\nNo $s to copy - OK";
 	}
 }
 
 
 /**
- * Generates a file with the given filename/path under dist root
- * from the given output of the given URL. The path needs to be the 'real'
- * non-symlinked path.
+ * Generates a file with the given filename/path under Dist
+ * from the output of the given URL. The file path needs to 
+ * be the 'real' non-symlinked path.
  */
-function generateExampleFile($srcUrl, $fileName) {
+function generateExampleFile($srcUrl, $fileName, $needsLoader) {
 
 	global $yuiDistRoot;
 	global $templatesBaseUrl;
+	global $useBuildPath;
+
+	$buildPath = "../../build/";
 
 	$file = $yuiDistRoot."/".$fileName;
 	$url = $templatesBaseUrl."/".$srcUrl;
+
+	if ($needsLoader && $useBuildPath) {
+		$url = $url."&buildpath=".urlencode($buildPath);
+	}
 
 	echo "\nGenerating: $file [$url]";
 
@@ -188,7 +198,7 @@ function generateExampleFile($srcUrl, $fileName) {
 
 
 /**
- * Generates the set of static example HTML files under dist root, 
+ * Generates the set of static example HTML files under Dist, 
  * by iterating over the module/examples arrays
  */
 function generateExamples($modules, $examples) {
@@ -206,8 +216,8 @@ function generateExamples($modules, $examples) {
 			echo "\nGenerating $moduleKey examples";
 			echo "\n=================================";
 
-			generateExampleFile("examples/module/examplesModuleIndex.php?module=$moduleKey", 
-						"examples/$moduleKey/index.html");
+			generateExampleFile("examples/module/examplesModuleIndex.php?module=".urlencode($moduleKey), 
+						"examples/$moduleKey/index.html", true);
 
 			copyModuleAssets($moduleKey);
 
@@ -219,25 +229,25 @@ function generateExamples($modules, $examples) {
 				foreach($moduleExamples as $exampleKey=>$example) {
 	
 					// Default Presentation (XXX.html)
-					generateExampleFile("examples/module/example.php?name=$exampleKey",
-								"examples/$moduleKey/$exampleKey".".html");
+					generateExampleFile("examples/module/example.php?name=".urlencode($exampleKey),
+								"examples/$moduleKey/$exampleKey".".html", true);
 
 					// Requires New Window (XXX_source.html)
 					if ($example["newWindow"] == "require") {
-						generateExampleFile("examples/data/src/$moduleKey/$exampleKey"."_source.php", 
-									"examples/$moduleKey/$exampleKey"."_source.html");
+						generateExampleFile("examples/data/src/$moduleKey/$exampleKey"."_source.php",
+									"examples/$moduleKey/$exampleKey"."_source.html", true);
 					}
 					
 					// Supports New Window (XXX_clean.html)
 					if ($example["newWindow"] != "require" && $example["newWindow"] != "suppress") {
-						generateExampleFile("examples/module/example.php?name=$exampleKey&clean=true", 
-									"examples/$moduleKey/$exampleKey"."_clean.html");
+						generateExampleFile("examples/module/example.php?name=".urlencode($exampleKey)."&clean=true", 
+									"examples/$moduleKey/$exampleKey"."_clean.html", true);
 					} 
 					
 					// Supports Logging (XXX_log.html)
 					if ($example["loggerInclude"] != "require" && $example["loggerInclude"] != "suppress") {
-						generateExampleFile("examples/module/example.php?name=$exampleKey&log=true", 
-									"examples/$moduleKey/$exampleKey"."_log.html");
+						generateExampleFile("examples/module/example.php?name=".urlencode($exampleKey)."&log=true", 
+									"examples/$moduleKey/$exampleKey"."_log.html", true);
 					}
 				}
 			}
@@ -248,7 +258,8 @@ function generateExamples($modules, $examples) {
 
 /**
  * Parses input args into a hashmap with argname => argvalue key/value
- * pairs (argname is saved without the -)
+ * pairs (argname is saved without the -). No extensive error checking
+ * performed. Expects a valid input.
  */ 
 function parseArgs($argsArray) {
 
@@ -266,8 +277,10 @@ function parseArgs($argsArray) {
 	if ($val == "-t") {
 		$arr["t"] = $argsArray[++$i];
 	}
+	if ($val == "-b") {
+		$arr["b"] = ($argsArray[++$i] != "false") ? true : false;
+	}
     }
-
     return $arr;
 }
 
@@ -276,15 +289,20 @@ function parseArgs($argsArray) {
  * Prints help
  */ 
 function printHelp() {
-	echo "\nUsage: ./gendistexamples.php [-u templatesurl] [-d yuidistroot] [-t templatesroot]";
+	echo "\nUsage: ./gendistexamples.php [-u templatesurl] [-d yuidistroot] [-b true|false] [-t templatesroot]";
 
-	echo "\n\ntemplatesurl\n\tThe absolute URL for the templates folder"
-		."\n\ton a server hosting the yui build.\n\tDefaults to 'http://localhost/templates'";
-	echo "\n\nyuidistroot\n\tThe path to the base directory for the yuidist package."
+	echo "\n\n-t templatesurl\n\tThe absolute URL for the templates folder"
+		."\n\ton a server hosting the yui build."
+		."\n\tDefaults to 'http://localhost/templates'";
+	echo "\n\n-d yuidistroot\n\tThe path to the base directory for the yuidist package."
 		."\n\tNeeds to be the 'real' non-symlinked path, due to php limitations with fopen."
 		."\n\tDefaults to './yuidist'";
-	echo "\n\ntemplatesroot\n\tThe path to the templates folder."
-		."\n\tCan be relative to gendistexamples.php.\n\tDefaults to '../../../../templates'";
+	echo "\n\n-b true|false\n\ttrue to have loader based examples use the dist build path."
+		."\n\tfalse to have loader based examples use default loader yui.yahooapis.com paths."
+		."\n\tDefaults to true, use dist build paths";
+	echo "\n\n-t templatesroot\n\tThe path to the templates folder."
+		."\n\tCan be relative to gendistexamples.php."
+		."\n\tDefaults to '../../../../templates'";
 
 	echo "\n\nNOTE: All paths should be specified without trailing slashes.\n\n";
 } 
