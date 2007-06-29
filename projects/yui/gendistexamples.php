@@ -6,7 +6,7 @@ include('../../../../templates/examples/data/examplesInfo.php');
 // Input Args default values
 
 $templatesBaseUrl = "http://localhost/templates";
-$yuiDistRoot = "yuidist";
+$yuiDistRoot = "./yuidist";
 $templatesRoot = "../../../../templates"; 
 
 if ($argc > 1) {
@@ -21,7 +21,7 @@ if ($argc > 1) {
 	}
 }
 
-echo "\nStart\n";
+echo "\nCreating Static Dist Examples\n\n";
 
 echo "Using Template Base URL: $templatesBaseUrl\n";
 echo "Using YUI Dist Root: $yuiDistRoot\n";
@@ -29,6 +29,10 @@ echo "Using Template Root: $templatesRoot\n";
 
 // 0. Create folders
 createFolders($modules);
+
+echo "\n=================================";
+echo "\nCreating Uber Index Pages";
+echo "\n=================================";
 
 // 1. Main Landing Page (Mega Uber List)
 generateExampleFile("index.php", "index.html");
@@ -126,7 +130,7 @@ function generateExampleFile($srcUrl, $fileName) {
 		curl_exec($cUrl);
 		curl_close($cUrl);
 		fclose($fHandle);
-		echo "- OK";
+		echo " - OK";
 	} else {
 		echo "- Failed";
 	}
@@ -168,13 +172,13 @@ function generateExamples($modules, $examples) {
 					}
 					
 					// Supports New Window (XXX_clean.html)
-					if ($example["newWindow"] == "default") {
+					if ($example["newWindow"] != "require" && $example["newWindow"] != "suppress") {
 						generateExampleFile("examples/module/example.php?name=$exampleKey&clean=true", 
 												"examples/$moduleKey/$exampleKey"."_clean.html");
 					} 
 					
 					// Supports Logging (XXX_log.html)
-					if ($example["loggerInclude"] == "default") {
+					if ($example["loggerInclude"] != "require" && $example["loggerInclude"] != "suppress") {
 						generateExampleFile("examples/module/example.php?name=$exampleKey&log=true", 
 												"examples/$moduleKey/$exampleKey"."_log.html");
 					}
@@ -212,7 +216,7 @@ function printHelp() {
 		."\n\ton a server hosting the yui build.\n\tDefaults to 'http://localhost/templates'";
 	echo "\n\nyuidistroot\n\tThe path to the base directory for the yuidist package."
 		."\n\tNeeds to be the 'real' non-symlinked path, due to php limitations with fopen."
-		."\n\tDefaults to 'yuidist' in the same folder as gendistexamples.php";
+		."\n\tDefaults to './yuidist'";
 	echo "\n\ntemplatesroot\n\tThe path to the templates folder."
 		."\n\tCan be relative to gendistexamples.php.\n\tDefaults to '../../../../templates'\n\n";
 
