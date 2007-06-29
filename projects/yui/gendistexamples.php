@@ -3,38 +3,52 @@
 
 include('../../../../templates/examples/data/examplesInfo.php');
 
-if ($argv[1] == "-h") {
-	echo "\nUsage: ./gendistexamples.php <url to templates> <path to yuidist> <path to templatesRoot>\n";
-	echo "\n\n<url to templates> - The absolute URL for the templates folder (without trailing slash) on a server hosting the yui build. Defaults to http://localhost/templates";
-	echo "\n<path to yuidist> - The path to the base directory for the yuidist package. Needs to be the 'real' non-symlinked path, due to php limitations. Defaults to yuidist in the same folder as gendistexamples.php";
-	echo "\n<path to templatesRoot> - The path to the templates folder. Can be relative to gendistexamples.php. Defaults to ../../../../templates\n\n";
- 
-	return;  
-} else {
-	if ($argv[1]) {
-		$templatesBaseUrl = $argv[1]; 		
-	}
-	if ($argv[2]) {
-		$yuiDistRoot = $argv[2];
-	}
-	if ($argv[3]) {
-		$templatesRoot = $argv[3];
-	}
-}
-
 // Input Args default values
 
-if (isset($templatesBaseUrl) === false) {
-	$templatesBaseUrl = "http://localhost/templates";
+$templatesBaseUrl = "http://localhost/templates";
+$yuiDistRoot = "yuidist";
+$templatesRoot = "../../../../templates"; 
+
+if ($argc > 1) {
+	if ($argv[1] == "-h") {
+		printHelp();
+		return;
+	}  else {
+		$args = parseArgs($argv); 
+		if (isset($args["u"])) { $templatesBaseUrl = $args["u"]; }
+		if (isset($args["d"])) { $yuiDistRoot = $args["d"]; }
+		if (isset($args["t"])) { $templatesRoot = $args["t"]; }
+	}
 }
 
-if (isset($yuiDistRoot) === false) {
-	$yuiDistRoot = "yuidist";
-}
+echo "\nStart\n";
 
-if (isset($templatesRoot) === false) {
-	$templatesRoot = "../../../../templates"; 
-}
+echo "Using Template Base URL: $templatesBaseUrl\n";
+echo "Using YUI Dist Root: $yuiDistRoot\n";
+echo "Using Template Root: $templatesRoot\n";
+
+// 0. Create folders
+createFolders($modules);
+
+// 1. Main Landing Page (Mega Uber List)
+generateExampleFile("index.php", "index.html");
+
+// 2. Per Example Landing Page (Not so Uber List)
+generateExampleFile("examples/index.php", "examples/index.html");
+
+// 3. Generate Examples
+generateExamples($modules, $examples);
+
+// 4. Copy Assets
+copyAssets(); 
+
+echo "\n\nDone\n";
+
+return;
+
+#######################################################################
+# Function Definitions
+#######################################################################
 
 function createFolders($modules) {
 
@@ -170,22 +184,39 @@ function generateExamples($modules, $examples) {
 	}
 }
 
-echo "\nStart\n";
+function parseArgs($argsArray) {
 
-// 0. Create folders
-createFolders($modules);
+    $arr = array();
 
-// 1. Main Landing Page (Mega Uber List)
-generateExampleFile("index.php", "index.html");
+    for ($i=1; $i < count($argsArray); $i++) {
+        $val = $argsArray[$i];
+	echo $val;
+	if ($val == "-u") {
+		$arr["u"] = $argsArray[++$i];       
+	}
+	if ($val == "-d") {
+		$arr["d"] = $argsArray[++$i];
+	}
+	if ($val == "-t") {
+		$arr["t"] = $argsArray[++$i];
+	}
+    }
 
-// 2. Per Example Landing Page (Simply Uber List)
-generateExampleFile("examples/index.php", "examples/index.html");
+    return $arr;
+}
 
-// 3. Generate Examples
-generateExamples($modules, $examples);
+function printHelp() {
+	echo "\nUsage: ./gendistexamples.php [-u templatesurl] [-d yuidistroot] [-t templatesroot]\n";
 
-// 4. Copy Assets
-copyAssets(); 
+	echo "\n\ntemplatesurl\n\tThe absolute URL for the templates folder"
+		."\n\ton a server hosting the yui build.\n\tDefaults to 'http://localhost/templates'";
+	echo "\n\nyuidistroot\n\tThe path to the base directory for the yuidist package."
+		."\n\tNeeds to be the 'real' non-symlinked path, due to php limitations with fopen."
+		."\n\tDefaults to 'yuidist' in the same folder as gendistexamples.php";
+	echo "\n\ntemplatesroot\n\tThe path to the templates folder."
+		."\n\tCan be relative to gendistexamples.php.\n\tDefaults to '../../../../templates'\n\n";
 
-echo "\n\nDone\n";
+	echo "\n\nNOTE: All paths should be specified without trailing slashes.";
+} 
+
 ?>
