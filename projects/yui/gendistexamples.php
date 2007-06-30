@@ -154,7 +154,7 @@ function copyDirectory($s, $d) {
 			echo " - OK";
 		}
 	} else {
-		echo "\nNo $s to copy - OK";
+		echo "\nNo $s to copy - SKIPPED";
 	}
 }
 
@@ -216,38 +216,40 @@ function generateExamples($modules, $examples) {
 			echo "\nGenerating $moduleKey examples";
 			echo "\n=================================";
 
+			copyModuleAssets($moduleKey);
+
 			generateExampleFile("examples/module/examplesModuleIndex.php?module=".urlencode($moduleKey), 
 						"examples/$moduleKey/index.html", true);
-
-			copyModuleAssets($moduleKey);
 
 			$moduleExamples = getExamplesByModule($moduleKey, $examples);
 	
 			if ($moduleExamples) {
 				
-				// 3. Example Pages
 				foreach($moduleExamples as $exampleKey=>$example) {
-	
-					// Default Presentation (XXX.html)
-					generateExampleFile("examples/module/example.php?name=".urlencode($exampleKey),
-								"examples/$moduleKey/$exampleKey".".html", true);
 
-					// Requires New Window (XXX_source.html)
-					if ($example["newWindow"] == "require") {
-						generateExampleFile("examples/data/src/$moduleKey/$exampleKey"."_source.php",
-									"examples/$moduleKey/$exampleKey"."_source.html", true);
-					}
+					if ($example["modules"][0] == $moduleKey) {
+	
+						// Default Presentation (XXX.html)
+						generateExampleFile("examples/module/example.php?name=".urlencode($exampleKey),
+									"examples/$moduleKey/$exampleKey".".html", true);
+	
+						// Requires New Window (XXX_source.html)
+						if ($example["newWindow"] == "require") {
+							generateExampleFile("examples/data/src/$moduleKey/$exampleKey"."_source.php",
+										"examples/$moduleKey/$exampleKey"."_source.html", true);
+						}
 					
-					// Supports New Window (XXX_clean.html)
-					if ($example["newWindow"] != "require" && $example["newWindow"] != "suppress") {
-						generateExampleFile("examples/module/example.php?name=".urlencode($exampleKey)."&clean=true", 
-									"examples/$moduleKey/$exampleKey"."_clean.html", true);
-					} 
+						// Supports New Window (XXX_clean.html)
+						if ($example["newWindow"] != "require" && $example["newWindow"] != "suppress") {
+							generateExampleFile("examples/module/example.php?name=".urlencode($exampleKey)."&clean=true", 
+										"examples/$moduleKey/$exampleKey"."_clean.html", true);
+						} 
 					
-					// Supports Logging (XXX_log.html)
-					if ($example["loggerInclude"] != "require" && $example["loggerInclude"] != "suppress") {
-						generateExampleFile("examples/module/example.php?name=".urlencode($exampleKey)."&log=true", 
-									"examples/$moduleKey/$exampleKey"."_log.html", true);
+						// Supports Logging (XXX_log.html)
+						if ($example["loggerInclude"] != "require" && $example["loggerInclude"] != "suppress") {
+							generateExampleFile("examples/module/example.php?name=".urlencode($exampleKey)."&log=true", 
+										"examples/$moduleKey/$exampleKey"."_log.html", true);
+						}
 					}
 				}
 			}
