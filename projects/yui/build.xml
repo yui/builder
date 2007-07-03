@@ -7,6 +7,32 @@
     Requires ant-contrib tasks: http://ant-contrib.sourceforge.net/
     -->
 
+    <property name="builddir" value="/Users/adamoore/dev/yahoo/presentation/tools/builder/componentbuild" />
+
+<!--
+    <import file="${builddir}/macrolib.xml" description="Macrodef definitions - jslint, jsmin, registerversion" />
+-->
+
+
+   <macrodef name="registerversion">
+        <attribute name="module" />
+        <attribute name="classname" />
+        <attribute name="file" />
+        <sequential>
+            <loadfile srcfile="${builddir}/files/versioncode.txt"
+property="@{module}-@{classname}-version" >
+                <filterchain>
+                    <replacetokens>
+                        <token key="MODULE" value="@{module}"/>
+                        <token key="CLASSNAME" value="@{classname}"/>
+                    </replacetokens>
+                </filterchain>
+            </loadfile>
+            <concat destfile="@{file}" append="true"
+fixlastline="true">${@{module}-@{classname}-version}</concat>
+        </sequential>
+    </macrodef>
+
     <property name="cvs.root" value="vault.yahoo.com:/CVSROOT" />
     <property name="cvs.rsh" value="yssh" />
 
@@ -14,6 +40,7 @@
 
     <property name="build" location="${basedir}/target"/>
     <property name="yui" location="${build}/yui"/>
+    <property name="examplesdist" location="${basedir}/examples_dist"/>
     <property name="src" location="${basedir}/yahoo/presentation/2.x"/>
     <property name="verify" location="${basedir}/verify"/>
     <property name="tmp" location="${basedir}/tmp"/>
@@ -47,6 +74,7 @@
         <!-- clean up build dir and recreate -->
         <delete dir="${build}"/>
         <delete dir="${tmp}"/>
+        <delete dir="${examplesdist}"/>
         <mkdir dir="${build}"/>
         <mkdir dir="${tmp}"/>
         <mkdir dir="${akamai}"/>
@@ -58,11 +86,17 @@
                       files="yahoo/yahoo-min.js,dom/dom-min.js,event/event-min.js"/>
         </concat>
 
+        <registerversion classname="YAHOO" module="yahoo-dom-event" 
+                file="${src}/build/yahoo-dom-event/yahoo-dom-event.js" />
+
         <!-- create utilities.js -->
         <concat destfile="${src}/build/utilities/utilities.js">
             <filelist dir="${src}/build" 
                       files="yahoo/yahoo-min.js,dom/dom-min.js,event/event-min.js,connection/connection-min.js,animation/animation-min.js,dragdrop/dragdrop-min.js,element/element-beta-min.js"/>
         </concat>
+
+        <registerversion classname="YAHOO" module="utilities" 
+                file="${src}/build/utilities/utilities.js" />
 
         <!-- copy global README ... @todo extract latest release notes from all components -->
         <copy file="${src}/README" tofile="${yui}/README" preservelastmodified="true" />
@@ -127,8 +161,24 @@
         -->
 
         <!-- copy examples -->
+        <!--
         <copy todir="${yui}/examples" preservelastmodified="true">
             <fileset dir="${src}/examples"/>
+        </copy>
+        <apply executable="gendistexamples.php"></apply>
+        <exec dir="." executable="php" outputproperty="docgen.output" >
+            <arg value="gendistexamples.php" />
+        </exec>
+        -->
+        <exec dir="${basedir}" executable="gendistexamples.php" output="examplegen.log" />
+        <copy todir="${yui}" preservelastmodified="true">
+            <fileset dir="${examplesdist}/"/>
+        </copy>
+
+
+        <!-- copy tests -->
+        <copy todir="${yui}/tests" preservelastmodified="true">
+            <fileset dir="${src}/tests"/>
         </copy>
 
     </target>

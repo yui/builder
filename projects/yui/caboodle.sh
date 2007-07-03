@@ -10,29 +10,34 @@ basedir=yahoo/presentation/2.x
 util=$basedir/util
 widget=$basedir/widget
 tool=$basedir/tool
+src=$basedir/src
 
 # The location of the files to parse.  Parses subdirectories, but will fail if
 # there are duplicate file names in these directories.
 parser_in="$util/animation/src/js \
           $widget/autocomplete/src/js \
           $widget/button/src/js \
-          $widget/calendar/src/js \
+          $src/calendar \
+          $src/colorpicker \
           $util/connection/src/js \
           $widget/container/src/js \
           $util/datasource/src/js \
           $widget/datatable/src/js \
           $util/dom/src/js \
-          $util/dragdrop/src/js \
+          $src/dragdrop \
+          $src/editor \
           $util/element/src/js \
-          $util/event/src/js \
+          $src/event \
           $util/history/src/js \
+          $src/imageloader \
           $widget/logger/src/js \
           $widget/menu/src/js \
-          $widget/slider/src/js \
+          $src/slider \
           $widget/tabview/src/js \
-          $widget/treeview/src/js \
+          $src/treeview \
           $util/yahoo/src/js \
-          $tool/yuitest/src/js"
+          $src/yuiloader \
+          $src/yuitest"
 
 # The location to output the parser data.  This output is a file containing a 
 # json string, and copies of the parsed files.

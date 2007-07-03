@@ -6,15 +6,18 @@
         </listeners>
 
         <bootstrappers>
-            <cvsbootstrapper localWorkingCopy="projects/${project.name}" file="yahoo/presentation/2.x" />
+            <cvsbootstrapper localWorkingCopy="projects/${project.name}" 
+                    file="yahoo/presentation/2.x yahoo/presentation/templates" />
         </bootstrappers>
 
         <modificationset quietperiod="25" ignoreFiles="utilities*,yahoo-dom-event*">
             <cvs localWorkingCopy="projects/${project.name}/yahoo/presentation/2.x/build"  />
+            <!--
             <cvs localWorkingCopy="projects/${project.name}/yahoo/presentation/2.x/examples" />
+            -->
         </modificationset>
 
-        <schedule interval="600">
+        <schedule interval="15000">
             <ant anthome="apache-ant-1.6.5" buildfile="projects/${project.name}/build.xml"/>
         </schedule>
 
