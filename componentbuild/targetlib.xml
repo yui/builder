@@ -26,7 +26,7 @@
     <import file="${builddir}/macrolib.xml" description="Macrodef definitions - jslint, jsmin, registerversion" />
 
     <target name="all" depends="local, deploy" description="Build and Deploy to Global Build Directory" />
-    <target name="local" depends="clean, core, debug, customlocal, jslint" description="Build and Deploy to Local Build Directory" />
+    <target name="local" depends="clean, core, debug, customlocal, skinsbuild, jslint" description="Build and Deploy to Local Build Directory" />
     <target name="core" depends="corebuild, jsmin" description="Core Build" />
     <target name="debug" depends="debugbuild" description="Debug Build" />
 
@@ -39,6 +39,7 @@
        <delete dir="${component.builddir}" />
    	</target>
 
+	<!-- CORE -->
     <target name="corebuild" depends="init, -concatcore, -loggerregex, -registercore" description="Create component.js">
         <fixcrlf srcdir="${component.builddir}" includes="${component.basefilename}.js" eol="${buildfiles.eol}" />
     </target>
@@ -46,11 +47,11 @@
 	<target name="-registercore" unless="skip.registerversion">
     	<registerversion classname="${component.mainclass}" module="${component.module}" file="${component.builddir}/${component.basefilename}.js" />
 	</target>
-	
+
     <target name="-concatcore">
         <concatsource destfile="${component.builddir}/${component.basefilename}.js" sourcedir="${component.jsfiles.base}" sourcefiles="${component.jsfiles}" />
     </target>
-	
+
     <target name="-loggerregex" if="component.logger.regex">
         <echo>Replacing Logger Statements in ${component.builddir}/${component.basefilename}.js</echo>
         <replaceregexp file="${component.builddir}/${component.basefilename}.js" 
@@ -59,15 +60,16 @@
                             replace="${component.logger.regex.replace}" 
                             flags="${component.logger.regex.flags}" />
     </target>
-
+	
+	<!-- DEBUG -->
     <target name="debugbuild" depends="init, -concatdebug, -registerdebug" description="Create component-debug.js">
         <fixcrlf srcdir="${component.builddir}" includes="${component.basefilename}-debug.js" eol="${buildfiles.eol}" />
     </target>
-	
+
     <target name="-concatdebug">
     	<concatsource destfile="${component.builddir}/${component.basefilename}-debug.js" sourcedir="${component.jsfiles.base}" sourcefiles="${component.jsfiles}" />
 	</target>
-	
+
 	<target name="-registerdebug" unless="skip.registerversion">
 	    <registerversion classname="${component.mainclass}" module="${component.module}" file="${component.builddir}/${component.basefilename}-debug.js" />
 	</target>
@@ -84,7 +86,17 @@
         </jslint>
     </target>
 
-    <target name="deploy" description="Move files to 2.x/build, 2.x/src" depends="customassets, -copyassets, examples, readme, deploysrc">
+	<!-- SKINS -->
+    <target name="skinsbuild" depends="init, -concatskins" description="Create skin rollup in local component build directory" if="component.skins.base">
+        <fixcrlf srcdir="${component.builddir}/assets/skins/sam" includes="${component}.css" eol="${buildfiles.eol}" />
+    </target>
+
+    <target name="-concatskins" if="component.skins.base">
+        <concatsource destfile="${component.builddir}/assets/skins/sam/${component}.css" sourcedir="${component.skins.base}" sourcefiles="${component}-core.css, skins/sam/${component}-skin.css" />
+    </target>
+
+	<!-- DEPLOY -->
+    <target name="deploy" description="Move files to 2.x/build, 2.x/src" depends="customassets, -copyassets, -copyskins, examples, readme, deploysrc">
         <copy todir="${global.build.component}" preservelastmodified="true">
             <fileset dir="${component.builddir}" includes="*.js" />
         </copy>
@@ -93,6 +105,24 @@
     <target name="-copyassets" if="component.assetfiles">
         <copy todir="${global.build.component.assets}" flatten="true" preservelastmodified="true">
             <fileset dir="${component.srcdir}" includes="${component.assetfiles}"  />
+        </copy>
+    </target>
+
+    <target name="-copyskins" if="component.skins.base">
+        <copy todir="${global.build.component.assets}/skins/sam" preservelastmodified="true">
+            <fileset dir="${component.builddir}/assets/skins/sam" includes="${component}.css"  />
+        </copy>
+
+        <copy todir="${global.build.component.assets}/skins/sam" preservelastmodified="true">
+            <fileset dir="${component.skins.base}/skins/sam" includes="${component}-skin.css"  />
+        </copy>
+
+        <copy todir="${global.build.component.assets}" preservelastmodified="true">
+            <fileset dir="${component.skins.base}" includes="${component}-core.css"  />
+        </copy>
+
+        <copy todir="${global.build.component.assets}/skins/sam" preservelastmodified="true">
+            <fileset dir="${component.skins.base}/skins/sam" includes="${component.skins.imgfiles}"  />
         </copy>
     </target>
 

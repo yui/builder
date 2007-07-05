@@ -26,6 +26,8 @@
     <condition property="component.basefilename" value="${component}-${component.releasetype}" else="${component}">
         <isset property="component.releasetype"/>
     </condition>
-    
+
+	<property name="component.skins.imgfiles" value="*.png, *.gif, *.jpg"/>
+
 </project>
 
