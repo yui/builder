@@ -4,8 +4,8 @@
 // Input Args default values
 
 $templatesBaseUrl = "http://localhost/templates";
-$yuiDistRoot = "./yuidist";
-$templatesRoot = "../../../../templates";
+$yuiDistRoot = "examples_dist";
+$templatesRoot = "yahoo/presentation/templates";
 $useBuildPath = true;
 
 if ($argc > 1) {
