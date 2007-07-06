@@ -225,7 +225,9 @@ function generateExamples($modules, $examples) {
 	
 			if ($moduleExamples) {
 				
-				foreach($moduleExamples as $exampleKey=>$example) {
+				foreach($moduleExamples as $exampleIdx=>$example) {
+
+					$exampleKey = $example["key"];
 
 					if ($example["modules"][0] == $moduleKey) {
 	
