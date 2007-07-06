@@ -176,7 +176,12 @@ function generateExampleFile($srcUrl, $fileName, $needsLoader) {
 	$url = $templatesBaseUrl."/".$srcUrl;
 
 	if ($needsLoader && $useBuildPath) {
-		$url = $url."&buildpath=".urlencode($buildPath);
+		$containsParams = strpos($url, "?");
+		if ($containsParams === false) {
+			$url = $url."?buildpath=".urlencode($buildPath);
+		} else {
+			$url = $url."&buildpath=".urlencode($buildPath);
+		}
 	}
 
 	echo "\nGenerating: $file [$url]";
@@ -237,7 +242,7 @@ function generateExamples($modules, $examples) {
 	
 						// Requires New Window (XXX_source.html)
 						if ($example["newWindow"] == "require") {
-							generateExampleFile("examples/data/src/$moduleKey/$exampleKey"."_source.php",
+							generateExampleFile("examples/$moduleKey/$exampleKey"."_source.php",
 										"examples/$moduleKey/$exampleKey"."_source.html", true);
 						}
 					
