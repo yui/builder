@@ -7,11 +7,12 @@
 
         <bootstrappers>
             <cvsbootstrapper localWorkingCopy="projects/${project.name}" 
-                    file="yahoo/presentation/2.x yahoo/presentation/templates" />
+                    file="yahoo/presentation" />
         </bootstrappers>
 
         <modificationset quietperiod="25" ignoreFiles="utilities*,yahoo-dom-event*">
             <cvs localWorkingCopy="projects/${project.name}/yahoo/presentation/2.x/build"  />
+            <cvs localWorkingCopy="projects/${project.name}/yahoo/presentation/templates"  />
             <!--
             <cvs localWorkingCopy="projects/${project.name}/yahoo/presentation/2.x/examples" />
             -->

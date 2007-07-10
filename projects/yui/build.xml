@@ -101,6 +101,7 @@ fixlastline="true">${@{module}-@{classname}-version}</concat>
         <!-- copy global README ... @todo extract latest release notes from all components -->
         <copy file="${src}/README" tofile="${yui}/README" preservelastmodified="true" />
 
+
         <!-- copy everything in build except the js/css files -->
         <copy todir="${yui}/build"  preservelastmodified="true">
             <fileset dir="${src}/build">
@@ -170,16 +171,39 @@ fixlastline="true">${@{module}-@{classname}-version}</concat>
             <arg value="gendistexamples.php" />
         </exec>
         -->
-        <exec dir="${basedir}" executable="gendistexamples.php" output="examplegen.log" />
+        <exec dir="." executable="./examples.sh" output="examplegen.log" />
         <copy todir="${yui}" preservelastmodified="true">
             <fileset dir="${examplesdist}/"/>
         </copy>
 
 
         <!-- copy tests -->
+        <!--
         <copy todir="${yui}/tests" preservelastmodified="true">
             <fileset dir="${src}/tests"/>
         </copy>
+        -->
+
+        <!-- copy skins -->
+        <!-- TODO, one task for all skins 
+        <copy todir="${yui}/build/assets/skins" preservelastmodified="true" flatten="true">
+            <fileset dir="${yui}/build">
+                <include name="**/assets/skins/**"/>
+            </fileset>
+        </copy>
+        -->
+        <copy todir="${yui}/build/assets/skins/sam" preservelastmodified="true" flatten="true">
+            <fileset dir="${yui}/build">
+                <include name="**/assets/skins/sam/*" />
+                <exclude name="**/assets/skins/sam/*-skin.css" />
+            </fileset>
+        </copy>
+
+        <concat destfile="${yui}/build/assets/skins/sam/skin.css">
+            <fileset dir="${yui}/build/assets/skins/sam">
+                <include name="*.css" />
+            </fileset>
+        </concat>
 
     </target>
 
@@ -207,12 +231,6 @@ fixlastline="true">${@{module}-@{classname}-version}</concat>
         <checksum file="${build}/yui_${version.internal}.zip" />
     </target>
 
-    <target name="verify" depends="compile">
-        <!-- copy build verification files -->
-        <copy todir="${build}/verify" preservelastmodified="true">
-            <fileset dir="${verify}"/>
-        </copy>
-    </target>
 
     <target name="akamai" depends="compile">
         <!-- copy only the build files that belong on akamai -->
@@ -247,6 +265,14 @@ fixlastline="true">${@{module}-@{classname}-version}</concat>
         <zip destfile="${build}/makeover_${version.internal}.zip" basedir="${build}/makeover" />
     </target>
 
+    <target name="verify" depends="compile">
+        <!-- copy build verification files -->
+        <copy todir="${build}/verify" preservelastmodified="true">
+            <fileset dir="${verify}"/>
+        </copy>
+        <copy file="${basedir}/PHP_ENABLED_LINK.html" tofile="${build}/PHP_ENABLED_LINK.html" preservelastmodified="true" />
+    </target>
+
     <target name="updatecvs">
 
         <!-- periods are not allowed in cvs labels -->
@@ -271,8 +297,11 @@ fixlastline="true">${@{module}-@{classname}-version}</concat>
                 <argument value="-m"/>
                 <argument value="${label.scrubbed}"/>
                 <argument value="yahoo/presentation/2.x/build/utilities"/>
+                <argument value="yahoo/presentation/2.x/build/yahoo-dom-event"/>
+                <argument value="yahoo/presentation/2.x/build/assets/skins/sam"/>
             </commandline>
         </cvs>
+        <!--
         <cvs cvsroot="${cvs.root}" cvsrsh="${cvs.rsh}" dest=".">
             <commandline>
                 <argument value="commit"/>
@@ -281,6 +310,7 @@ fixlastline="true">${@{module}-@{classname}-version}</concat>
                 <argument value="yahoo/presentation/2.x/build/yahoo-dom-event"/>
             </commandline>
         </cvs>
+        -->
 
         <echo message="labeling cvs" />
         <cvs cvsroot="${cvs.root}" cvsrsh="${cvs.rsh}" dest=".">
