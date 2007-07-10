@@ -324,24 +324,48 @@ function parseArgs($argsArray) {
  * Prints help
  */ 
 function printHelp() {
-	echo "\nUsage: ./gendistexamples.php [-u templatesurl] [-d yuibuildroot] [-b true|false] [-y true|false] [-t templatesroot]";
+	echo "\nUsage: ./genexamples.php [-u templatesurl] [-d yuibuildroot] [-b true|false] [-y true|false] [-t templatesroot]";
 
-	echo "\n\n-t templatesurl\n\tThe absolute URL for the templates folder"
-		."\n\ton a server hosting the yui build."
-		."\n\tDefaults to 'http://localhost/templates'";
-	echo "\n\n-d yuibuildroot\n\tThe path to the root directory under which the examples directory structure will be created."
-		."\n\tNeeds to be the 'real' non-symlinked path, due to php limitations with fopen."
-		."\n\tDefaults to 'examples_dist'";
-	echo "\n\n-t templatesroot\n\tThe path to the templates folder."
-		."\n\tCan be relative to gendistexamples.php."
-		."\n\tDefaults to 'yahoo/presentation/templates'";
-	echo "\n\n-b true:false \n\tForce build to use a buildPath?"
-		."\n\tBy default YDN examples will use yui.yahooapis.com URLs for non-debug example. Set this flag to true to force YDN to be built with a local build path for all examples. NOTE: Dist examples are always built with a local build path"
-		."\n\tIf true, all examples will be generated with a buildPath (loader will pickup files from local build dir). If false, YDN examples will use yui.yahooapis URLs for non-debugger examples"
-		."\n\tDefaults to false";
-	echo "\n\n-y true:false \n\tIs this build for YDN?"
-		."\n\tIf true, files are generated for YDN, if false, they are generated for the distribution"
-		."\n\tDefaults to false";
+	echo "\n\n-t templatesurl\n"
+		."\n    The absolute URL for the templates folder on a server hosting"
+		."\n    the yui build."
+		."\n"
+		."\n    Defaults to 'http://localhost/templates'";
+
+	echo "\n\n-d yuibuildroot\n"
+		."\n    The path to the root directory under which the examples "
+		."\n    directory structure will be created. Needs to be the 'real'"
+		."\n    non-symlinked path, due to php fopen limitations."
+		."\n"
+		."\n    Defaults to 'examples_dist'";
+
+	echo "\n\n-t templatesroot\n"
+		."\n    The path to the templates folder. Can be relative to "
+		."\n    gendistexamples.php."
+		."\n"
+		."\n    Defaults to 'yahoo/presentation/templates'";
+
+	echo "\n\n-y true|false\n"
+		."\n    Specifies if the build is for YDN (or dist)."
+		."\n"
+		."\n    If true, files are generated for YDN."
+		."\n    If false, they are generated for the distribution."
+		."\n"
+		."\n    Defaults to false (generate files for distribution)";
+
+	echo "\n\n-b true|false\n"
+		."\n    Force build to use a local build path for YDN examples"
+		."\n"
+		."\n    By default YDN examples will use yui.yahooapis.com URLs for"
+		."\n    non-debug examples. Set this flag to true to force YDN to be"
+		."\n    built with a local build path for all examples."
+		."\n"
+		."\n    NOTE: Dist examples are always built with a local build path."
+		."\n"
+		."\n    If true, all YDN examples will use the local build path."
+		."\n    If false, non-debug YDN examples will use yui.yahooapis URLs."
+		."\n"
+		."\n    Defaults to false";
 	
 	echo "\n\nNOTE: All paths should be specified without trailing slashes.\n\n";
 } 
