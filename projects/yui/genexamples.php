@@ -93,7 +93,7 @@ function createFolders($modules) {
 
 	if (file_exists($assetsPath) === false) {
 		echo "\nCreating $assetsPath";
- 		if(mkdir($assetsPath)) {
+ 		if(mkdir($assetsPath, 0777, true)) {
 			echo " - OK";
 		} else {
 			echo " - Failed";
