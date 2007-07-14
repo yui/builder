@@ -44,10 +44,10 @@ echo "\n=================================";
 echo "\nCreating Uber Index Pages";
 echo "\n=================================";
 
-// 1. Main Landing Page (Mega Uber List)
+// 1. Main Landing Page
 generateExampleFile("index.php", "index.html", false);
 
-// 2. Per Example Landing Page (Not so Uber List)
+// 2. Per Example Landing Page (Uber List)
 generateExampleFile("examples/index.php", "examples/index.html", false);
 
 // 3. Generate Examples
@@ -70,6 +70,7 @@ return;
 function createFolders($modules) {
 
 	global $yuiDistRoot;
+	global $isYDNBuild;
 
 	echo "\n=================================";
 	echo "\nCreating Folders";
@@ -85,6 +86,20 @@ function createFolders($modules) {
 				echo " - OK";
 			} else {
 				echo " - Failed";
+			}
+		}
+
+		if ($isYDNBuild) {
+			
+			$incFolderPath = "$yuiDistRoot/inc/$moduleKey";
+	
+			if (file_exists($incFolderPath) === false) {
+				echo "\nCreating $incFolderPath";
+				if (mkdir($incFolderPath, 0777, true)) {
+					echo " - OK";
+				} else {
+					echo " - Failed";
+				}
 			}
 		}
 	}
@@ -249,6 +264,12 @@ function generateExamples($modules, $examples) {
 			// Index - Dist: build path, YDN: yui.yahooapis
 			generateExampleFile("examples/module/examplesModuleIndex.php?module=".urlencode($moduleKey), 
 						"examples/$moduleKey/index.html", $useBuildPath);
+
+			// Left Nav for YDN
+			if ($isYDNBuild) {
+				generateExampleFile("examples/module/examplesLandingPageNav.php?module=".urlencode($moduleKey), 
+						"inc/$moduleKey/$moduleKey.inc", false);
+			}
 
 			$moduleExamples = getExamplesByModule($moduleKey, $examples);
 	
