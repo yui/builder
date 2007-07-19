@@ -41,6 +41,7 @@ fixlastline="true">${@{module}-@{classname}-version}</concat>
     <property name="build" location="${basedir}/target"/>
     <property name="yui" location="${build}/yui"/>
     <property name="examplesdist" location="${basedir}/examples_dist"/>
+    <property name="examplesydn" location="${basedir}/examples_ydn"/>
     <property name="src" location="${basedir}/yahoo/presentation/2.x"/>
     <property name="verify" location="${basedir}/verify"/>
     <property name="tmp" location="${basedir}/tmp"/>
@@ -75,6 +76,7 @@ fixlastline="true">${@{module}-@{classname}-version}</concat>
         <delete dir="${build}"/>
         <delete dir="${tmp}"/>
         <delete dir="${examplesdist}"/>
+        <delete dir="${examplesydn}"/>
         <mkdir dir="${build}"/>
         <mkdir dir="${tmp}"/>
         <mkdir dir="${akamai}"/>
@@ -171,11 +173,20 @@ fixlastline="true">${@{module}-@{classname}-version}</concat>
             <arg value="gendistexamples.php" />
         </exec>
         -->
-        <exec dir="." executable="./examples.sh" output="examplegen.log" />
+        <exec dir="." executable="./examples.sh" output="examples_dist.log" />
         <copy todir="${yui}" preservelastmodified="true">
             <fileset dir="${examplesdist}/"/>
         </copy>
 
+        <exec dir="." executable="./examples.sh" output="examples_ydn.log">
+            <arg value="-y" />
+            <arg value="true" />
+            <arg value="-d" />
+            <arg value="examples_ydn" />
+        </exec>
+        <copy todir="${build}/ydn/examples" preservelastmodified="true">
+            <fileset dir="${examplesydn}/"/>
+        </copy>
 
         <!-- copy tests -->
         <!--
@@ -204,6 +215,13 @@ fixlastline="true">${@{module}-@{classname}-version}</concat>
                 <include name="*.css" />
             </fileset>
         </concat>
+
+        <replace dir="${yui}/build/assets/skins/sam" value="">
+            <include name="**/*.css"/>
+            <!-- <replacetoken><![CDATA[../../../../assets/skins/sam/]]></replacetoken> -->
+            <replacefilter token="../../../../../build/assets/skins/sam/" />
+            <replacefilter token="../../../../assets/skins/sam/" />
+        </replace>
 
     </target>
 
