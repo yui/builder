@@ -89,19 +89,6 @@ function createFolders($modules) {
 			}
 		}
 
-		if ($isYDNBuild) {
-			
-			$incFolderPath = "$yuiDistRoot/inc/$moduleKey";
-	
-			if (file_exists($incFolderPath) === false) {
-				echo "\nCreating $incFolderPath";
-				if (mkdir($incFolderPath, 0777, true)) {
-					echo " - OK";
-				} else {
-					echo " - Failed";
-				}
-			}
-		}
 	}
 
 	$assetsPath = "$yuiDistRoot/assets"; 
@@ -113,6 +100,20 @@ function createFolders($modules) {
 		} else {
 			echo " - Failed";
 	 	}	
+	}
+
+
+	if ($isYDNBuild) {
+		$incFolderPath = "$yuiDistRoot/inc/examplesNav";
+	
+		if (file_exists($incFolderPath) === false) {
+			echo "\nCreating $incFolderPath";
+			if (mkdir($incFolderPath, 0777, true)) {
+				echo " - OK";
+			} else {
+				echo " - Failed";
+			}
+		}
 	}
 }
 
@@ -268,7 +269,7 @@ function generateExamples($modules, $examples) {
 			// Left Nav for YDN
 			if ($isYDNBuild) {
 				generateExampleFile("examples/module/examplesLandingPageNav.php?module=".urlencode($moduleKey), 
-						"inc/$moduleKey/$moduleKey.inc", false);
+						"inc/examplesNav/$moduleKey.inc", false);
 			}
 
 			$moduleExamples = getExamplesByModule($moduleKey, $examples);
