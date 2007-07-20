@@ -9,29 +9,7 @@
 
     <property name="builddir" value="/Users/adamoore/dev/yahoo/presentation/tools/builder/componentbuild" />
 
-<!--
     <import file="${builddir}/macrolib.xml" description="Macrodef definitions - jslint, jsmin, registerversion" />
--->
-
-
-   <macrodef name="registerversion">
-        <attribute name="module" />
-        <attribute name="classname" />
-        <attribute name="file" />
-        <sequential>
-            <loadfile srcfile="${builddir}/files/versioncode.txt"
-property="@{module}-@{classname}-version" >
-                <filterchain>
-                    <replacetokens>
-                        <token key="MODULE" value="@{module}"/>
-                        <token key="CLASSNAME" value="@{classname}"/>
-                    </replacetokens>
-                </filterchain>
-            </loadfile>
-            <concat destfile="@{file}" append="true"
-fixlastline="true">${@{module}-@{classname}-version}</concat>
-        </sequential>
-    </macrodef>
 
     <property name="cvs.root" value="vault.yahoo.com:/CVSROOT" />
     <property name="cvs.rsh" value="yssh" />
@@ -111,6 +89,62 @@ fixlastline="true">${@{module}-@{classname}-version}</concat>
                 <exclude name="**/*.css"/>
             </fileset>
         </copy>
+
+
+        <!-- copy skins -->
+        <!-- TODO, one task for all skins 
+        <copy todir="${yui}/build/assets/skins" preservelastmodified="true" flatten="true">
+            <fileset dir="${yui}/build">
+                <include name="**/assets/skins/**"/>
+            </fileset>
+        </copy>
+        -->
+
+        
+        <echo message="copying skin assets from all components to tmp dir" />
+        <copy todir="${tmp}/build/assets/skins/sam" preservelastmodified="true" flatten="true">
+            <fileset dir="${src}/build">
+                <include name="**/assets/skins/sam/*" />
+                <exclude name="**/assets/skins/sam/*-skin.css" />
+            </fileset>
+        </copy>
+
+        <echo message="creating skin rollup" />
+        <concat destfile="${tmp}/build/assets/skins/sam/skin.css">
+            <fileset dir="${tmp}/build/assets/skins/sam">
+                <include name="*.css" />
+            </fileset>
+        </concat>
+
+        <echo message="fixing paths to skin assets" />
+        <replace dir="${tmp}/build/assets/skins/sam" value="">
+            <include name="**/*.css"/>
+            <replacefilter token="../../../../../build/assets/skins/sam/" />
+            <replacefilter token="../../../../assets/skins/sam/" />
+        </replace>
+
+        <echo message="copying non-css skin files to build" />
+        <copy todir="${yui}/build/assets/skins/sam" preservelastmodified="true" flatten="true">
+            <fileset dir="${tmp}/build/assets/skins/sam">
+                <include name="*" />
+                <exclude name="*.css" />
+            </fileset>
+        </copy>
+
+        <echo message="copying css skin files to build, adding copyright" />
+        <copy todir="${yui}/build/assets/skins/sam" preservelastmodified="true" flatten="true">
+            <fileset dir="${tmp}/build/assets/skins/sam">
+                <include name="*.css" />
+            </fileset>
+            <filterchain>
+                <concatfilter prepend="copyright.txt"/>
+                <replacetokens>
+                    <token key="VERSION" value="${version.internal}"/>
+                    <token key="BUILD" value="${version.build}"/>
+                </replacetokens>
+            </filterchain>
+        </copy>
+
         
         <!-- copy build js/css files, updating version token and prepending the copyright info 
              do NOT preservelastmodified because the file is being modified with the current
@@ -143,36 +177,6 @@ fixlastline="true">${@{module}-@{classname}-version}</concat>
             </fileset>
         </copy>
 
-        <!-- copy docs, but not the legacy subdirs -->
-        <!--
-        <copy todir="${yui}/docs" preservelastmodified="true">
-            <fileset dir="${src}/docs">
-             <patternset id="no.subdirs.but.assets">
-                <include name="*.html"/>
-                <include name="*.gif"/>
-                <include name="*.json"/>
-              </patternset>
-            </fileset>
-        </copy>
-        -->
-
-        <!-- copy doc assets -->
-        <!--
-        <copy todir="${yui}/docs/assets" preservelastmodified="true">
-            <fileset dir="${src}/docs/assets"/>
-        </copy>
-        -->
-
-        <!-- copy examples -->
-        <!--
-        <copy todir="${yui}/examples" preservelastmodified="true">
-            <fileset dir="${src}/examples"/>
-        </copy>
-        <apply executable="gendistexamples.php"></apply>
-        <exec dir="." executable="php" outputproperty="docgen.output" >
-            <arg value="gendistexamples.php" />
-        </exec>
-        -->
         <exec dir="." executable="./examples.sh" output="examples_dist.log" />
         <copy todir="${yui}" preservelastmodified="true">
             <fileset dir="${examplesdist}/"/>
@@ -183,6 +187,8 @@ fixlastline="true">${@{module}-@{classname}-version}</concat>
             <arg value="true" />
             <arg value="-d" />
             <arg value="examples_ydn" />
+            <arg value="-b" />
+            <arg value="true" />
         </exec>
         <copy todir="${build}/ydn/examples" preservelastmodified="true">
             <fileset dir="${examplesydn}/"/>
@@ -195,33 +201,6 @@ fixlastline="true">${@{module}-@{classname}-version}</concat>
         </copy>
         -->
 
-        <!-- copy skins -->
-        <!-- TODO, one task for all skins 
-        <copy todir="${yui}/build/assets/skins" preservelastmodified="true" flatten="true">
-            <fileset dir="${yui}/build">
-                <include name="**/assets/skins/**"/>
-            </fileset>
-        </copy>
-        -->
-        <copy todir="${yui}/build/assets/skins/sam" preservelastmodified="true" flatten="true">
-            <fileset dir="${yui}/build">
-                <include name="**/assets/skins/sam/*" />
-                <exclude name="**/assets/skins/sam/*-skin.css" />
-            </fileset>
-        </copy>
-
-        <concat destfile="${yui}/build/assets/skins/sam/skin.css">
-            <fileset dir="${yui}/build/assets/skins/sam">
-                <include name="*.css" />
-            </fileset>
-        </concat>
-
-        <replace dir="${yui}/build/assets/skins/sam" value="">
-            <include name="**/*.css"/>
-            <!-- <replacetoken><![CDATA[../../../../assets/skins/sam/]]></replacetoken> -->
-            <replacefilter token="../../../../../build/assets/skins/sam/" />
-            <replacefilter token="../../../../assets/skins/sam/" />
-        </replace>
 
     </target>
 
@@ -247,6 +226,10 @@ fixlastline="true">${@{module}-@{classname}-version}</concat>
 		basedir="${build}" 
 		includes="yui/**" />
         <checksum file="${build}/yui_${version.internal}.zip" />
+
+        <!-- ydn examples -->
+        <zip destfile="${build}/ydn_${version.internal}.zip" basedir="${build}/ydn/examples" />
+
     </target>
 
 
@@ -281,6 +264,8 @@ fixlastline="true">${@{module}-@{classname}-version}</concat>
         </copy>
 
         <zip destfile="${build}/makeover_${version.internal}.zip" basedir="${build}/makeover" />
+
+
     </target>
 
     <target name="verify" depends="compile">
@@ -304,7 +289,7 @@ fixlastline="true">${@{module}-@{classname}-version}</concat>
 
         <!-- committing these files to this location will cause another
              build to happen unless I specifically itemize all of the
-             directories I want to monitor.  Added ignorFiles in
+             directories I want to monitor.  Added ignoreFiles in
              config.xml that will hopefully take care of this -->
 
         <echo message="Build successful, committing rollups" />
@@ -319,16 +304,6 @@ fixlastline="true">${@{module}-@{classname}-version}</concat>
                 <argument value="yahoo/presentation/2.x/build/assets/skins/sam"/>
             </commandline>
         </cvs>
-        <!--
-        <cvs cvsroot="${cvs.root}" cvsrsh="${cvs.rsh}" dest=".">
-            <commandline>
-                <argument value="commit"/>
-                <argument value="-m"/>
-                <argument value="${label.scrubbed}"/>
-                <argument value="yahoo/presentation/2.x/build/yahoo-dom-event"/>
-            </commandline>
-        </cvs>
-        -->
 
         <echo message="labeling cvs" />
         <cvs cvsroot="${cvs.root}" cvsrsh="${cvs.rsh}" dest=".">
