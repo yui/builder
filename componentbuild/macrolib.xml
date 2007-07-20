@@ -5,12 +5,59 @@
     <macrodef name="jsmin">
         <attribute name="dir" />
         <attribute name="file" />
+
         <sequential>
-        <echo>Running JSMin on @{dir}/@{file}</echo>
+            <echo>Running JSMin on @{dir}/@{file}</echo>
             <basename file="@{file}" suffix=".js" property="basename" />
             <java jar="${jsmin.jar}" output="@{dir}/${basename}-min.js" fork="true">
                 <arg file="@{dir}/@{file}" />
             </java>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="cssmin">
+        <attribute name="dir" />
+        <attribute name="file" />
+
+        <sequential>
+            <echo>Running cssmin on @{dir}/@{file}</echo>
+
+            <!-- REMOVE COMMENTS -->
+            <replaceregexp file="@{dir}/@{file}"
+                                byline="false"
+                                match="/\*.*?\*/"
+                                replace=""
+                                flags="sg" />
+
+            <!-- REMOVE NEW LINES -->
+            <replaceregexp file="@{dir}/@{file}"
+                                byline="false"
+                                match="\r?\n"
+                                replace=""
+                                flags="sg" />
+
+            <!-- REMOVE ANY REMAINING UNNECESSARY WHITESPACE -->
+
+            <!-- Any whitespace around { } : ; or , -->
+            <replaceregexp file="@{dir}/@{file}"
+                                byline="false"
+                                match="\s*([{|:|;|}|,])\s*"
+                                replace="\1"
+                                flags="g" />
+
+            <!-- Collapse consecutive whitespace chars -->
+            <replaceregexp file="@{dir}/@{file}"
+                                byline="false"
+                                match="\s+"
+                                replace=" "
+                                flags="g" />
+
+            <!-- Trim -->
+            <replaceregexp file="@{dir}/@{file}"
+                                byline="false"
+                                match="(^\s+|\s+$)"
+                                replace=""
+                                flags="g" />
         </sequential>
     </macrodef>
 
@@ -19,11 +66,10 @@
         <attribute name="sourcedir" />
         <attribute name="sourcefiles" />
         <attribute name="workingdir" default="${workingdir}" />
-        
+
         <element name="filters" optional="true" description="Additonal filters to apply to individual files"/>
 
         <sequential>
-        
             <echo>Concatenating</echo>
             <echo>    Source Files : @{sourcefiles}</echo>
             <echo>    In Source Dir : @{sourcedir}</echo>
@@ -47,24 +93,24 @@
     </macrodef>
 
     <macrodef name="jslint">
-    <element name="jsfiles" optional="false" />
-    <sequential>
-        <!-- 
-           Need to find a way to convert fileset to args (script?) to 
-           avoid ' ', which will break for files with ' in them
-           
-           Evaluates to the following java execution line...
-           java -r js.jar jslintconsole.js 'file1.js' 'file2.js' 'file3.js'
-        -->
-        <pathconvert pathsep="' '" property="jsfileargs">
-            <jsfiles />
-        </pathconvert>
-        
-        <java jar="${rhino.jar}" fork="true">
-            <arg file="${jslintconsole.js}" />
-            <arg value="${jslintsrc.js}" />
-            <arg line="'${jsfileargs}'" />
-        </java>
+        <element name="jsfiles" optional="false" />
+        <sequential>
+            <!-- 
+               Need to find a way to convert fileset to args (script?) to 
+               avoid ' ', which will break for files with ' in them
+               
+               Evaluates to the following java execution line...
+               java -r js.jar jslintconsole.js 'file1.js' 'file2.js' 'file3.js'
+            -->
+            <pathconvert pathsep="' '" property="jsfileargs">
+                <jsfiles />
+            </pathconvert>
+            
+            <java jar="${rhino.jar}" fork="true">
+                <arg file="${jslintconsole.js}" />
+                <arg value="${jslintsrc.js}" />
+                <arg line="'${jsfileargs}'" />
+            </java>
         </sequential>
     </macrodef>
 
@@ -73,17 +119,16 @@
         <attribute name="classname" />
         <attribute name="file" />
         <sequential>
-            <loadfile srcfile="${builddir}/files/versioncode.txt" property="versioncode" >
+            <loadfile srcfile="${builddir}/files/versioncode.txt" property="@{module}-@{classname}-version" >
                 <filterchain>
                     <replacetokens>
-                      <token key="MODULE" value="@{module}"/>
+                        <token key="MODULE" value="@{module}"/>
                         <token key="CLASSNAME" value="@{classname}"/>
                     </replacetokens>
                 </filterchain>
             </loadfile>
-            
-        <echo>Adding Version Registration Code to @{file}</echo>
-            <concat destfile="@{file}" append="true" fixlastline="true">${versioncode}</concat>
+            <echo>Adding Version Registration Code to @{file}</echo>
+            <concat destfile="@{file}" append="true" fixlastline="true">${@{module}-@{classname}-version}</concat>
         </sequential>
     </macrodef>
 

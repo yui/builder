@@ -35,18 +35,18 @@
         <mkdir dir="${component.builddir}" />
     </target>
 
-   	<target name="clean" description="Clean Local Build Directory (not 2.x/build)" unless="skip.clean">
+    <target name="clean" description="Clean Local Build Directory (not 2.x/build)" unless="skip.clean">
        <delete dir="${component.builddir}" />
-   	</target>
+    </target>
 
-	<!-- CORE -->
+    <!-- CORE -->
     <target name="corebuild" depends="init, -concatcore, -loggerregex, -registercore" description="Create component.js">
         <fixcrlf srcdir="${component.builddir}" includes="${component.basefilename}.js" eol="${buildfiles.eol}" />
     </target>
 
-	<target name="-registercore" unless="skip.registerversion">
-    	<registerversion classname="${component.mainclass}" module="${component.module}" file="${component.builddir}/${component.basefilename}.js" />
-	</target>
+    <target name="-registercore" unless="skip.registerversion">
+        <registerversion classname="${component.mainclass}" module="${component.module}" file="${component.builddir}/${component.basefilename}.js" />
+    </target>
 
     <target name="-concatcore">
         <concatsource destfile="${component.builddir}/${component.basefilename}.js" sourcedir="${component.jsfiles.base}" sourcefiles="${component.jsfiles}" />
@@ -54,26 +54,27 @@
 
     <target name="-loggerregex" if="component.logger.regex">
         <echo>Replacing Logger Statements in ${component.builddir}/${component.basefilename}.js</echo>
-        <replaceregexp file="${component.builddir}/${component.basefilename}.js" 
-                            byline="${component.logger.regex.byline}" 
-                            match="${component.logger.regex}" 
-                            replace="${component.logger.regex.replace}" 
+        <replaceregexp file="${component.builddir}/${component.basefilename}.js"
+                            byline="${component.logger.regex.byline}"
+                            match="${component.logger.regex}"
+                            replace="${component.logger.regex.replace}"
                             flags="${component.logger.regex.flags}" />
     </target>
-	
-	<!-- DEBUG -->
+    
+    <!-- DEBUG -->
     <target name="debugbuild" depends="init, -concatdebug, -registerdebug" description="Create component-debug.js">
         <fixcrlf srcdir="${component.builddir}" includes="${component.basefilename}-debug.js" eol="${buildfiles.eol}" />
     </target>
 
     <target name="-concatdebug">
-    	<concatsource destfile="${component.builddir}/${component.basefilename}-debug.js" sourcedir="${component.jsfiles.base}" sourcefiles="${component.jsfiles}" />
-	</target>
+        <concatsource destfile="${component.builddir}/${component.basefilename}-debug.js" sourcedir="${component.jsfiles.base}" sourcefiles="${component.jsfiles}" />
+    </target>
 
-	<target name="-registerdebug" unless="skip.registerversion">
-	    <registerversion classname="${component.mainclass}" module="${component.module}" file="${component.builddir}/${component.basefilename}-debug.js" />
-	</target>
+    <target name="-registerdebug" unless="skip.registerversion">
+        <registerversion classname="${component.mainclass}" module="${component.module}" file="${component.builddir}/${component.basefilename}-debug.js" />
+    </target>
 
+    <!-- MIN -->
     <target name="jsmin" description="Create component-min.js from component.js">
         <jsmin dir="${component.builddir}" file="${component.basefilename}.js" />
     </target>
@@ -86,16 +87,17 @@
         </jslint>
     </target>
 
-	<!-- SKINS -->
+    <!-- SKINS -->
     <target name="skinsbuild" depends="init, -concatskins" description="Create skin rollup in local component build directory" if="component.skins.base">
         <fixcrlf srcdir="${component.builddir}/assets/skins/sam" includes="${component}.css" eol="${buildfiles.eol}" />
     </target>
 
     <target name="-concatskins" if="component.skins.base">
         <concatsource destfile="${component.builddir}/assets/skins/sam/${component}.css" sourcedir="${component.skins.base}" sourcefiles="${component}-core.css, skins/sam/${component}-skin.css" />
+        <cssmin dir="${component.builddir}/assets/skins/sam" file="${component}.css" />
     </target>
 
-	<!-- DEPLOY -->
+    <!-- DEPLOY -->
     <target name="deploy" description="Move files to 2.x/build, 2.x/src" depends="customassets, -copyassets, -copyskins, examples, readme, deploysrc">
         <copy todir="${global.build.component}" preservelastmodified="true">
             <fileset dir="${component.builddir}" includes="*.js" />
@@ -147,7 +149,7 @@
     <!-- Stub, to be over-ridden by components if the need custom work in local (e.g. container builds container_core using this) -->
     <target name="customlocal" />
 
-   	<!-- Stub, to be over-ridden by components if the need custom work in assets (e.g. concatenation of css files). Called before assets are copied -->
+       <!-- Stub, to be over-ridden by components if the need custom work in assets (e.g. concatenation of css files). Called before assets are copied -->
     <target name="customassets" />
 
 </project>
