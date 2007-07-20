@@ -40,14 +40,20 @@ include("$templatesRoot/examples/data/examplesInfo.php");
 // 0. Create folders
 createFolders($modules);
 
-echo "\n=================================";
-echo "\nCreating Uber Index Pages";
-echo "\n=================================";
-
 // 1. Main Landing Page
-generateExampleFile("index.php", "index.html", false);
+if($isYDNBuild === false) {
+	echo "\n=================================";
+	echo "\nCreating Root Index Page";
+	echo "\n=================================";
 
-// 2. Per Example Landing Page (Uber List)
+	generateExampleFile("index.php", "index.html", false);
+}
+
+echo "\n=================================";
+echo "\nCreating Examples Index Page";
+echo "\n=================================";
+
+// 2. Examples Landing Page (uber example list)
 generateExampleFile("examples/index.php", "examples/index.html", false);
 
 // 3. Generate Examples
