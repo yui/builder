@@ -131,6 +131,7 @@ function copyAssets() {
 
 	global $yuiDistRoot;
 	global $templatesRoot;
+	global $isYDNBuild;
 
 	echo "\n=================================";
 	echo "\nCopying Top Level Assets";
@@ -139,7 +140,13 @@ function copyAssets() {
 	$src = "$templatesRoot/assets"; 
 	$dest = "$yuiDistRoot/"; 
 
-	copyDirectory($src, $dest);
+	copyDirectory($src, $dest, "--exclude=exampleslib*.inc");
+
+	if ($isYDNBuild) {
+		copy("$src/exampleslib_ydn.inc", "$dest/assets/exampleslib.inc");
+	} else {
+		copy("$src/exampleslib_dist.inc", "$dest/assets/exampleslib.inc");
+	}
 }
 
 
@@ -154,14 +161,14 @@ function copyModuleAssets($moduleKey) {
 	$src = "$templatesRoot/examples/$moduleKey/assets";
 	$dest = "$yuiDistRoot/examples/$moduleKey/"; 
 
-	copyDirectory($src, $dest);
+	copyDirectory($src, $dest, "");
 }
 
 
 /**
  * Copies one directory to another, using rsync -r --exclude=CVS 
  */
-function copyDirectory($s, $d) {
+function copyDirectory($s, $d, $args) {
 
 	// NOTE: Deciding to use rsync as opposed to DirectoryIterator, 
 	// to save checking for CVS files. Also using --exclude
@@ -173,7 +180,7 @@ function copyDirectory($s, $d) {
 	if (file_exists($s)) {
 		echo "\nCopying Directory $s to $d";
 
-		$cmd = "rsync -r --exclude=CVS $s $d";
+		$cmd = "rsync -r --exclude=CVS $args $s $d";
 		exec($cmd, $out, $ret);
 
 		if ($ret > 0) {
