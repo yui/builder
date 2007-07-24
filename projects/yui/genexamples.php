@@ -131,7 +131,6 @@ function copyAssets() {
 
 	global $yuiDistRoot;
 	global $templatesRoot;
-	global $isYDNBuild;
 
 	echo "\n=================================";
 	echo "\nCopying Top Level Assets";
@@ -140,13 +139,7 @@ function copyAssets() {
 	$src = "$templatesRoot/assets"; 
 	$dest = "$yuiDistRoot/"; 
 
-	copyDirectory($src, $dest, "--exclude=exampleslib*.inc");
-
-	if ($isYDNBuild) {
-		copy("$src/exampleslib_ydn.inc", "$dest/assets/exampleslib.inc");
-	} else {
-		copy("$src/exampleslib_dist.inc", "$dest/assets/exampleslib.inc");
-	}
+	copyDirectory($src, $dest, "");
 }
 
 
@@ -154,14 +147,25 @@ function copyAssets() {
  * Copies module assets from Templates to Dist
  */
 function copyModuleAssets($moduleKey) {
-
+	
 	global $yuiDistRoot;
 	global $templatesRoot;
+	global $isYDNBuild;
 
 	$src = "$templatesRoot/examples/$moduleKey/assets";
-	$dest = "$yuiDistRoot/examples/$moduleKey/"; 
+	$dest = "$yuiDistRoot/examples/$moduleKey/";
 
-	copyDirectory($src, $dest, "");
+	copyDirectory($src, $dest, "--exclude=exampleslib*.inc");
+
+	if ($isYDNBuild) {
+		if (file_exists("$src/exampleslib_ydn.inc")) {
+			copy("$src/exampleslib_ydn.inc", $dest."assets/exampleslib.inc");
+		}
+	} else {
+		if (file_exists("$src/exampleslib_dist.inc")) {
+			copy("$src/exampleslib_dist.inc", $dest."assets/exampleslib.inc");
+		}
+	}
 }
 
 
