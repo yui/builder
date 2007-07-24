@@ -2,26 +2,26 @@
 
 <project name="YuiTaskLib">
 
-    <echo>Starting Build For ${component}</echo>
+    <echo level="info">Starting Build For ${component}</echo>
 
-    <echo>Ant Properties</echo>
-    <echo>    Home : ${ant.home}</echo>
-    <echo>    Ant Version : ${ant.version}</echo>
-    <echo>    Build File : ${ant.file}</echo>
-    <echo>Local Build Properties</echo>
-    <echo>    srcdir : ${srcdir}</echo>
-    <echo>    builddir : ${builddir}</echo>
-    <echo>    component : ${component}</echo>
-    <echo>    component.basefilename : ${component.basefilename}</echo>
-    <echo>    component.basedir : ${component.basedir}</echo>
-    <echo>    component.srcdir : ${component.srcdir}</echo>
-    <echo>    component.builddir : ${component.builddir}</echo>
-    <echo>Global Build Properties</echo>
-    <echo>    global.build.base : ${global.build.base}</echo>
-    <echo>    global.build.component : ${global.build.component}</echo>
-    <echo>    global.build.component.assets : ${global.build.component.assets}</echo>
-    <echo>    global.src.base : ${global.src.base}</echo>
-    <echo>    global.src.component : ${global.src.component}</echo>
+    <echo level="info">Ant Properties</echo>
+    <echo level="info">    Home : ${ant.home}</echo>
+    <echo level="info">    Ant Version : ${ant.version}</echo>
+    <echo level="info">    Build File : ${ant.file}</echo>
+    <echo level="info">Local Build Properties</echo>
+    <echo level="info">    srcdir : ${srcdir}</echo>
+    <echo level="info">    builddir : ${builddir}</echo>
+    <echo level="info">    component : ${component}</echo>
+    <echo level="info">    component.basefilename : ${component.basefilename}</echo>
+    <echo level="info">    component.basedir : ${component.basedir}</echo>
+    <echo level="info">    component.srcdir : ${component.srcdir}</echo>
+    <echo level="info">    component.builddir : ${component.builddir}</echo>
+    <echo level="info">Global Build Properties</echo>
+    <echo level="info">    global.build.base : ${global.build.base}</echo>
+    <echo level="info">    global.build.component : ${global.build.component}</echo>
+    <echo level="info">    global.build.component.assets : ${global.build.component.assets}</echo>
+    <echo level="info">    global.src.base : ${global.src.base}</echo>
+    <echo level="info">    global.src.component : ${global.src.component}</echo>
 
     <import file="${builddir}/macrolib.xml" description="Macrodef definitions - jslint, jsmin, registerversion" />
 
@@ -53,7 +53,7 @@
     </target>
 
     <target name="-loggerregex" if="component.logger.regex">
-        <echo>Replacing Logger Statements in ${component.builddir}/${component.basefilename}.js</echo>
+        <echo level="info">Replacing Logger Statements in ${component.builddir}/${component.basefilename}.js</echo>
         <replaceregexp file="${component.builddir}/${component.basefilename}.js"
                             byline="${component.logger.regex.byline}"
                             match="${component.logger.regex}"

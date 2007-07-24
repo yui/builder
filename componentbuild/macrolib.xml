@@ -7,7 +7,7 @@
         <attribute name="file" />
 
         <sequential>
-            <echo>Running JSMin on @{dir}/@{file}</echo>
+            <echo level="info">Running JSMin on @{dir}/@{file}</echo>
             <basename file="@{file}" suffix=".js" property="basename" />
             <java jar="${jsmin.jar}" output="@{dir}/${basename}-min.js" fork="true">
                 <arg file="@{dir}/@{file}" />
@@ -20,7 +20,7 @@
         <attribute name="file" />
 
         <sequential>
-            <echo>Running cssmin on @{dir}/@{file}</echo>
+            <echo level="info">Running cssmin on @{dir}/@{file}</echo>
 
             <!-- REMOVE COMMENTS -->
             <replaceregexp file="@{dir}/@{file}"
@@ -70,10 +70,10 @@
         <element name="filters" optional="true" description="Additonal filters to apply to individual files"/>
 
         <sequential>
-            <echo>Concatenating</echo>
-            <echo>    Source Files : @{sourcefiles}</echo>
-            <echo>    In Source Dir : @{sourcedir}</echo>
-            <echo>    To : @{destfile}</echo>
+            <echo level="info">Concatenating</echo>
+            <echo level="info">    Source Files : @{sourcefiles}</echo>
+            <echo level="info">    In Source Dir : @{sourcedir}</echo>
+            <echo level="info">    To : @{destfile}</echo>
         
             <delete dir="@{workingdir}" quiet="true"/>
             <copy todir="@{workingdir}">
@@ -127,7 +127,7 @@
                     </replacetokens>
                 </filterchain>
             </loadfile>
-            <echo>Adding Version Registration Code to @{file}</echo>
+            <echo level="info">Adding Version Registration Code to @{file}</echo>
             <concat destfile="@{file}" append="true" fixlastline="true">${@{module}-@{classname}-version}</concat>
         </sequential>
     </macrodef>
