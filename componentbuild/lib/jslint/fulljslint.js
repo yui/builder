@@ -293,6 +293,7 @@ JSLINT = function () {
 
         widget = {
             YAHOO: true,
+            YAHOO_config: true,
             alert                   : true,
             appleScript             : true,
             animator                : true,
