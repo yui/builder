@@ -16,7 +16,8 @@ load(jslintsrc);
 	var OPTS = {
 		widget : true,
 		browser : true,
-		laxLineEnd : true
+		//laxLineEnd : true,
+        undef: true
 	};
 	
 	function test(jsFile) {
