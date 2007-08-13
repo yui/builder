@@ -76,7 +76,8 @@
 
     <!-- MIN -->
     <target name="jsmin" description="Create component-min.js from component.js">
-        <jsmin dir="${component.builddir}" file="${component.basefilename}.js" />
+        <!--<jsmin dir="${component.builddir}" file="${component.basefilename}.js" />-->
+		<yuicompress dir="${component.builddir}" file="${component.basefilename}.js" />
     </target>
 
     <target name="jslint" description="Run jslint over the local build files (default settings)" unless="skip.jslint">

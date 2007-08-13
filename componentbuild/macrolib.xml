@@ -15,6 +15,19 @@
         </sequential>
     </macrodef>
 
+    <macrodef name="yuicompress">
+        <attribute name="dir" />
+        <attribute name="file" />
+
+        <sequential>
+            <echo level="info">Running yuicompressor on @{dir}/@{file}</echo>
+            <basename file="@{file}" suffix=".js" property="basename" />
+            <java jar="${yuicompressor.jar}" fork="true">
+                <arg file="@{dir}/@{file}" />
+            </java>
+        </sequential>
+    </macrodef>
+
     <macrodef name="cssmin">
         <attribute name="dir" />
         <attribute name="file" />

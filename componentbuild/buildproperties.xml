@@ -10,6 +10,7 @@
     <property name="rhino.jar" location="${builddir}/lib/rhino/js.jar" />
     <property name="jslintconsole.js" location="${builddir}/lib/jslint/jslint-console.js" />
     <property name="jslintsrc.js" location="${builddir}/lib/jslint/fulljslint.js" />
+    <property name="yuicompressor.jar" location="${builddir}/lib/yuicompressor/yuicompressor-1.0.jar" />
 
     <!-- Global Directories -->
     <property name="global.build.base" location="${srcdir}/build" />

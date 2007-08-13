@@ -44,9 +44,13 @@ load(jslintsrc);
 	function clean(str) {
 		var trimmed = "";
 		if (str) {
-			trimmed = str.replace(/^\s*(\S*(\s+\S+)*)\s*$/, "$1");
-		} 
-		return trimmed; 
+			if(str.length <= 500) {
+				trimmed = str.replace(/^\s*(\S*(\s+\S+)*)\s*$/, "$1");
+			} else {
+				trimmed = "[Code Evidence Omitted: Greater than 500 chars]";
+			}
+		}
+		return trimmed;
 	}
 	 
 	function jslint(aScripts) {
