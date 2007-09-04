@@ -8,6 +8,7 @@
     -->
 
     <property name="builddir" value="/Users/adamoore/dev/yahoo/presentation/tools/builder/componentbuild" />
+    <property name="yuicompressor.jar" value="/Users/adamoore/dev/yahoo/presentation/tools/builder/componentbuild/lib/yuicompressor/yuicompressor-2.1.2.jar" />
 
     <import file="${builddir}/macrolib.xml" description="Macrodef definitions - jslint, jsmin, registerversion" />
 
@@ -101,7 +102,6 @@
         -->
 
         
-        <echo message="copying skin assets from all components to tmp dir" />
         <copy todir="${tmp}/build/assets/skins/sam" preservelastmodified="true" flatten="true">
             <fileset dir="${src}/build">
                 <include name="**/assets/skins/sam/*" />
@@ -109,21 +109,18 @@
             </fileset>
         </copy>
 
-        <echo message="creating skin rollup" />
         <concat destfile="${tmp}/build/assets/skins/sam/skin.css">
             <fileset dir="${tmp}/build/assets/skins/sam">
                 <include name="*.css" />
             </fileset>
         </concat>
 
-        <echo message="fixing paths to skin assets" />
         <replace dir="${tmp}/build/assets/skins/sam" value="">
             <include name="**/*.css"/>
             <replacefilter token="../../../../../build/assets/skins/sam/" />
             <replacefilter token="../../../../assets/skins/sam/" />
         </replace>
 
-        <echo message="copying non-css skin files to build" />
         <copy todir="${yui}/build/assets/skins/sam" preservelastmodified="true" flatten="true">
             <fileset dir="${tmp}/build/assets/skins/sam">
                 <include name="*" />
@@ -131,7 +128,6 @@
             </fileset>
         </copy>
 
-        <echo message="copying css skin files to build, adding copyright" />
         <copy todir="${yui}/build/assets/skins/sam" preservelastmodified="true" flatten="true">
             <fileset dir="${tmp}/build/assets/skins/sam">
                 <include name="*.css" />
@@ -195,12 +191,9 @@
         </copy>
 
         <!-- copy tests -->
-        <!--
         <copy todir="${yui}/tests" preservelastmodified="true">
             <fileset dir="${src}/tests"/>
         </copy>
-        -->
-
 
     </target>
 
@@ -311,8 +304,44 @@
                 <argument value="tag"/>
                 <argument value="${label.scrubbed}"/>
                 <argument value="yahoo/presentation/2.x"/>
+                <argument value="yahoo/presentation/templates"/>
+                <argument value="yahoo/presentation/tools"/>
             </commandline>
         </cvs>
+    </target>
+
+    <target name="recompress">
+
+        <foreach list="animation,autocomplete,calendar,connection,container,dom,dragdrop,event,logger,menu,slider,tabview,treeview,yahoo"
+                 param="mod" target="compressnormal" />
+
+        <foreach list="button,colorpicker,datasource,datatable,element,editor,history,yuiloader,yuitest" 
+                 param="mod" target="compressbeta" />
+
+        <foreach list="imageloader"
+                 param="mod" target="compressexperimental" />
+
+        <echo>compressing container core</echo>
+           <yuicompress dir="${src}/build/container" file="container_core.js"
+                        args="--warn --preserve-semi --line-break 6000" />
+    </target>
+
+    <target name="compressnormal">
+        <echo>compressing ${mod}</echo>
+           <yuicompress dir="${src}/build/${mod}" file="${mod}.js"
+                        args="--warn --preserve-semi --line-break 6000" />
+    </target>
+
+    <target name="compressbeta">
+        <echo>compressing ${mod}</echo>
+           <yuicompress dir="${src}/build/${mod}" file="${mod}-beta.js"
+                        args="--warn --preserve-semi --line-break 6000" />
+    </target>
+
+    <target name="compressexperimental">
+        <echo>compressing ${mod}</echo>
+           <yuicompress dir="${src}/build/${mod}" file="${mod}-experimental.js"
+                        args="--warn --preserve-semi --line-break 6000" />
     </target>
 
 </project>

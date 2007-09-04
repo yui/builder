@@ -14,28 +14,28 @@ src=$basedir/src
 
 # The location of the files to parse.  Parses subdirectories, but will fail if
 # there are duplicate file names in these directories.
-parser_in="$util/animation/src/js \
-          $widget/autocomplete/src/js \
-          $widget/button/src/js \
+parser_in="$src/animation \
+          $src/autocomplete \
+          $src/button \
           $src/calendar \
           $src/colorpicker \
-          $util/connection/src/js \
-          $widget/container/src/js \
-          $util/datasource/src/js \
-          $widget/datatable/src/js \
-          $util/dom/src/js \
+          $src/connection \
+          $src/container \
+          $src/datasource \
+          $src/datatable \
+          $src/dom \
           $src/dragdrop \
           $src/editor \
-          $util/element/src/js \
+          $src/element \
           $src/event \
-          $util/history/src/js \
+          $src/history \
           $src/imageloader \
-          $widget/logger/src/js \
-          $widget/menu/src/js \
+          $src/logger \
+          $src/menu \
           $src/slider \
-          $widget/tabview/src/js \
+          $src/tabview \
           $src/treeview \
-          $util/yahoo/src/js \
+          $src/yahoo \
           $src/yuiloader \
           $src/yuitest"
 
