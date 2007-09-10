@@ -173,6 +173,22 @@
             </fileset>
         </copy>
 
+
+        <!-- generate the ydn specific docs -->
+        <exec dir="." executable="./caboodle.sh" outputproperty="docgen.output" >
+            <arg value="-y" />
+        </exec>
+        <copy todir="${build}/ydn/docs" preservelastmodified="true">
+            <fileset dir="${tmp}/docs" />
+        </copy>
+
+        <!-- copy the cheat sheets too -->
+        <copy todir="${build}/ydn/docs/assets" preservelastmodified="true">
+            <fileset dir="${src}/docs/assets">
+                <include name="**/*.zip"/>
+            </fileset>
+        </copy>
+
         <exec dir="." executable="./examples.sh" output="examples_dist.log" />
         <copy todir="${yui}" preservelastmodified="true">
             <fileset dir="${examplesdist}/"/>

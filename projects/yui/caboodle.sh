@@ -54,5 +54,5 @@ version=`cat version.internal.txt`
 
 ##############################################################################
 
-$yuidoc_home/bin/yuidoc.py $parser_in -p $parser_out -o $generator_out -t $template -v $version -s
+$yuidoc_home/bin/yuidoc.py $parser_in -p $parser_out -o $generator_out -t $template -v $version -s $*
 

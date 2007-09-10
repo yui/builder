@@ -35,7 +35,7 @@
                     xsldir="webapps/cruisecontrol/xsl"
                     logdir="logs/yui">
                 <failure address="adamoore@yahoo-inc.com"/>
-                <success address="yui-team@yahoo-inc.com"/>
+                <success address="yui-authors@yahoo-inc.com"/>
                 <!--
                 <always address="adamoore@yahoo-inc.com"/>
                 <always address="tsha@yahoo-inc.com"/>
