@@ -46,14 +46,19 @@
     component.jsfiles.base              Base dir for component.jsfiles. For most components this is component.srcdir or component.srcdir/js		
     component.jsfiles                   Comma seperated ordered list of source files to be concatenated, relative to component.jsfiles.base. No wildcards allowed
     component.assetfiles                Comma seperated list of asset files, relative to component.srcdir (can be left undefined for components which don't have assets)
+    component.skins.base                Base directory for skin assets (component.assetfiles will eventually be deprecated).
+                                        If this value is set, the build expects the following directory structure:
+                                            <component.skins.base>
+                                                - <component>-core.css
+                                                - skins/sam/<component>-skin.css
+                                                - skins/sam/[component specific skin images]
 
     component.logger.regex              Regex used to strip logger statements 
     component.logger.regex.byline       If component.logger.regex.byline is false, regex will match against the 
                                         entire file as opposed to line by line - required for multiline search.
     component.logger.regex.flags        The set of standard Perl5 regex flags which apply.Defaults to mg if not provided[ imgs ]
     component.logger.regex.replace      The replacement string to use. An empty property is used for empty string. Defaults to empty string
-                                        
-                                            
+
     # BUILDPATH PROPERTIES (defined in buildproperties.xml. Probably don't need to be over-ridden per component, except container_core)
 
     global.build.base                   Absolute path to global build directory ( e.g. /home/yuideveloper/cvsroot/yahoo/presentation/2.x/build )
