@@ -4,7 +4,8 @@
 
 # The location of your yuidoc install
 # yuidoc_home=yahoo/presentation/tools/yuidoc
-yuidoc_home=~/www/yuidoc/yuidoc
+# yuidoc_home=~/www/yuidoc/yuidoc
+yuidoc_home=yahoo/presentation/tools/yuidoc
 
 basedir=yahoo/presentation/2.x
 util=$basedir/util
@@ -18,6 +19,7 @@ parser_in="$src/animation \
           $src/autocomplete \
           $src/button \
           $src/calendar \
+          $src/charts \
           $src/colorpicker \
           $src/connection \
           $src/container \
@@ -28,10 +30,14 @@ parser_in="$src/animation \
           $src/editor \
           $src/element \
           $src/event \
+          $src/get \
           $src/history \
           $src/imageloader \
+          $src/json \
           $src/logger \
           $src/menu \
+          $src/profiler \
+          $src/selector \
           $src/slider \
           $src/tabview \
           $src/treeview \

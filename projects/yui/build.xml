@@ -76,6 +76,16 @@
                       files="yahoo/yahoo-min.js,dom/dom-min.js,event/event-min.js,connection/connection-min.js,animation/animation-min.js,dragdrop/dragdrop-min.js,element/element-beta-min.js"/>
         </concat>
 
+        <concat destfile="${src}/build/reset-fonts-grids/reset-fonts-grids.css">
+            <filelist dir="${src}/build" 
+                      files="reset/reset-min.css,fonts/fonts-min.css,grids/grids-min.css"/>
+        </concat>
+
+        <concat destfile="${src}/build/reset-fonts/reset-fonts.css">
+            <filelist dir="${src}/build" 
+                      files="reset/reset-min.css,fonts/fonts-min.css"/>
+        </concat>
+
         <registerversion classname="YAHOO" module="utilities" 
                 file="${src}/build/utilities/utilities.js" />
 
@@ -84,7 +94,7 @@
 
 
         <!-- copy everything in build except the js/css files -->
-        <copy todir="${yui}/build"  preservelastmodified="true">
+        <copy todir="${yui}/build" includeEmptyDirs="false"  preservelastmodified="true">
             <fileset dir="${src}/build">
                 <exclude name="**/*.js"/>
                 <exclude name="**/*.css"/>
@@ -145,8 +155,11 @@
         <!-- copy build js/css files, updating version token and prepending the copyright info 
              do NOT preservelastmodified because the file is being modified with the current
              build number
+
+             includeEmptryDirs needs to be turned off since removed
+             directories in CVS are not completely removed.
         -->
-        <copy todir="${yui}/build">
+        <copy todir="${yui}/build" includeEmptyDirs="false">
             <fileset dir="${src}/build">
                 <include name="**/*.js"/>
                 <include name="**/*.css"/>
@@ -233,10 +246,14 @@
     </target>
 
     <!-- zip up everything in the build directory -->
+        <!--
+		excludes="yui/build/selector"
+        -->
     <target name="package" depends="compile">
         <zip destfile="${build}/yui_${version.internal}.zip" 
 		basedir="${build}" 
-		includes="yui/**" />
+		includes="yui/**"
+        />
         <checksum file="${build}/yui_${version.internal}.zip" />
 
         <!-- ydn examples -->
@@ -250,11 +267,16 @@
         <copy todir="${akamai}/build">
             <fileset dir="${yui}/build">
               <patternset id="just.min">
+              <!--
                 <include name="**/*-min.js"/>
                 <include name="**/*-min.css"/>
                 <include name="**/utilities*"/>
                 <include name="**/yahoo-dom-event*"/>
-                <include name="**/reset-fonts-grids*"/>
+                <include name="**/reset-fonts*"/>
+                <include name="**/assets/**"/>
+                -->
+                <include name="**/*.js"/>
+                <include name="**/*.css"/>
                 <include name="**/assets/**"/>
               </patternset>
             </fileset>
@@ -313,6 +335,8 @@
                 <argument value="${label.scrubbed}"/>
                 <argument value="yahoo/presentation/2.x/build/utilities"/>
                 <argument value="yahoo/presentation/2.x/build/yahoo-dom-event"/>
+                <argument value="yahoo/presentation/2.x/build/reset-fonts-grids"/>
+                <argument value="yahoo/presentation/2.x/build/reset-fonts"/>
                 <argument value="yahoo/presentation/2.x/build/assets/skins/sam"/>
             </commandline>
         </cvs>
