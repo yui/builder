@@ -18,13 +18,13 @@
     <macrodef name="yuicompress">
         <attribute name="dir" />
         <attribute name="file" />
-		<attribute name="args" />
+	<attribute name="args" />
 
         <sequential>
             <echo level="info">Running yuicompressor on @{dir}/@{file}</echo>
             <basename file="@{file}" suffix=".js" property="basename" />
             <java jar="${yuicompressor.jar}" fork="true">
-                <arg line="@{args}" />
+                <arg line="@{args} -o @{dir}/${basename}-min.js" />
                 <arg file="@{dir}/@{file}" />
             </java>
         </sequential>
