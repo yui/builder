@@ -262,14 +262,18 @@ function generateExamples($modules, $examples) {
 	global $forceBuildPath;
 	global $isYDNBuild;
 
+	// COULDN'T REALLY REMEMBER WHY WE WERE FILTERING BY TYPE, WHEN 
+        // WE WANT TO RUN THROUGH ALL MODULES ANYWAY. HENCE COMMENTING
+	// OUT, OUTER LOOP.
+
 	// MAKE CONSTANT?
-	$types = array('css', 'utility', 'widget');
+	// $types = array('css', 'utility', 'widget', 'tool', 'core');
 
-	foreach($types as $type) {
+	// foreach($types as $type) {
 
-		$modulesForType = getModulesByType($type, $modules);
+		// $modulesForType = getModulesByType($type, $modules);
 
-		foreach($modulesForType as $moduleKey=>$module) {
+		foreach($modules as $moduleKey=>$module) {
 
 			echo "\n=================================";
 			echo "\nGenerating $moduleKey examples";
@@ -324,7 +328,7 @@ function generateExamples($modules, $examples) {
 				}
 			}
 		}
-	}
+	// }
 }
 
 
