@@ -10,7 +10,7 @@ source to <component>.js, <component>-min.js, <component>-debug.js by:
 
    a). Concatenating source files
    b). Stripping logger statements
-   c). Running jsmin 
+   c). Running yuicompressor 
    d). Running jslint all 3 built files
    e). Attaching the appropriate suffix (e.g. beta, experimental etc.)
    f). Adding version registration code
@@ -90,9 +90,13 @@ GETTING STARTED
     With no arguments, ANT will run look for a "build.xml" in the current 
     folder, and invoke it's default target
 
-8). If all is good, this should run the "local" target which will create 
-    <component>.js and <component>-min.js in the local build directory 
-    specified by ${component.builddir}
+8). If all is good, this should run the "local" target (which is the default
+    target). This creates <component>.js and <component>-min.js in the local 
+    build directory specified by ${component.builddir}.
+
+9). If you run "ant all", the script will run the "local" target, building
+    to your local build directory and then deploy files to the top level 
+    2.x/build, 2.x/src directories.
 
 You can run other targets also by specifying them on the command line 
 using "ant <target>". 
