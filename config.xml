@@ -10,14 +10,14 @@
                     file="yahoo/presentation" />
         </bootstrappers>
 
-        <modificationset quietperiod="15" ignoreFiles="utilities*,yahoo-dom-event*,reset-fonts*">
-            <cvs localWorkingCopy="projects/${project.name}/yahoo/presentation/2.x/build" tag='yui-2_4' />
-            <cvs localWorkingCopy="projects/${project.name}/yahoo/presentation/templates" tag='yui-2_4' />
-            <!--
+        <modificationset quietperiod="25" ignoreFiles="utilities*,*dom-event*,reset-fonts*">
             <cvs localWorkingCopy="projects/${project.name}/yahoo/presentation/2.x/build" />
             <cvs localWorkingCopy="projects/${project.name}/yahoo/presentation/templates" />
+            <!--
             <cvs localWorkingCopy="projects/${project.name}/yahoo/presentation/2.x/build" tag='ydn-2_3_1+' />
             <cvs localWorkingCopy="projects/${project.name}/yahoo/presentation/templates" tag='ydn-2_3_1+' />
+            <cvs localWorkingCopy="projects/${project.name}/yahoo/presentation/2.x/build" tag='yui-2_3_1' />
+            <cvs localWorkingCopy="projects/${project.name}/yahoo/presentation/templates" tag='yui-2_3_1' />
             <cvs localWorkingCopy="projects/${project.name}/yahoo/presentation/2.x/examples" />
             -->
         </modificationset>

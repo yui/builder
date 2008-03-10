@@ -13,6 +13,7 @@ widget=$basedir/widget
 tool=$basedir/tool
 src=$basedir/src
 
+
 # The location of the files to parse.  Parses subdirectories, but will fail if
 # there are duplicate file names in these directories.
 parser_in="$src/animation \
@@ -23,6 +24,7 @@ parser_in="$src/animation \
           $src/colorpicker \
           $src/connection \
           $src/container \
+          $src/cookie \
           $src/datasource \
           $src/datatable \
           $src/dom \
@@ -32,15 +34,20 @@ parser_in="$src/animation \
           $src/event \
           $src/get \
           $src/history \
+          $src/imagecropper \
           $src/imageloader \
           $src/json \
+          $src/layout \
           $src/logger \
           $src/menu \
           $src/profiler \
+          $src/profilerviewer \
+          $src/resize \
           $src/selector \
           $src/slider \
           $src/tabview \
           $src/treeview \
+          $src/uploader \
           $src/yahoo \
           $src/yuiloader \
           $src/yuitest"
