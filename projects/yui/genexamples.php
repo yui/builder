@@ -9,6 +9,7 @@ $yuiDistRoot = "examples_dist";
 $templatesRoot = "yahoo/presentation/templates";
 $isYDNBuild = false;
 $forceBuildPath = false;
+$yuiVersion = null;
 
 if ($argc > 1) {
 	if ($argv[1] == "-h") {
@@ -21,6 +22,13 @@ if ($argc > 1) {
 		if (isset($args["t"])) { $templatesRoot = $args["t"]; }
 		if (isset($args["b"])) { $forceBuildPath = $args["b"]; }
 		if (isset($args["y"])) { $isYDNBuild = $args["y"]; }
+
+		if (!isset($args["v"])) {
+			echo "\nFailed: -v argument specifying the YUI version is required.\n";
+			return;
+		} else {
+			$yuiVersion = $args["v"];
+	        }
 	}
 }
 
@@ -34,6 +42,7 @@ echo "Using YUI Build Root: $yuiDistRoot\n";
 echo "Using Template Root: $templatesRoot\n";
 echo "Is YDN Build: $strIsYDNBuild\n";
 echo "Force Build Path: $strForceBuildPath\n";
+echo "YUI Version: $yuiVersion\n";
 
 include("$templatesRoot/examples/data/examplesInfo.php");
 
@@ -223,6 +232,7 @@ function generateExampleFile($srcUrl, $fileName, $useBuildPath) {
 	global $yuiDistRoot;
 	global $templatesBaseUrl;
 	global $isYDNBuild;
+	global $yuiVersion;
 
 	$file = $yuiDistRoot."/".$fileName;
 	$url = $templatesBaseUrl."/".$srcUrl;
@@ -234,6 +244,8 @@ function generateExampleFile($srcUrl, $fileName, $useBuildPath) {
 	if ($isYDNBuild) {
 		$url = addQueryParam($url, "ydn", "true");
 	}
+
+	$url = addQueryParam($url, "v", $yuiVersion);
 
 	echo "\nGenerating: $file\nfrom [$url]";
 
@@ -281,7 +293,8 @@ function generateExamples($modules, $examples) {
 
 			copyModuleAssets($moduleKey);
 			
-			$useBuildPath = ($isYDNBuild === false || $forceBuildPath);
+			//$useBuildPath = ($isYDNBuild === false || $forceBuildPath);
+			$useBuildPath = $forceBuildPath;
 
 			// Index - Dist: build path, YDN: yui.yahooapis
 			generateExampleFile("examples/module/examplesModuleIndex.php?module=".urlencode($moduleKey), 
@@ -305,7 +318,7 @@ function generateExamples($modules, $examples) {
 	
 						// Default Presentation (XXX.html) - Dist: build path, YDN: build path if logger required, else yui.yahooapis
 						generateExampleFile("examples/module/example.php?name=".urlencode($exampleKey),
-									"examples/$moduleKey/$exampleKey".".html", ($useBuildPath || $example["loggerInclude"] == "require"));
+									"examples/$moduleKey/$exampleKey".".html", $useBuildPath);
 	
 						// Requires New Window (XXX_source.html) - Dist: build path, YDN: yui.yahooapis
 						if ($example["newWindow"] == "require") {
@@ -322,7 +335,7 @@ function generateExamples($modules, $examples) {
 						// Supports Logging (XXX_log.html) - Dist: build path, YDN: build path (debug files not hosted on yui.yahooapis)
 						if ($example["loggerInclude"] != "require" && $example["loggerInclude"] != "suppress") {
 							generateExampleFile("examples/module/example.php?name=".urlencode($exampleKey)."&log=true", 
-										"examples/$moduleKey/$exampleKey"."_log.html", true);
+										"examples/$moduleKey/$exampleKey"."_log.html", $useBuildPath);
 						}
 					}
 				}
@@ -357,6 +370,9 @@ function parseArgs($argsArray) {
 		}
 		if ($val == "-y") {
 			$arr["y"] = ($argsArray[++$i] != "false") ? true : false;
+		}
+		if ($val == "-v") {
+			$arr["v"] = $argsArray[++$i];
 		}
     }
     return $arr;
@@ -396,17 +412,16 @@ function printHelp() {
 		."\n"
 		."\n    Defaults to false (generate files for distribution)";
 
+	echo "\n\n-v YUI version\n"
+		."\n    Specifies the YUI version, used to set the yuiCurrentVersion variable for examples to use"
+		."\n"
+		."\n    No Default";
+
 	echo "\n\n-b true|false\n"
-		."\n    Force build to use a local build path for YDN examples"
+		."\n    Use a local build path instead of yui.yahooapis.com"
 		."\n"
-		."\n    By default YDN examples will use yui.yahooapis.com URLs for"
-		."\n    non-debug examples. Set this flag to true to force YDN to be"
-		."\n    built with a local build path for all examples."
-		."\n"
-		."\n    NOTE: Dist examples are always built with a local build path."
-		."\n"
-		."\n    If true, all YDN examples will use the local build path."
-		."\n    If false, non-debug YDN examples will use yui.yahooapis URLs."
+		."\n    If true, all examples will use the local build path."
+		."\n    If false, all examples will use yui.yahooapis URLs."
 		."\n"
 		."\n    Defaults to false";
 	
