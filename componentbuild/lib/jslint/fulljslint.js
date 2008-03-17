@@ -1,5 +1,5 @@
 // jslint.js
-// 2007-08-04
+// 2008-03-15
 /*
 Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -27,7 +27,7 @@ SOFTWARE.
 /*
     JSLINT is a global function. It takes two parameters.
 
-        var myResult = JSLINT(source, option);
+        var myResult = JSLINT(source, option, adsafe);
 
     The first parameter is either a string or an array of strings. If it is a
     string, it will be split on '\n' or '\r'. If it is an array of strings, it
@@ -37,6 +37,13 @@ SOFTWARE.
     The second parameter is an optional object of options which control the
     operation of JSLINT. All of the options are booleans. All are optional and
     have a default value of false.
+
+    The third parameter is an optional object that names the global objects
+    that are allowed under ADsafe. The default is {
+        ADSAFE: true,
+    }. Each member must have a true value. These names will deliver methods
+    to the guest code. The guest will be allowed to call the methods, but not
+    to retrieve or set members.
 
     If it checks out, JSLINT returns true. Otherwise, it returns false.
 
@@ -70,64 +77,98 @@ SOFTWARE.
 
 /*jslint evil: true, nomen: false */
 
-
+/*members "\b", "\t", "\n", "\f", "\r", "\"", "(begin)", "(breakage)",
+    "(context)", "(end)", "(global)", "(identifier)", "(line)", "(name)",
+    "(params)", "(scope)", "(verb)", ")", "++", "--", "\/", ADSAFE, Array,
+    Boolean, COM, Canvas, CustomAnimation, Date, Debug, E, Error, EvalError,
+    FadeAnimation, Frame, Function, HotKey, Image, LN10, LN2, LOG10E, LOG2E,
+    MAX_VALUE, MIN_VALUE, Math, MenuItem, MoveAnimation, NEGATIVE_INFINITY,
+    Number, Object, PI, POSITIVE_INFINITY, Point, RangeError,
+    ReferenceError, RegExp, RotateAnimation, SQRT1_2, SQRT2, ScrollBar,
+    String, SyntaxError, System, Text, TextArea, TypeError, URIError, URL,
+    Window, XMLDOM, XMLHttpRequest, "\\", "]", a, abbr, "about-box",
+    "about-image", "about-text", "about-version", acronym, action, address,
+    adsafe, alert, alignment, anchorstyle, animator, appleScript, applet,
+    apply, area, author, autohide, b, background, base, bdo, beep, beget,
+    bgcolor, bgcolour, bgopacity, big, bitwise, block, blockquote, blur,
+    body, br, browser, button, bytesToUIString, c, call, callee, caller,
+    canvas, cap, caption, cases, center, charAt, charCodeAt, character,
+    charset, checked, chooseColor, chooseFile, chooseFolder, cite,
+    clearInterval, clearTimeout, cliprect, close, closeWidget, closed, code,
+    col, colgroup, color, colorize, colour, columns, company, condition,
+    confirm, console, constructor, content, contextmenuitems,
+    convertPathToHFS, convertPathToPlatform, copyright, d, data, dd, debug,
+    decodeURI, decodeURIComponent, defaultStatus, defaulttracking,
+    defaultvalue, defineClass, del, description, deserialize, dfn, dir,
+    directory, div, dl, doAttribute, doBegin, doIt, doTagName, document, dt,
+    dynsrc, editable, em, embed, empty, enabled, encodeURI,
+    encodeURIComponent, entityify, eqeqeq, errors, escape, eval, event,
+    evidence, evil, exec, exps, extension, fieldset, file, filesystem,
+    fillmode, floor, focus, focusWidget, font, fontstyle, forin, form,
+    fragment, frame, frames, frameset, from, fromCharCode, fud, function, g,
+    gc, getComputedStyle, group, h1, h2, h3, h4, h5, h6, halign,
+    handlelinks, hasOwnProperty, head, height, help, hidden, history,
+    hlinesize, hoffset, hotkey, hr, href, hregistrationpoint, hscrollbar,
+    hsladjustment, hsltinting, html, i, iTunes, icon, id, identifier,
+    iframe, image, img, include, indexOf, init, input, ins, interval,
+    isAlpha, isApplicationRunning, isDigit, isFinite, isNaN, join, kbd, key,
+    kind, konfabulatorVersion, label, labelled, laxbreak, lbp, led, left,
+    legend, length, level, li, line, lines, link, load, loadClass,
+    loadingsrc, location, locked, log, lowsrc, m, map, match, max,
+    maxlength, menu, menuitem, message, meta, min, minimumversion,
+    minlength, missingsrc, modifier, moveBy, moveTo, name, navigator, new,
+    noframes, nomen, noscript, notsaved, nud, object, ol, on, onblur,
+    onclick, oncontextmenu, ondragdrop, ondragenter, ondragexit, onerror,
+    onfirstdisplay, onfocus, ongainfocus, onimageloaded, onkeydown,
+    onkeypress, onkeyup, onload, onlosefocus, onmousedown, onmousedrag,
+    onmouseenter, onmouseexit, onmousemove, onmouseup, onmousewheel,
+    onmulticlick, onresize, onselect, ontextinput, ontimerfired, onunload,
+    onvaluechanged, opacity, open, openURL, opener, opera, optgroup, option,
+    optionvalue, order, orientation, p, pagesize, param, parent, parseFloat,
+    parseInt, passfail, play, plusplus, pop, popupMenu, pre, preference,
+    preferenceGroups, preferencegroup, preferences, print, prompt,
+    prototype, push, q, quit, random, raw, reach, readFile, readUrl, reason,
+    regexp, reloadWidget, remoteasync, replace, report, requiredplatform,
+    reserved, resizeBy, resizeTo, resolvePath, resumeUpdates, rhino, right,
+    root, rotation, runCommand, runCommandInBg, samp, saveAs,
+    savePreferences, screen, script, scroll, scrollBy, scrollTo, scrollbar,
+    scrolling, scrollx, scrolly, seal, search, secure, select, self,
+    serialize, setInterval, setTimeout, setting, settings, shadow, shift,
+    showWidgetPreferences, sidebar, size, skip, sleep, slice, small, sort,
+    span, spawn, speak, special, spellcheck, split, src, srcheight,
+    srcwidth, status, strong, style, sub, substr, subviews, sup, superview,
+    supplant, suppressUpdates, sync, system, table, tag, tbody, td,
+    tellWidget, test, text, textarea, tfoot, th, thead, thumbcolor, ticking,
+    ticklabel, ticks, tileorigin, timer, title, toLowerCase, toString,
+    toint32, token, tooltip, top, tr, tracking, trigger, truncation, tt,
+    type, u, ul, undef, unescape, union, unwatch, updateNow, url,
+    usefileicon, valign, value, valueOf, var, version, visible, vlinesize,
+    voffset, vregistrationpoint, vscrollbar, watch, white, widget, width,
+    window, wrap, yahooCheckLogin, yahooLogin, yahooLogout, zorder
+*/
 
 // We build the application inside a function so that we produce only a single
 // global variable. The function will be invoked, its return value is the JSLINT
-// function itself.
+// application itself.
 
 var JSLINT;
 JSLINT = function () {
 
-// These are words that should not be permitted in third party ads.
+// These are members that should not be permitted in third party ads.
 
-    var adsafe = {
-        activexobject   : true,
-        alert           : true,
-        back            : true,
-        body            : true,
-        close           : true,
-        confirm         : true,
-        cookie          : true,
-        constructor     : true,
-        createpopup     : true,
-        defaultstatus   : true,
-        defaultview     : true,
-        document        : true,
-        documentelement : true,
-        domain          : true,
-        'eval'          : true,
-        execScript      : true,
-        external        : true,
-        forms           : true,
-        forward         : true,
-        frameelement    : true,
-        fromcharcode    : true,
-        history         : true,
-        home            : true,
-        location        : true,
-        moveby          : true,
-        moveto          : true,
-        navigate        : true,
-        opener          : true,
-        parent          : true,
-        print           : true,
-        prompt          : true,
-        prototype       : true,
-        referrer        : true,
-        resizeby        : true,
-        resizeto        : true,
-        self            : true,
-        showhelp        : true,
-        showmodaldialog : true,
-        status          : true,
-        stop            : true,
-        top             : true,
-        window          : true,
-        write           : true,
-        writeln         : true,
-        __proto__       : true
-    },
+    var adsafe = {              // the member names that ADsafe prohibits.
+            apply           : true,
+            call            : true,
+            callee          : true,
+            caller          : true,
+            constructor     : true,
+            'eval'          : true,
+            prototype       : true,
+            unwatch         : true,
+            valueOf         : true,
+            watch           : true
+        },
+        adsafe_allow,           // the global objects that ADsafe allows.
 
 // These are all of the JSLint options.
 
@@ -139,13 +180,17 @@ JSLINT = function () {
             debug      : true, // if debugger statements should be allowed
             eqeqeq     : true, // if === should be required
             evil       : true, // if eval should be allowed
+            forin      : true, // if for in statements must filter
             fragment   : true, // if HTML fragments should be allowed
             laxbreak   : true, // if line breaks should not be checked
             nomen      : true, // if names should be checked
+            on         : true, // if HTML event handlers should be allowed
             passfail   : true, // if the scan should stop on first error
             plusplus   : true, // if increment/decrement should not be allowed
+            regexp     : true, // if the . should not be allowed in regexp literals
             rhino      : true, // if the Rhino environment globals should be predefined
             undef      : true, // if variables should be declared before used
+            sidebar    : true, // if the System object should be predefined
             white      : true, // if strict whitespace rules apply
             widget     : true  // if the Yahoo Widgets globals should be predefined
         },
@@ -205,6 +250,7 @@ JSLINT = function () {
             window          : true,
             XMLHttpRequest  : true
         },
+
         escapes = {
             '\b': '\\b',
             '\t': '\\t',
@@ -212,23 +258,61 @@ JSLINT = function () {
             '\f': '\\f',
             '\r': '\\r',
             '"' : '\\"',
+            '/' : '\\/',
             '\\': '\\\\'
         },
+
         funct,          // The current function
         functions,      // All of the functions
+
+        href = {
+            background  : true,
+            content     : true,
+            data        : true,
+            dynsrc      : true,
+            href        : true,
+            lowsrc      : true,
+            value       : true,
+            src         : true,
+            style       : true
+        },
+
+        global,         // The global object
         globals,        // The current globals
         implied,        // Implied globals
+        inblock,
         indent,
         jsonmode,
         lines,
         lookahead,
+
+        math_member = {
+            E:       true,
+            LN2:     true,
+            LN10:    true,
+            LOG2E:   true,
+            LOG10E:  true,
+            PI:      true,
+            SQRT1_2: true,
+            SQRT2:   true
+        },
+
         member,
         membersOnly,
         nexttoken,
         noreach,
+
+        number_member = {
+            MAX_VALUE:         true,
+            MIN_VALUE:         true,
+            NEGATIVE_INFINITY: true,
+            POSITIVE_INFINITY: true
+        },
+
         option,
         prereg,
         prevtoken,
+
         rhino = {
             defineClass : true,
             deserialize : true,
@@ -248,7 +332,14 @@ JSLINT = function () {
             toint32     : true,
             version     : true
         },
+
         scope,      // The current scope
+
+        sidebar = {
+            System      : true
+        },
+
+        src,
         stack,
 
 // standard contains the global names that are provided by the
@@ -283,17 +374,20 @@ JSLINT = function () {
             unescape            : true,
             URIError            : true
         },
+
         syntax = {},
         token,
-        verb,
         warnings,
 
 // widget contains the global names which are provided to a Yahoo
 // (fna Konfabulator) widget.
 
         widget = {
-            YAHOO: true,
-            YAHOO_config: true,
+            YAHOO: true, // 2.x YUI
+            YUI: true, // 3.x YUI
+            YAHOO_config: true, // 2.x YUI
+            ActiveXObject: true, // IE connection mgr
+            Event: true, // Event constructor used in getEvent
             alert                   : true,
             appleScript             : true,
             animator                : true,
@@ -362,7 +456,6 @@ JSLINT = function () {
             yahooLogin              : true,
             yahooLogout             : true
         },
-        wmode,
 
 //  xmode is used to adapt to the exceptions in XML parsing.
 //  It can have these states:
@@ -382,29 +475,32 @@ JSLINT = function () {
 
         xtype,
 
+// unsafe comment
+        ax = /@cc|<\/?script|\]\]|&/i,
+// unsafe character
+        cx = /[\u0000-\u001f\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/,
 // token
-        tx = /^\s*([(){}[.,:;'"~]|\](\]>)?|\?>?|==?=?|\/(\*(global|extern|jslint|member|members)?|=|\/)?|\*[\/=]?|\+[+=]?|-[-=]?|%[=>]?|&[&=]?|\|[|=]?|>>?>?=?|<([\/=%\?]|\!(\[|--)?|<=?)?|\^=?|\!=?=?|[a-zA-Z_$][a-zA-Z0-9_$]*|[0-9]+([xX][0-9a-fA-F]+|\.[0-9]*)?([eE][+-]?[0-9]+)?)/,
-// regular expression
-        rx = /^(\\[^\x00-\x1f]|\[(\\[^\x00-\x1f]|[^\x00-\x1f\\\/])*\]|[^\x00-\x1f\\\/\[])+\/[gim]*/,
+        tx = /^\s*([(){}\[.,:;'"~]|\](\]>)?|\?>?|==?=?|\/(\*(global|extern|jslint|member|members)?|=|\/)?|\*[\/=]?|\+[+=]?|-[\-=]?|%[=>]?|&[&=]?|\|[|=]?|>>?>?=?|<([\/=%\?]|\!(\[|--)?|<=?)?|\^=?|\!=?=?|[a-zA-Z_$][a-zA-Z0-9_$]*|[0-9]+([xX][0-9a-fA-F]+|\.[0-9]*)?([eE][+\-]?[0-9]+)?)/,
 // star slash
         lx = /\*\/|\/\*/,
 // identifier
-        ix = /^([a-zA-Z_$][a-zA-Z0-9_$]*$)/,
+        ix = /^([a-zA-Z_$][a-zA-Z0-9_$]*)$/,
 // javascript url
-        jx = /(javascript|jscript|ecmascript)\s*:/i;
+        jx = /(?:javascript|jscript|ecmascript|vbscript|mocha|livescript)\s*:/i,
+// url badness
+        ux = /&|\+|\u00AD|\.\.|\/\*|%[^;]|base64|url|expression|data|mailto/i;
 
-    Object.prototype.begetObject = function () {
-        function F() {}
-        F.prototype = this;
+    function F() {}
+
+    function object(o) {
+        F.prototype = o;
         return new F();
-    };
+    }
 
-    Object.prototype.combine = function (o) {
+    Object.prototype.union = function (o) {
         var n;
-        for (n in o) {
-            if (o.hasOwnProperty(n)) {
-                this[n] = o[n];
-            }
+        for (n in o) if (o.hasOwnProperty(n)) {
+            this[n] = o[n];
         }
     };
 
@@ -427,7 +523,7 @@ JSLINT = function () {
 
 
     String.prototype.supplant = function (o) {
-        return this.replace(/{([^{}]*)}/g, function (a, b) {
+        return this.replace(/\{([^{}]*)\}/g, function (a, b) {
             var r = o[b];
             return typeof r === 'string' || typeof r === 'number' ? r : a;
         });
@@ -445,8 +541,8 @@ JSLINT = function () {
         if (ix.test(this)) {
             return this;
         }
-        if (/[&<"\\\x00-\x1f]/.test(this)) {
-            return '"' + this.replace(/[&<"\\\x00-\x1f]/g, function (a) {
+        if (/[&<"\/\\\x00-\x1f]/.test(this)) {
+            return '"' + this.replace(/[&<"\/\\\x00-\x1f]/g, function (a) {
                 var c = escapes[a];
                 if (c) {
                     return c;
@@ -462,14 +558,21 @@ JSLINT = function () {
 
 
     function populateGlobals() {
-        if (option.rhino) {
-            globals.combine(rhino);
-        }
-        if (option.browser) {
-            globals.combine(browser);
-        }
-        if (option.widget) {
-            globals.combine(widget);
+        if (option.adsafe) {
+            globals.union(adsafe_allow);
+        } else {
+            if (option.rhino) {
+                globals.union(rhino);
+            }
+            if (option.browser || option.sidebar) {
+                globals.union(browser);
+            }
+            if (option.sidebar) {
+                globals.union(sidebar);
+            }
+            if (option.widget) {
+                globals.union(widget);
+            }
         }
     }
 
@@ -546,12 +649,17 @@ JSLINT = function () {
 // Private lex methods
 
         function nextLine() {
+            var at;
             line += 1;
             if (line >= lines.length) {
                 return false;
             }
             character = 0;
-            s = lines[line];
+            s = lines[line].replace(/\t/g, '    ');
+            at = s.search(cx);
+            if (at >= 0) {
+                warningAt("Unsafe character.", line, at);
+            }
             return true;
         }
 
@@ -559,10 +667,6 @@ JSLINT = function () {
 
         function it(type, value) {
             var i, t;
-            if (option.adsafe && adsafe[value.toLowerCase()] === true) {
-                warning("Adsafe restricted word '{a}'.",
-                        {line: line, from: character}, value);
-            }
             if (type === '(punctuator)' ||
                     (type === '(identifier)' && syntax.hasOwnProperty(value))) {
                 t = syntax[value];
@@ -575,10 +679,14 @@ JSLINT = function () {
             } else {
                 t = syntax[type];
             }
-            t = t.begetObject();
+            t = object(t);
             if (type === '(string)') {
-                if (/(javascript|jscript|ecmascript)\s*:/i.test(value)) {
-                    warningAt("JavaScript URL.", line, from);
+                if (jx.test(value)) {
+                    warningAt("Script URL.", line, from);
+                }
+            } else if (type === '(identifier)') {
+                if (option.nomen && value.charAt(0) === '_') {
+                    warningAt("Unexpected '_' in '{a}'.", line, from, value);
                 }
             }
             t.value = value;
@@ -586,9 +694,11 @@ JSLINT = function () {
             t.character = character;
             t.from = from;
             i = t.id;
-            prereg = i &&
-                    (('(,=:[!&|?{};'.indexOf(i.charAt(i.length - 1)) >= 0) ||
-                    i === 'return');
+            if (i !== '(endline)') {
+                prereg = i &&
+                        (('(,=:[!&|?{};'.indexOf(i.charAt(i.length - 1)) >= 0) ||
+                        i === 'return');
+            }
             return t;
         }
 
@@ -597,26 +707,22 @@ JSLINT = function () {
         return {
             init: function (source) {
                 if (typeof source === 'string') {
-                    lines = source.split('\r\n');
-                    if (lines.length === 1) {
-                        lines = lines[0].split('\n');
-                        if (lines.length === 1) {
-                            lines = lines[0].split('\r');
-                        }
-                    }
+                    lines = source.
+                        replace(/\r\n/g, '\n').
+                        replace(/\r/g, '\n').
+                        split('\n');
                 } else {
                     lines = source;
                 }
-                line = 0;
-                character = 0;
+                line = -1;
+                nextLine();
                 from = 0;
-                s = lines[0];
             },
 
 // token -- this is called by advance to get the next token.
 
             token: function () {
-                var c, d, i, l, r, t;
+                var b, c, captures, d, depth, high, i, l, low, q, t;
 
                 function match(x) {
                     var r = x.exec(s), r1;
@@ -653,8 +759,14 @@ JSLINT = function () {
                         character += n;
                         c = String.fromCharCode(i);
                     }
-
-                    for (j = 0; j < s.length; j += 1) {
+                    j = 0;
+                    for (;;) {
+                        while (j >= s.length) {
+                            j = 0;
+                            if (xmode !== 'xml' || !nextLine()) {
+                                errorAt("Unclosed string.", line, from);
+                            }
+                        }
                         c = s.charAt(j);
                         if (c === x) {
                             character += 1;
@@ -666,12 +778,19 @@ JSLINT = function () {
                                 break;
                             }
                             warningAt("Control character in string: {a}.",
-                                    line, character + j, s.substring(0, j));
+                                    line, character + j, s.slice(0, j));
                         } else if (c === '<') {
-                            if (s.charAt(j + 1) === '/' && xmode && xmode !== 'CDATA') {
+                            if (option.adsafe && xmode === 'xml') {
+                                warningAt("ADsafe string violation.",
+                                        line, character + j);
+                            } else if (s.charAt(j + 1) === '/' && ((xmode && xmode !== 'CDATA') || option.adsafe)) {
                                 warningAt("Expected '<\\/' and instead saw '</'.", line, character);
                             }
                         } else if (c === '\\') {
+                            if (option.adsafe && xmode === 'xml') {
+                                warningAt("ADsafe string violation.",
+                                        line, character + j);
+                            }
                             j += 1;
                             character += 1;
                             c = s.charAt(j);
@@ -714,8 +833,8 @@ JSLINT = function () {
                         }
                         r += c;
                         character += 1;
+                        j += 1;
                     }
-                    errorAt("Unclosed string.", line, from);
                 }
 
                 for (;;) {
@@ -780,12 +899,24 @@ JSLINT = function () {
 //      // comment
 
                     case '//':
+                        if (src || (xmode && !(xmode === 'script' || xmode === 'CDATA'))) {
+                            warningAt("Unexpected comment.", line, character);
+                        }
+                        if (option.adsafe && ax.test(s)) {
+                            warningAt("ADsafe comment violation.", line, character);
+                        }
                         s = '';
                         break;
 
 //      /* comment
 
                     case '/*':
+                        if (src || (xmode && !(xmode === 'script' || xmode === 'CDATA'))) {
+                            warningAt("Unexpected comment.", line, character);
+                        }
+                        if (option.adsafe && ax.test(s)) {
+                            warningAt("ADsafe comment violation.", line, character);
+                        }
                         for (;;) {
                             i = s.search(lx);
                             if (i >= 0) {
@@ -793,6 +924,10 @@ JSLINT = function () {
                             }
                             if (!nextLine()) {
                                 errorAt("Unclosed comment.", line, character);
+                            } else {
+                                if (option.adsafe && ax.test(s)) {
+                                    warningAt("ADsafe comment violation.", line, character);
+                                }
                             }
                         }
                         character += i + 2;
@@ -802,10 +937,10 @@ JSLINT = function () {
                         s = s.substr(i + 2);
                         break;
 
-//      /*extern /*global /*members /*jslint */
+//      /*global /*extern /*members /*jslint */
 
-                    case '/*extern':
                     case '/*global':
+                    case '/*extern':
                     case '/*members':
                     case '/*member':
                     case '/*jslint':
@@ -823,15 +958,184 @@ JSLINT = function () {
 //      /
                     case '/':
                         if (prereg) {
-                            r = rx.exec(s);
-                            if (r) {
-                                c = r[0];
-                                l = c.length;
-                                character += l;
-                                s = s.substr(l);
-                                return it('(regex)', c);
+                            depth = 0;
+                            captures = 0;
+                            l = 0;
+                            for (;;) {
+                                b = true;
+                                c = s.charAt(l);
+                                l += 1;
+                                switch (c) {
+                                case '':
+                                    errorAt("Unclosed regular expression.", line, from);
+                                    return;
+                                case '/':
+                                    if (depth > 0) {
+                                        warningAt("Unescaped '{a}'.", line, from + l, '/');
+                                    }
+                                    c = s.substr(0, l - 1);
+                                    q = {
+                                        g: true,
+                                        i: true,
+                                        m: true
+                                    };
+                                    while (q[s.charAt(l)] === true) {
+                                        q[s.charAt(l)] = false;
+                                        l += 1;
+                                    }
+                                    character += l;
+                                    s = s.substr(l);
+                                    return it('(regex)', c);
+                                case '\\':
+                                    l += 1;
+                                    break;
+                                case '(':
+                                    depth += 1;
+                                    b = false;
+                                    if (s.charAt(l) === '?') {
+                                        l += 1;
+                                        switch (s.charAt(l)) {
+                                        case ':':
+                                        case '=':
+                                        case '!':
+                                            l += 1;
+                                            break;
+                                        default:
+                                            warningAt("Expected '{a}' and instead saw '{b}'.", line, from + l, ':', s.charAt(l));
+                                        }
+                                    } else {
+                                        captures += 1;
+                                    }
+                                    break;
+                                case ')':
+                                    if (depth === 0) {
+                                        warningAt("Unescaped '{a}'.", line, from + l, ')');
+                                    } else {
+                                        depth -= 1;
+                                    }
+                                    break;
+                                case ' ':
+                                    q = 1;
+                                    while (s.charAt(l) === ' ') {
+                                        l += 1;
+                                        q += 1;
+                                    }
+                                    if (q > 1) {
+                                        warningAt("Spaces are hard to count. Use {{a}}.", line, from + l, q);
+                                    }
+                                    break;
+                                case '[':
+                                    if (s.charAt(l) === '^') {
+                                        l += 1;
+                                    }
+                                    q = false;
+klass:                              for (;;) {
+                                        c = s.charAt(l);
+                                        l += 1;
+                                        switch (c) {
+                                        case '[':
+                                        case '^':
+                                            warningAt("Unescaped '{a}'.", line, from + l, c);
+                                            q = true;
+                                            break;
+                                        case '-':
+                                            if (q) {
+                                                q = false;
+                                            } else {
+                                                warningAt("Unescaped '{a}'.", line, from + l, '-');
+                                                q = true;
+                                            }
+                                            break;
+                                        case ']':
+                                            if (!q) {
+                                                warningAt("Unescaped '{a}'.", line, from + l - 1, '-');
+                                            }
+                                            break klass;
+                                        case '\\':
+                                            l += 1;
+                                            q = true;
+                                            break;
+                                        default:
+                                            q = true;
+                                        }
+                                    }
+                                    break;
+                                case '.':
+                                    if (option.regexp) {
+                                        warningAt("Unexpected '{a}'.", line, from + l, c);
+                                    }
+                                    break;
+                                case ']':
+                                case '?':
+                                case '{':
+                                case '}':
+                                case '+':
+                                case '*':
+                                    warningAt("Unescaped '{a}'.", line, from + l, c);
+                                    break;
+                                }
+                                if (b) {
+                                    switch (s.charAt(l)) {
+                                    case '?':
+                                    case '+':
+                                    case '*':
+                                        l += 1;
+                                        if (s.charAt(l) === '?') {
+                                            l += 1;
+                                        }
+                                        break;
+                                    case '{':
+                                        l += 1;
+                                        c = s.charAt(l);
+                                        if (c < '0' || c > '9') {
+                                            warningAt("Expected a number and instead saw '{a}'.", line, from + l, c);
+                                        }
+                                        l += 1;
+                                        low = +c;
+                                        for (;;) {
+                                            c = s.charAt(l);
+                                            if (c < '0' || c > '9') {
+                                                break;
+                                            }
+                                            l += 1;
+                                            low = +c + (low * 10);
+                                        }
+                                        high = low;
+                                        if (c === ',') {
+                                            l += 1;
+                                            high = Infinity;
+                                            c = s.charAt(l);
+                                            if (c >= '0' && c <= '9') {
+                                                l += 1;
+                                                high = +c;
+                                                for (;;) {
+                                                    c = s.charAt(l);
+                                                    if (c < '0' || c > '9') {
+                                                        break;
+                                                    }
+                                                    l += 1;
+                                                    high = +c + (high * 10);
+                                                }
+                                            }
+                                        }
+                                        if (s.charAt(l) !== '}') {
+                                            warningAt("Expected '{a}' and instead saw '{b}'.", line, from + l, '}', c);
+                                        } else {
+                                            l += 1;
+                                        }
+                                        if (s.charAt(l) === '?') {
+                                            l += 1;
+                                        }
+                                        if (low > high) {
+                                            warningAt("'{a}' should not be greater than '{b}'.", line, from + l, low, high);
+                                        }
+                                    }
+                                }
                             }
-                            errorAt("Bad regular expression.", line, character);
+                            c = s.substr(0, l - 1);
+                            character += l;
+                            s = s.substr(l);
+                            return it('(regex)', c);
                         }
                         return it('(punctuator)', t);
 
@@ -884,37 +1188,44 @@ JSLINT = function () {
         if (t === 'hasOwnProperty') {
             error("'hasOwnProperty' is a really bad name.");
         }
+        if (option.adsafe && scope === global) {
+            warning('ADsafe global: ' + t + '.', token);
+        }
 
 // Define t in the current function in the current scope.
 
-        if (funct === true) {
-            scope[t] = true;
-        } else {
-            if (funct.hasOwnProperty(t)) {
-                warning(funct[t] === true ?
-                    "'{a}' was used before it was defined." :
-                    "'{a}' is already defined.",
-                    nexttoken, t);
-            }
-
-            scope[t] = funct;
-            funct[t] = type;
+        if (funct.hasOwnProperty(t)) {
+            warning(funct[t] === true ?
+                "'{a}' was used before it was defined." :
+                "'{a}' is already defined.",
+                nexttoken, t);
+        }
+        scope[t] = funct;
+        funct[t] = type;
+        if (funct['(global)'] && implied.hasOwnProperty(t)) {
+            warning("'{a}' was used before it was defined.",
+                nexttoken, t);
+            delete implied[t];
         }
     }
 
 
     function doOption() {
-        var b, obj, filter, t, v;
-        switch (nexttoken.value) {
+        var b, obj, filter, o = nexttoken.value, t, v;
+        switch (o) {
         case '*/':
             error("Unbegun comment.");
             break;
-        case '/*extern':
         case '/*global':
+        case '/*extern':
+            if (option.adsafe) {
+                warning("ADsafe restriction.");
+            }
             obj = globals;
             break;
         case '/*members':
         case '/*member':
+            o = '/*members';
             if (!membersOnly) {
                 membersOnly = {};
             }
@@ -922,7 +1233,7 @@ JSLINT = function () {
             break;
         case '/*jslint':
             if (option.adsafe) {
-                error("Adsafe restriction.");
+                warning("ADsafe restriction.");
             }
             obj = option;
             filter = allOptions;
@@ -938,7 +1249,8 @@ JSLINT = function () {
             if (t.type === 'special' && t.value === '*/') {
                 break;
             }
-            if (t.type !== '(string)' && t.type !== '(identifier)') {
+            if (t.type !== '(string)' && t.type !== '(identifier)' &&
+                    o !== '/*members') {
                 error("Bad option.", t);
             }
             if (filter) {
@@ -1044,6 +1356,9 @@ JSLINT = function () {
                 doOption();
             } else {
                 if (nexttoken.id === '<![') {
+                    if (option.adsafe) {
+                        error("ADsafe violation.", nexttoken);
+                    }
                     if (xtype === 'html') {
                         error("Unexpected '{a}'.", nexttoken, '<![');
                     }
@@ -1126,18 +1441,36 @@ JSLINT = function () {
 // They are key to the parsing method called Top Down Operator Precedence.
 
     function parse(rbp, initial) {
-        var left;
-        var o;
+        var left, o, p;
         if (nexttoken.id === '(end)') {
             error("Unexpected early end of program.", token);
         }
         advance();
+        if (option.adsafe) {
+            p = peek(0);
+            if (adsafe_allow[token.value] === true) {
+                if (nexttoken.id !== '.' || !p.identifier ||
+                        peek(1).id !== '(') {
+                    warning('ADsafe violation.', token);
+                }
+            } else if (token.value === 'Math') {
+                if (nexttoken.id !== '.' || !p.identifier ||
+                        (math_member[p.value] !== true && peek(1).id !== '(')) {
+                    warning('ADsafe violation.', token);
+                }
+            } else if (token.value === 'Number') {
+                if (nexttoken.id !== '.' || !p.identifier ||
+                        number_member[p.value] !== true || peek(1).id === '(') {
+                    warning('ADsafe violation.', token);
+                }
+            }
+        }
         if (initial) {
             anonname = 'anonymous';
-            verb = token.value;
+            funct['(verb)'] = token.value;
         }
-        if (initial && token.fud) {
-            token.fud();
+        if (initial === true && token.fud) {
+            left = token.fud();
         } else {
             if (token.nud) {
                 o = token.exps;
@@ -1224,17 +1557,26 @@ JSLINT = function () {
         }
     }
 
+    function nolinebreak(t) {
+        if (t.line !== nexttoken.line) {
+            warning("Line breaking error '{a}'.", t, t.id);
+        }
+    }
 
 
 // Parasitic constructors for making the symbols that will be inherited by
 // tokens.
 
     function symbol(s, p) {
-        return syntax[s] || (syntax[s] = {
-            id: s,
-            lbp: p,
-            value: s
-        });
+        var x = syntax[s];
+        if (!x || typeof x !== 'object') {
+            syntax[s] = x = {
+                id: s,
+                lbp: p,
+                value: s
+            };
+        }
+        return x;
     }
 
 
@@ -1298,6 +1640,9 @@ JSLINT = function () {
 
     function reservevar(s) {
         return reserve(s, function () {
+            if (option.adsafe && this.id === 'this') {
+                warning("ADsafe violation.", this);
+            }
             return this;
         });
     }
@@ -1309,7 +1654,9 @@ JSLINT = function () {
         x.led = (typeof f === 'function') ? f : function (left) {
             nonadjacent(prevtoken, token);
             nonadjacent(token, nexttoken);
-            return [this.id, left, parse(p)];
+            this.left = left;
+            this.right = parse(p);
+            return this;
         };
         return x;
     }
@@ -1326,7 +1673,9 @@ JSLINT = function () {
             } else if (f) {
                 f.apply(this, [left, right]);
             }
-            return [this.id, left, right];
+            this.left = left;
+            this.right = right;
+            return this;
         };
         return x;
     }
@@ -1345,8 +1694,18 @@ JSLINT = function () {
     function assignop(s, f) {
         symbol(s, 20).exps = true;
         return infix(s, function (left) {
+            var l;
             nonadjacent(prevtoken, token);
             nonadjacent(token, nexttoken);
+            if (option.adsafe) {
+                l = left;
+                do {
+                    if (adsafe_allow[l.value] === true) {
+                        warning('ADsafe violation.', l);
+                    }
+                    l = l.left;
+                } while (l);
+            }
             if (left) {
                 if (left.id === '.' || left.id === '[' ||
                         (left.identifier && !left.reserved)) {
@@ -1372,7 +1731,9 @@ JSLINT = function () {
             }
             nonadjacent(prevtoken, token);
             nonadjacent(token, nexttoken);
-            return [this.id, left, parse(p)];
+            this.left = left;
+            this.right = parse(p);
+            return this;
         };
         return x;
     }
@@ -1408,7 +1769,8 @@ JSLINT = function () {
             if (option.plusplus) {
                 warning("Unexpected use of '{a}'.", this, this.id);
             }
-            return [f, left];
+            this.left = left;
+            return this;
         };
         return x;
     }
@@ -1420,13 +1782,6 @@ JSLINT = function () {
                     nexttoken, nexttoken.id);
         }
         if (nexttoken.identifier) {
-            if (option.nomen) {
-                if (nexttoken.value.charAt(0) === '_' ||
-                        nexttoken.value.indexOf('$') >= 0) {
-                    warning("Unexpected characters in '{a}'.",
-                            nexttoken, nexttoken.value);
-                }
-            }
             advance();
             return token.value;
         }
@@ -1447,8 +1802,7 @@ JSLINT = function () {
     }
 
     function reachable(s) {
-        var i = 0;
-        var t;
+        var i = 0, t;
         if (nexttoken.id !== ';' || noreach) {
             return;
         }
@@ -1471,8 +1825,8 @@ JSLINT = function () {
     }
 
 
-    function statement() {
-        var i = indent, s = scope, t = nexttoken;
+    function statement(noindent) {
+        var i = indent, r, s = scope, t = nexttoken;
 
 // We don't like the empty statement.
 
@@ -1487,7 +1841,7 @@ JSLINT = function () {
         if (t.identifier && !t.reserved && peek().id === ':') {
             advance();
             advance(':');
-            scope = s.begetObject();
+            scope = object(s);
             addlabel(t.value, 'label');
             if (!nexttoken.labelled) {
                 warning("Label '{a}' on {b} statement.",
@@ -1503,7 +1857,10 @@ JSLINT = function () {
 
 // Parse the statement.
 
-        parse(0, true);
+        if (!noindent) {
+            indentation();
+        }
+        r = parse(0, true);
 
 // Look for the final semicolon.
 
@@ -1522,25 +1879,29 @@ JSLINT = function () {
 
         indent = i;
         scope = s;
+        return r;
     }
 
 
     function statements() {
+        var a = [];
         while (!nexttoken.reach && nexttoken.id !== '(end)') {
             if (nexttoken.id === ';') {
                 warning("Unnecessary semicolon.");
                 advance(';');
+            } else {
+                a.push(statement());
             }
-            indentation();
-            statement();
         }
+        return a;
     }
 
 
     function block(f) {
-        var s = scope;
+        var a, b = inblock, s = scope;
+        inblock = f;
         if (f) {
-            scope = scope.begetObject();
+            scope = object(scope);
         }
         nonadjacent(token, nexttoken);
         var t = nexttoken;
@@ -1551,7 +1912,7 @@ JSLINT = function () {
                 if (!f && nexttoken.from === indent + 4) {
                     indent += 4;
                 }
-                statements();
+                a = statements();
                 indent -= 4;
                 indentation();
             }
@@ -1560,11 +1921,13 @@ JSLINT = function () {
             warning("Expected '{a}' and instead saw '{b}'.",
                     nexttoken, '{', nexttoken.value);
             noreach = true;
-            statement();
+            a = [statement()];
             noreach = false;
         }
-        verb = null;
+        funct['(verb)'] = null;
         scope = s;
+        inblock = b;
+        return a;
     }
 
 
@@ -1577,7 +1940,7 @@ JSLINT = function () {
 
     function countMember(m) {
         if (membersOnly && membersOnly[m] !== true) {
-            warning("Unexpected member '{a}'.", nexttoken, m);
+            warning("Unexpected /*member '{a}'.", nexttoken, m);
         }
         if (typeof member[m] === 'number') {
             member[m] += 1;
@@ -1586,53 +1949,29 @@ JSLINT = function () {
         }
     }
 
-
-// Common HTML attributes that carry scripts.
-
-    var scriptstring = {
-        onblur:      true,
-        onchange:    true,
-        onclick:     true,
-        ondblclick:  true,
-        onfocus:     true,
-        onkeydown:   true,
-        onkeypress:  true,
-        onkeyup:     true,
-        onload:      true,
-        onmousedown: true,
-        onmousemove: true,
-        onmouseout:  true,
-        onmouseover: true,
-        onmouseup:   true,
-        onreset:     true,
-        onselect:    true,
-        onsubmit:    true,
-        onunload:    true
-    };
+    function note_implied(token) {
+        var name = token.value, line = token.line + 1, a = implied[name];
+        if (!a) {
+            a = [line];
+            implied[name] = a;
+        } else if (a[a.length - 1] !== line) {
+            a.push(line);
+        }
+    }
 
 
 // XML types. Currently we support html and widget.
 
     var xmltype = {
-        HTML: {
-            doBegin: function (n) {
-                if (!option.cap) {
-                    warning("HTML case error.");
-                }
-                xmltype.html.doBegin();
-            }
-        },
         html: {
             doBegin: function (n) {
                 xtype = 'html';
-                xmltype.html.script = false;
                 option.browser = true;
                 populateGlobals();
             },
             doTagName: function (n, p) {
-                var i;
-                var t = xmltype.html.tag[n];
-                var x;
+                var i, t = xmltype.html.tag[n], x;
+                src = false;
                 if (!t) {
                     error("Unrecognized tag '<{a}>'.",
                             nexttoken,
@@ -1640,42 +1979,58 @@ JSLINT = function () {
                                 n + ' (capitalization error)');
                 }
                 x = t.parent;
-                if (x) {
-                    if (x.indexOf(' ' + p + ' ') < 0) {
-                        error("A '<{a}>' must be within '<{b}>'.",
-                                token, n, x);
-                    }
-                } else {
-                    i = stack.length;
-                    do {
-                        if (i <= 0) {
+                if (!option.fragment || stack.length !== 1 || !stack[0].fragment) {
+                    if (x) {
+                        if (x.indexOf(' ' + p + ' ') < 0) {
                             error("A '<{a}>' must be within '<{b}>'.",
-                                    token, n, 'body');
+                                    token, n, x);
                         }
-                        i -= 1;
-                    } while (stack[i].name !== 'body');
+                    } else {
+                        i = stack.length;
+                        do {
+                            if (i <= 0) {
+                                error("A '<{a}>' must be within '<{b}>'.",
+                                        token, n, 'body');
+                            }
+                            i -= 1;
+                        } while (stack[i].name !== 'body');
+                    }
                 }
-                xmltype.html.script = n === 'script';
                 return t.empty;
             },
             doAttribute: function (n, a) {
+                if (!a) {
+                    warning("Missing attribute name.", token);
+                }
+                a = a.toLowerCase();
                 if (n === 'script') {
                     if (a === 'src') {
-                        xmltype.html.script = false;
-                        return 'string';
+                        src = true;
+                        return 'href';
                     } else if (a === 'language') {
                         warning("The 'language' attribute is deprecated.",
                                 token);
                         return false;
                     }
+                } else if (n === 'style') {
+                    if (a === 'type' && option.adsafe) {
+                        warning("Don't bother with 'type'.", token);
+                    }
                 }
-                if (a === 'href') {
+                if (href[a] === true) {
                     return 'href';
                 }
-                return scriptstring[a] && 'script';
+                if (a.slice(0, 2) === 'on') {
+                    if (!option.on) {
+                        warning("Avoid HTML event handlers.");
+                    }
+                    return 'script';
+                } else {
+                    return 'value';
+                }
             },
             doIt: function (n) {
-                return xmltype.html.script ? 'script' : n !== 'html' &&
+                return n === 'script' ? 'script' : n !== 'html' &&
                         xmltype.html.tag[n].special && 'special';
             },
             tag: {
@@ -1735,10 +2090,9 @@ JSLINT = function () {
                 link:     {empty: true, parent: ' head '},
                 map:      {},
                 menu:     {},
-                meta:     {empty: true, parent: ' head noscript '},
+                meta:     {empty: true, parent: ' head noframes noscript '},
                 noframes: {parent: ' html body '},
-                noscript: {parent:
-' applet blockquote body button center dd del div fieldset form frameset head html iframe ins li map noframes noscript object td th '},
+                noscript: {parent: ' body head noframes '},
                 object:   {},
                 ol:       {},
                 optgroup: {parent: ' select '},
@@ -1748,8 +2102,7 @@ JSLINT = function () {
                 pre:      {},
                 q:        {},
                 samp:     {},
-                script:   {parent:
-' head body p div span abbr acronym address bdo blockquote cite code del dfn em ins kbd pre samp strong table tbody td th tr var '},
+                script:   {parent: ' body div frame head iframe p pre span '},
                 select:   {},
                 small:    {},
                 span:     {},
@@ -1776,6 +2129,7 @@ JSLINT = function () {
             doBegin: function (n) {
                 xtype = 'widget';
                 option.widget = true;
+                option.cap = true;
                 populateGlobals();
             },
             doTagName: function (n, p) {
@@ -1814,50 +2168,51 @@ JSLINT = function () {
                 "about-version":        {parent: ' about-box '},
                 action:                 {parent: ' widget ', script: true},
                 alignment:              {parent: ' canvas frame image scrollbar text textarea window '},
-                anchorStyle:            {parent: ' text '},
+                anchorstyle:            {parent: ' text '},
                 author:                 {parent: ' widget '},
-                autoHide:               {parent: ' scrollbar '},
+                autohide:               {parent: ' scrollbar '},
                 beget:                  {parent: ' canvas frame image scrollbar text window '},
-                bgColor:                {parent: ' text textarea '},
-                bgColour:               {parent: ' text textarea '},
-                bgOpacity:              {parent: ' text textarea '},
+                bgcolor:                {parent: ' text textarea '},
+                bgcolour:               {parent: ' text textarea '},
+                bgopacity:              {parent: ' text textarea '},
                 canvas:                 {parent: ' frame window '},
-                checked:                {parent: ' image menuItem '},
-                clipRect:               {parent: ' image '},
+                charset:                {parent: ' script '},
+                checked:                {parent: ' image menuitem '},
+                cliprect:               {parent: ' image '},
                 color:                  {parent: ' about-text about-version shadow text textarea '},
                 colorize:               {parent: ' image '},
                 colour:                 {parent: ' about-text about-version shadow text textarea '},
                 columns:                {parent: ' textarea '},
                 company:                {parent: ' widget '},
-                contextMenuItems:       {parent: ' canvas frame image scrollbar text textarea window '},
+                contextmenuitems:       {parent: ' canvas frame image scrollbar text textarea window '},
                 copyright:              {parent: ' widget '},
                 data:                   {parent: ' about-text about-version text textarea '},
                 debug:                  {parent: ' widget '},
-                defaultValue:           {parent: ' preference '},
-                defaultTracking:        {parent: ' widget '},
+                defaultvalue:           {parent: ' preference '},
+                defaulttracking:        {parent: ' widget '},
                 description:            {parent: ' preference '},
                 directory:              {parent: ' preference '},
                 editable:               {parent: ' textarea '},
-                enabled:                {parent: ' menuItem '},
+                enabled:                {parent: ' menuitem '},
                 extension:              {parent: ' preference '},
                 file:                   {parent: ' action preference '},
-                fillMode:               {parent: ' image '},
+                fillmode:               {parent: ' image '},
                 font:                   {parent: ' about-text about-version text textarea '},
-                fontStyle:              {parent: ' textarea '},
+                fontstyle:              {parent: ' textarea '},
                 frame:                  {parent: ' frame window '},
                 group:                  {parent: ' preference '},
-                hAlign:                 {parent: ' canvas frame image scrollbar text textarea '},
-                handleLinks:            {parent: ' textArea '},
+                halign:                 {parent: ' canvas frame image scrollbar text textarea '},
+                handlelinks:            {parent: ' textarea '},
                 height:                 {parent: ' canvas frame image scrollbar text textarea window '},
                 hidden:                 {parent: ' preference '},
-                hLineSize:              {parent: ' frame '},
-                hOffset:                {parent: ' about-text about-version canvas frame image scrollbar shadow text textarea window '},
+                hlinesize:              {parent: ' frame '},
+                hoffset:                {parent: ' about-text about-version canvas frame image scrollbar shadow text textarea window '},
                 hotkey:                 {parent: ' widget '},
-                hRegistrationPoint:     {parent: ' canvas frame image scrollbar text '},
-                hScrollBar:             {parent: ' frame '},
-                hslAdjustment:          {parent: ' image '},
-                hslTinting:             {parent: ' image '},
-                icon:                   {parent: ' preferenceGroup '},
+                hregistrationpoint:     {parent: ' canvas frame image scrollbar text '},
+                hscrollbar:             {parent: ' frame '},
+                hsladjustment:          {parent: ' image '},
+                hsltinting:             {parent: ' image '},
+                icon:                   {parent: ' preferencegroup '},
                 id:                     {parent: ' canvas frame hotkey image preference text textarea timer scrollbar widget window '},
                 image:                  {parent: ' about-box frame window widget '},
                 interval:               {parent: ' action timer '},
@@ -1865,98 +2220,99 @@ JSLINT = function () {
                 kind:                   {parent: ' preference '},
                 level:                  {parent: ' window '},
                 lines:                  {parent: ' textarea '},
-                loadingSrc:             {parent: ' image '},
+                loadingsrc:             {parent: ' image '},
                 locked:                 {parent: ' window '},
                 max:                    {parent: ' scrollbar '},
-                maxLength:              {parent: ' preference '},
-                menuItem:               {parent: ' contextMenuItems '},
+                maxlength:              {parent: ' preference '},
+                menuitem:               {parent: ' contextmenuitems '},
                 min:                    {parent: ' scrollbar '},
-                minimumVersion:         {parent: ' widget '},
-                minLength:              {parent: ' preference '},
-                missingSrc:             {parent: ' image '},
+                minimumversion:         {parent: ' widget '},
+                minlength:              {parent: ' preference '},
+                missingsrc:             {parent: ' image '},
                 modifier:               {parent: ' hotkey '},
-                name:                   {parent: ' canvas frame hotkey image preference preferenceGroup scrollbar setting text textarea timer widget window '},
-                notSaved:               {parent: ' preference '},
-                onClick:                {parent: ' canvas frame image scrollbar text textarea ', script: true},
-                onContextMenu:          {parent: ' canvas frame image scrollbar text textarea window ', script: true},
-                onDragDrop:             {parent: ' canvas frame image scrollbar text textarea ', script: true},
-                onDragEnter:            {parent: ' canvas frame image scrollbar text textarea ', script: true},
-                onDragExit:             {parent: ' canvas frame image scrollbar text textarea ', script: true},
-                onFirstDisplay:         {parent: ' window ', script: true},
-                onGainFocus:            {parent: ' textarea window ', script: true},
-                onKeyDown:              {parent: ' hotkey text textarea window ', script: true},
-                onKeyPress:             {parent: ' textarea window ', script: true},
-                onKeyUp:                {parent: ' hotkey text textarea window ', script: true},
-                onImageLoaded:          {parent: ' image ', script: true},
-                onLoseFocus:            {parent: ' textarea window ', script: true},
-                onMouseDown:            {parent: ' canvas frame image scrollbar text textarea window ', script: true},
-                onMouseDrag:            {parent: ' canvas frame image scrollbar text textArea window ', script: true},
-                onMouseEnter:           {parent: ' canvas frame image scrollbar text textarea window ', script: true},
-                onMouseExit:            {parent: ' canvas frame image scrollbar text textarea window ', script: true},
-                onMouseMove:            {parent: ' canvas frame image scrollbar text textarea window ', script: true},
-                onMouseUp:              {parent: ' canvas frame image scrollbar text textarea window ', script: true},
-                onMouseWheel:           {parent: ' frame ', script: true},
-                onMultiClick:           {parent: ' canvas frame image scrollbar text textarea window ', script: true},
-                onSelect:               {parent: ' menuItem ', script: true},
-                onTextInput:            {parent: ' window ', script: true},
-                onTimerFired:           {parent: ' timer ', script: true},
-                onValueChanged:         {parent: ' scrollbar ', script: true},
+                name:                   {parent: ' canvas frame hotkey image preference preferencegroup scrollbar setting text textarea timer widget window '},
+                notsaved:               {parent: ' preference '},
+                onclick:                {parent: ' canvas frame image scrollbar text textarea ', script: true},
+                oncontextmenu:          {parent: ' canvas frame image scrollbar text textarea window ', script: true},
+                ondragdrop:             {parent: ' canvas frame image scrollbar text textarea ', script: true},
+                ondragenter:            {parent: ' canvas frame image scrollbar text textarea ', script: true},
+                ondragexit:             {parent: ' canvas frame image scrollbar text textarea ', script: true},
+                onfirstdisplay:         {parent: ' window ', script: true},
+                ongainfocus:            {parent: ' textarea window ', script: true},
+                onkeydown:              {parent: ' hotkey text textarea window ', script: true},
+                onkeypress:             {parent: ' textarea window ', script: true},
+                onkeyup:                {parent: ' hotkey text textarea window ', script: true},
+                onimageloaded:          {parent: ' image ', script: true},
+                onlosefocus:            {parent: ' textarea window ', script: true},
+                onmousedown:            {parent: ' canvas frame image scrollbar text textarea window ', script: true},
+                onmousedrag:            {parent: ' canvas frame image scrollbar text textarea window ', script: true},
+                onmouseenter:           {parent: ' canvas frame image scrollbar text textarea window ', script: true},
+                onmouseexit:            {parent: ' canvas frame image scrollbar text textarea window ', script: true},
+                onmousemove:            {parent: ' canvas frame image scrollbar text textarea window ', script: true},
+                onmouseup:              {parent: ' canvas frame image scrollbar text textarea window ', script: true},
+                onmousewheel:           {parent: ' frame ', script: true},
+                onmulticlick:           {parent: ' canvas frame image scrollbar text textarea window ', script: true},
+                onselect:               {parent: ' menuitem ', script: true},
+                ontextinput:            {parent: ' window ', script: true},
+                ontimerfired:           {parent: ' timer ', script: true},
+                onvaluechanged:         {parent: ' scrollbar ', script: true},
                 opacity:                {parent: ' canvas frame image scrollbar shadow text textarea window '},
                 option:                 {parent: ' preference widget '},
-                optionValue:            {parent: ' preference '},
-                order:                  {parent: ' preferenceGroup '},
+                optionvalue:            {parent: ' preference '},
+                order:                  {parent: ' preferencegroup '},
                 orientation:            {parent: ' scrollbar '},
-                pageSize:               {parent: ' scrollbar '},
+                pagesize:               {parent: ' scrollbar '},
                 preference:             {parent: ' widget '},
-                preferenceGroup:        {parent: ' widget '},
-                remoteAsync:            {parent: ' image '},
-                requiredPlatform:       {parent: ' widget '},
+                preferencegroup:        {parent: ' widget '},
+                remoteasync:            {parent: ' image '},
+                requiredplatform:       {parent: ' widget '},
                 root:                   {parent: ' window '},
                 rotation:               {parent: ' canvas frame image scrollbar text '},
+                script:                 {parent: ' widget ', script: true},
                 scrollbar:              {parent: ' frame text textarea window '},
                 scrolling:              {parent: ' text '},
-                scrollX:                {parent: ' frame '},
-                scrollY:                {parent: ' frame '},
+                scrollx:                {parent: ' frame '},
+                scrolly:                {parent: ' frame '},
                 secure:                 {parent: ' preference textarea '},
                 setting:                {parent: ' settings '},
                 settings:               {parent: ' widget '},
                 shadow:                 {parent: ' about-text about-version text window '},
                 size:                   {parent: ' about-text about-version text textarea '},
                 spellcheck:             {parent: ' textarea '},
-                src:                    {parent: ' image '},
-                srcHeight:              {parent: ' image '},
-                srcWidth:               {parent: ' image '},
+                src:                    {parent: ' image script '},
+                srcheight:              {parent: ' image '},
+                srcwidth:               {parent: ' image '},
                 style:                  {parent: ' about-text about-version canvas frame image preference scrollbar text textarea window '},
                 subviews:               {parent: ' frame '},
                 superview:              {parent: ' canvas frame image scrollbar text textarea '},
                 text:                   {parent: ' frame text textarea window '},
                 textarea:               {parent: ' frame window '},
                 timer:                  {parent: ' widget '},
-                thumbColor:             {parent: ' scrollbar textarea '},
+                thumbcolor:             {parent: ' scrollbar textarea '},
                 ticking:                {parent: ' timer '},
                 ticks:                  {parent: ' preference '},
-                tickLabel:              {parent: ' preference '},
-                tileOrigin:             {parent: ' image '},
-                title:                  {parent: ' menuItem preference preferenceGroup window '},
+                ticklabel:              {parent: ' preference '},
+                tileorigin:             {parent: ' image '},
+                title:                  {parent: ' menuitem preference preferencegroup window '},
                 tooltip:                {parent: ' frame image text textarea '},
                 tracking:               {parent: ' canvas image '},
                 trigger:                {parent: ' action '},
                 truncation:             {parent: ' text '},
                 type:                   {parent: ' preference '},
                 url:                    {parent: ' about-box about-text about-version '},
-                useFileIcon:            {parent: ' image '},
-                vAlign:                 {parent: ' canvas frame image scrollbar text textarea '},
+                usefileicon:            {parent: ' image '},
+                valign:                 {parent: ' canvas frame image scrollbar text textarea '},
                 value:                  {parent: ' preference scrollbar setting '},
                 version:                {parent: ' widget '},
                 visible:                {parent: ' canvas frame image scrollbar text textarea window '},
-                vLineSize:              {parent: ' frame '},
-                vOffset:                {parent: ' about-text about-version canvas frame image scrollbar shadow text textarea window '},
-                vRegistrationPoint:     {parent: ' canvas frame image scrollbar text '},
-                vScrollBar:             {parent: ' frame '},
+                vlinesize:              {parent: ' frame '},
+                voffset:                {parent: ' about-text about-version canvas frame image scrollbar shadow text textarea window '},
+                vregistrationpoint:     {parent: ' canvas frame image scrollbar text '},
+                vscrollbar:             {parent: ' frame '},
                 width:                  {parent: ' canvas frame image scrollbar text textarea window '},
                 window:                 {parent: ' canvas frame image scrollbar text textarea widget '},
                 wrap:                   {parent: ' text '},
-                zOrder:                 {parent: ' canvas frame image scrollbar text textarea window '}
+                zorder:                 {parent: ' canvas frame image scrollbar text textarea window '}
             }
         }
     };
@@ -1987,6 +2343,9 @@ JSLINT = function () {
             w += nexttoken.value;
             advance();
         }
+        if (option.cap) {
+            w = w.toLowerCase();
+        }
         return w;
     }
 
@@ -1995,7 +2354,7 @@ JSLINT = function () {
     }
 
     function xml() {
-        var a, e, n, q, t;
+        var a, e, n, q, t, wmode;
         xmode = 'xml';
         stack = null;
         for (;;) {
@@ -2009,6 +2368,10 @@ JSLINT = function () {
                 n = xmlword(true);
                 t.name = n;
                 if (!xtype) {
+                    if (option.fragment && option.adsafe &&
+                            n !== 'div' && n !== 'iframe') {
+                        error("ADsafe HTML fragment violation.", token);
+                    }
                     if (xmltype[n]) {
                         xmltype[n].doBegin();
                         n = xtype;
@@ -2016,16 +2379,11 @@ JSLINT = function () {
                     } else {
                         if (option.fragment) {
                             xmltype.html.doBegin();
-                            stack = [{name: 'body'}];
-                            e = xmltype[xtype].doTagName(n, 'body');
                         } else {
                             error("Unrecognized tag '<{a}>'.", nexttoken, n);
                         }
                     }
                 } else {
-                    if (option.cap && xtype === 'html') {
-                        n = n.toLowerCase();
-                    }
                     if (stack.length === 0) {
                         error("What the hell is this?");
                     }
@@ -2036,6 +2394,10 @@ JSLINT = function () {
                 for (;;) {
                     if (nexttoken.id === '/') {
                         advance('/');
+                        if (nexttoken.id !== '>') {
+                            warning("Expected '{a}' and instead saw '{b}'.",
+                                    nexttoken, '>', nexttoken.value);
+                        }
                         e = true;
                         break;
                     }
@@ -2074,11 +2436,21 @@ JSLINT = function () {
                         advance();
                         break;
                     case 'string':
+                        advance('=');
+                        if (nexttoken.type !== '(string)') {
+                            error("Bad value '{a}'.",
+                                    nexttoken, nexttoken.value);
+                        }
+                        advance();
+                        break;
                     case 'href':
                         advance('=');
                         if (nexttoken.type !== '(string)') {
                             error("Bad value '{a}'.",
                                     nexttoken, nexttoken.value);
+                        }
+                        if (option.adsafe && ux.test(nexttoken.value)) {
+                            error("ADsafe URL violation.");
                         }
                         advance();
                         break;
@@ -2097,6 +2469,8 @@ JSLINT = function () {
                             if (!nexttoken.identifier &&
                                     nexttoken.type !== '(string)' &&
                                     nexttoken.type !== '(number)') {
+                                error("Bad value '{a}'.",
+                                        nexttoken, nexttoken.value);
                             }
                             advance();
                         }
@@ -2107,9 +2481,16 @@ JSLINT = function () {
                     xmode = 'script';
                     advance('>');
                     indent = nexttoken.from;
-                    statements();
+                    if (src) {
+                        if (option.fragment && option.adsafe) {
+                            warning("ADsafe script violation.", token);
+                        }
+                    } else {
+                        statements();
+                    }
                     if (nexttoken.id !== '</' && nexttoken.id !== '(end)') {
-                        warning("Unexpected '{a}'.", nexttoken, nexttoken.id);
+                        warning("Expected '{a}' and instead saw '{b}'.",
+                                nexttoken, '<\/script>', nexttoken.value);
                     }
                     xmode = 'xml';
                     break;
@@ -2148,6 +2529,9 @@ JSLINT = function () {
                 }
                 break;
             case '<!':
+                if (option.adsafe) {
+                    error("ADsafe HTML violation.");
+                }
                 for (;;) {
                     advance();
                     if (nexttoken.id === '>') {
@@ -2160,12 +2544,21 @@ JSLINT = function () {
                 lex.skip('>');
                 break;
             case '<!--':
+                if (option.adsafe) {
+                    error("ADsafe comment violation.");
+                }
                 lex.skip('-->');
                 break;
             case '<%':
+                if (option.adsafe) {
+                    error("ADsafe HTML violation.");
+                }
                 lex.skip('%>');
                 break;
             case '<?':
+                if (option.adsafe) {
+                    error("ADsafe HTML violation.");
+                }
                 for (;;) {
                     advance();
                     if (nexttoken.id === '?>') {
@@ -2190,6 +2583,9 @@ JSLINT = function () {
                 return;
             }
             if (!lex.skip('')) {
+                if (!stack) {
+                    error("Bad XML.");
+                }
                 t = stack.pop();
                 if (t.value) {
                     error("Missing '{a}'.", t, closetag(t.name));
@@ -2217,12 +2613,12 @@ JSLINT = function () {
 
 // The name is in scope and defined in the current function.
 
-            if (s === funct) {
+            if (s && (s === funct || s === funct['(global)'])) {
 
 //      If we are not also in the global scope, change 'unused' to 'var',
 //      and reject labels.
 
-                if (funct !== true) {
+                if (!funct['(global)']) {
                     switch (funct[v]) {
                     case 'unused':
                         funct[v] = 'var';
@@ -2236,13 +2632,11 @@ JSLINT = function () {
 // The name is not defined in the function.  If we are in the global scope,
 // then we have an undefined variable.
 
-            } else if (funct === true) {
+            } else if (funct['(global)']) {
                 if (option.undef) {
                     warning("'{a}' is undefined.", token, v);
-                } else {
-                    implied[v] = true;
-                    globals[v] = true;
                 }
+                note_implied(token);
 
 // If the name is already defined in the current
 // function, but not as outer, then there is a scope error.
@@ -2272,10 +2666,9 @@ JSLINT = function () {
                         if (option.undef) {
                             warning("'{a}' is undefined.", token, v);
                         } else {
-                            implied[v] = true;
-                            globals[v] = true;
                             funct[v] = true;
                         }
+                        note_implied(token);
                     } else {
                         switch (s[v]) {
                         case 'function':
@@ -2303,7 +2696,7 @@ JSLINT = function () {
     };
 
     type('(regex)', function () {
-        return [this.id, this.value, this.flags];
+        return this;
     });
 
     delim('(endline)');
@@ -2377,7 +2770,7 @@ JSLINT = function () {
             warning("Use '{a}' to compare with '{b}'.",
                 this, '===', right.value);
         }
-        return ['==', left, right];
+        return this;
     });
     relation('===');
     relation('!=', function (left, right) {
@@ -2391,7 +2784,7 @@ JSLINT = function () {
             warning("Use '{a}' to compare with '{b}'.",
                     this, '!==', right.value);
         }
-        return ['!=', left, right];
+        return this;
     });
     relation('!==');
     relation('<');
@@ -2410,15 +2803,14 @@ JSLINT = function () {
         if (left && right && left.id === '(string)' && right.id === '(string)') {
             left.value += right.value;
             left.character = right.character;
-            if (option.adsafe && adsafe[left.value.toLowerCase()] === true) {
-                warning("Adsafe restricted word '{a}'.", left, left.value);
-            }
             if (jx.test(left.value)) {
                 warning("JavaScript URL.", left);
             }
             return left;
         }
-        return [this.id, left, right];
+        this.left = left;
+        this.right = right;
+        return this;
     }, 130);
     prefix('+', 'num');
     infix('-', 'sub', 130);
@@ -2435,7 +2827,11 @@ JSLINT = function () {
     prefix('--', 'predec');
     syntax['--'].exps = true;
     prefix('delete', function () {
-        parse(0);
+        var p = parse(0);
+        if (p.id !== '.' && p.id !== '[') {
+            warning("Expected '{a}' and instead saw '{b}'.",
+                    nexttoken, '.', nexttoken.value);
+        }
     }).exps = true;
 
 
@@ -2463,6 +2859,7 @@ JSLINT = function () {
                 case 'Number':
                 case 'String':
                 case 'Boolean':
+                case 'Math':
                     warning("Do not use the {a} function as a constructor.",
                             token, c.value);
                     break;
@@ -2517,6 +2914,9 @@ JSLINT = function () {
         if (typeof m === 'string') {
             countMember(m);
         }
+        if (option.adsafe && adsafe[m] === true) {
+            warning("ADsafe restricted word '{a}'.", this, m);
+        }
         if (!option.evil && left && left.value === 'document' &&
                 (m === 'write' || m === 'writeln')) {
             warning("document.write can be a form of eval.", left);
@@ -2535,8 +2935,12 @@ JSLINT = function () {
             if (left.value.match(/^[A-Z](.*[a-z].*)?$/)) {
                 if (left.value !== 'Number' && left.value !== 'String' &&
                         left.value !== 'Boolean' && left.value !== 'Date') {
-                    warning("Missing 'new' prefix when invoking a constructor.",
+                    if (left.value === 'Math') {
+                        warning("Math is not a function.", left);
+                    } else {
+                        warning("Missing 'new' prefix when invoking a constructor.",
                             left);
+                    }
                 }
             }
         }
@@ -2567,8 +2971,9 @@ JSLINT = function () {
     "Implied eval is evil. Pass a function instead of a string.", left);
                 }
             }
-            if (!left.identifier && left.id !== '.' &&
-                    left.id !== '[' && left.id !== '(') {
+            if (!left.identifier && left.id !== '.' && left.id !== '[' &&
+                    left.id !== '(' && left.id !== '&&' && left.id !== '||' &&
+                    left.id !== '?') {
                 warning("Bad invocation.", left);
             }
 
@@ -2585,6 +2990,9 @@ JSLINT = function () {
     });
 
     infix('[', function (left) {
+        if (option.adsafe) {
+            warning('ADsafe subscripting.');
+        }
         nospace();
         var e = parse(0), s;
         if (e && e.type === '(string)') {
@@ -2695,7 +3103,7 @@ JSLINT = function () {
             }
         };
         x.fud = function () {
-            error("Expected to see a statement and instead saw a block.");
+            error("Expected to see a statement and instead saw a block.", token);
         };
     })(delim('{'));
 
@@ -2761,12 +3169,13 @@ JSLINT = function () {
 
     function doFunction(i) {
         var s = scope;
-        scope = s.begetObject();
+        scope = object(s);
         funct = {
-            '(type)'    : 'function',
             '(name)'    : i || '"' + anonname + '"',
             '(line)'    : nexttoken.line + 1,
-            '(context)' : funct
+            '(context)' : funct,
+            '(breakage)': 0,
+            '(scope)'   : scope
         };
         functions.push(funct);
         if (i) {
@@ -2781,6 +3190,11 @@ JSLINT = function () {
 
 
     blockstmt('function', function () {
+        if (inblock) {
+            warning(
+"Function statements cannot be placed in blocks. Use a function expression or move the statement to the top of the outer function.", token);
+
+        }
         var i = identifier();
         adjacent(token, nexttoken);
         addlabel(i, 'unused');
@@ -2808,7 +3222,7 @@ JSLINT = function () {
         nospace();
         parse(20);
         if (nexttoken.id === '=') {
-            warning("Assignment in control part.");
+            warning("Expected a conditional expression and instead saw an assignment.");
             advance('=');
             parse(20);
         }
@@ -2819,24 +3233,39 @@ JSLINT = function () {
             nonadjacent(token, nexttoken);
             advance('else');
             if (nexttoken.id === 'if' || nexttoken.id === 'switch') {
-                statement();
+                statement(true);
             } else {
                 block(true);
             }
         }
+        return this;
     });
 
     blockstmt('try', function () {
-        var b;
-        block(true);
+        var b, e, s;
+        block(false);
         if (nexttoken.id === 'catch') {
             advance('catch');
-            doFunction('"catch"');
+            nonadjacent(token, nexttoken);
+            advance('(');
+            s = scope;
+            scope = object(s);
+            e = nexttoken.value;
+            if (nexttoken.type !== '(identifier)') {
+                warning("Expected an identifier and instead saw '{a}'.",
+                    nexttoken, e);
+            } else {
+                addlabel(e, 'unused');
+            }
+            advance();
+            advance(')');
+            block(false);
             b = true;
+            scope = s;
         }
         if (nexttoken.id === 'finally') {
             advance('finally');
-            doFunction('"finally"');
+            block(false);
             return;
         } else if (!b) {
             error("Expected '{a}' and instead saw '{b}'.",
@@ -2846,18 +3275,20 @@ JSLINT = function () {
 
     blockstmt('while', function () {
         var t = nexttoken;
+        funct['(breakage)'] += 1;
         advance('(');
         nonadjacent(this, t);
         nospace();
         parse(20);
         if (nexttoken.id === '=') {
-            warning("Assignment in control part.");
+            warning("Expected a conditional expression and instead saw an assignment.");
             advance('=');
             parse(20);
         }
         advance(')', t);
         nospace(prevtoken, token);
         block(true);
+        funct['(breakage)'] -= 1;
     }).labelled = true;
 
     reserve('with');
@@ -2865,6 +3296,7 @@ JSLINT = function () {
     blockstmt('switch', function () {
         var t = nexttoken;
         var g = false;
+        funct['(breakage)'] += 1;
         advance('(');
         nonadjacent(this, t);
         nospace();
@@ -2880,7 +3312,7 @@ JSLINT = function () {
         for (;;) {
             switch (nexttoken.id) {
             case 'case':
-                switch (verb) {
+                switch (funct['(verb)']) {
                 case 'break':
                 case 'case':
                 case 'continue':
@@ -2898,10 +3330,10 @@ JSLINT = function () {
                 this.cases.push(parse(20));
                 g = true;
                 advance(':');
-                verb = 'case';
+                funct['(verb)'] = 'case';
                 break;
             case 'default':
-                switch (verb) {
+                switch (funct['(verb)']) {
                 case 'break':
                 case 'continue':
                 case 'return':
@@ -2925,6 +3357,7 @@ JSLINT = function () {
                         this.condition.id === 'false') {
                     warning("This 'switch' should be an 'if'.", this);
                 }
+                funct['(breakage)'] -= 1;
                 return;
             case '(end)':
                 error("Missing '{a}'.", nexttoken, '}');
@@ -2956,6 +3389,7 @@ JSLINT = function () {
     });
 
     stmt('do', function () {
+        funct['(breakage)'] += 1;
         block(true);
         advance('while');
         var t = nexttoken;
@@ -2963,12 +3397,19 @@ JSLINT = function () {
         advance('(');
         nospace();
         parse(20);
+        if (nexttoken.id === '=') {
+            warning("Expected a conditional expression and instead saw an assignment.");
+            advance('=');
+            parse(20);
+        }
         advance(')', t);
         nospace(prevtoken, token);
+        funct['(breakage)'] -= 1;
     }).labelled = true;
 
     blockstmt('for', function () {
-        var t = nexttoken;
+        var s, t = nexttoken;
+        funct['(breakage)'] += 1;
         advance('(');
         nonadjacent(this, t);
         nospace();
@@ -2982,8 +3423,18 @@ JSLINT = function () {
             advance('in');
             parse(20);
             advance(')', t);
-            block(true);
-            return;
+            if (nexttoken.id === 'if') {
+                nolinebreak(token);
+                statement(true);
+            } else {
+                s = block(true);
+                if (!option.forin && (s.length > 1 || typeof s[0] !== 'object' ||
+                        s[0].value !== 'if')) {
+                    warning("The body of a for in should be wrapped in an if statement to filter unwanted properties from the prototype.", this);
+                }
+            }
+            funct['(breakage)'] -= 1;
+            return this;
         } else {
             if (nexttoken.id !== ';') {
                 if (nexttoken.id === 'var') {
@@ -2991,7 +3442,7 @@ JSLINT = function () {
                     varstatement();
                 } else {
                     for (;;) {
-                        parse(0);
+                        parse(0, 'for');
                         if (nexttoken.id !== ',') {
                             break;
                         }
@@ -3002,6 +3453,11 @@ JSLINT = function () {
             advance(';');
             if (nexttoken.id !== ';') {
                 parse(20);
+                if (nexttoken.id === '=') {
+                    warning("Expected a conditional expression and instead saw an assignment.");
+                    advance('=');
+                    parse(20);
+                }
             }
             advance(';');
             if (nexttoken.id === ';') {
@@ -3010,7 +3466,7 @@ JSLINT = function () {
             }
             if (nexttoken.id !== ')') {
                 for (;;) {
-                    parse(0);
+                    parse(0, 'for');
                     if (nexttoken.id !== ',') {
                         break;
                     }
@@ -3020,25 +3476,19 @@ JSLINT = function () {
             advance(')', t);
             nospace(prevtoken, token);
             block(true);
+            funct['(breakage)'] += 1;
         }
     }).labelled = true;
 
 
-    function nolinebreak(t) {
-        if (t.line !== nexttoken.line) {
-            warning("Line breaking error '{a}'.", t, t.id);
-        }
-    }
-
-
     stmt('break', function () {
         var v = nexttoken.value;
+        if (funct['(breakage)'] === 0) {
+            warning("Unexpected '{a}'.", nexttoken, this.value);
+        }
         nolinebreak(this);
         if (nexttoken.id !== ';') {
-            if (funct === true) {
-                warning("Put '{a}' and the statement it labels in a function.",
-                        nexttoken, v);
-            } else if (funct[v] !== 'label') {
+            if (funct[v] !== 'label') {
                 warning("'{a}' is not a statement label.", nexttoken, v);
             } else if (scope[v] !== funct) {
                 warning("'{a}' is out of scope.", nexttoken, v);
@@ -3053,10 +3503,7 @@ JSLINT = function () {
         var v = nexttoken.value;
         nolinebreak(this);
         if (nexttoken.id !== ';') {
-            if (funct === true) {
-                warning("Put '{a}' and the statement it labels in a function.",
-                        nexttoken, v);
-            } else if (funct[v] !== 'label') {
+            if (funct[v] !== 'label') {
                 warning("'{a}' is not a statement label.", nexttoken, v);
             } else if (scope[v] !== funct) {
                 warning("'{a}' is out of scope.", nexttoken, v);
@@ -3205,19 +3652,42 @@ JSLINT = function () {
 
 // The actual JSLINT function itself.
 
-    var itself = function (s, o) {
-        option = o || {};
+    var itself = function (s, o, a) {
+        if (o) {
+            if (o.adsafe) {
+                o.browser = false;
+                o.debug   = false;
+                o.eqeqeq  = true;
+                o.evil    = false;
+                o.forin   = false;
+                o.nomen   = true;
+                o.on      = false;
+                o.rhino   = false;
+                o.sidebar = false;
+                o.undef   = true;
+                o.widget  = false;
+            }
+            option = o;
+        } else {
+            option = {};
+        }
+        adsafe_allow = a || {
+            ADSAFE: true
+        };
+        globals = option.adsafe ? {Math: true, Number: true} : object(standard);
         JSLINT.errors = [];
-        globals = standard.begetObject();
-        scope = globals.begetObject();
-        funct = true;
+        global = object(globals);
+        scope = global;
+        funct = {'(global)': true, '(name)': '(global)', '(scope)': scope};
         functions = [];
+        src = false;
         xmode = false;
         xtype = '';
         stack = null;
         member = {};
         membersOnly = null;
         implied = {};
+        inblock = false;
         lookahead = [];
         indent = 0;
         jsonmode = false;
@@ -3252,6 +3722,13 @@ JSLINT = function () {
         return JSLINT.errors.length === 0;
     };
 
+    function to_array(o) {
+        var a = [], k;
+        for (k in o) if (o.hasOwnProperty(k)) {
+            a.push(k);
+        }
+        return a;
+    }
 
 // Report generator.
 
@@ -3265,29 +3742,30 @@ JSLINT = function () {
             }
         }
 
-        s = [];
-        for (k in implied) {
-            if (implied.hasOwnProperty(k)) {
-                s.push(k);
-            }
-        }
+        s = to_array(implied);
 
         k = JSLINT.errors.length;
         if (k || s.length > 0) {
             o.push('<div id=errors><i>Error:</i>');
             if (s.length > 0) {
-                o.push('<p><i>Implied global:</i> ' + s.sort().join(', ') + '</p>');
+                s.sort();
+                for (i = 0; i < s.length; i += 1) {
+                    s[i] = '<code>' + s[i] + '</code>&nbsp;<i>' +
+                        implied[s[i]].join(' ') +
+                        '</i>';
+                }
+                o.push('<p><i>Implied global:</i> ' + s.join(', ') + '</p>');
                 c = true;
             }
             for (i = 0; i < k; i += 1) {
                 c = JSLINT.errors[i];
                 if (c) {
                     e = c.evidence || '';
-                    o.push('<p>Problem at line ' + (c.line + 1) +
-                            ' character ' + (c.character + 1) +
+                    o.push('<p>Problem' + (isFinite(c.line) ? ' at line ' + (c.line + 1) +
+                            ' character ' + (c.character + 1) : '') +
                             ': ' + c.reason.entityify() +
                             '</p><p class=evidence>' +
-                            (e && (e.length > 80 ? e.substring(0, 77) + '...' :
+                            (e && (e.length > 80 ? e.slice(0, 77) + '...' :
                             e).entityify()) + '</p>');
                 }
             }
@@ -3301,16 +3779,19 @@ JSLINT = function () {
 
             o.push('<div id=functions>');
 
-            s = [];
-            for (k in scope) {
-                if (scope.hasOwnProperty(k)) {
-                    s.push(k);
-                }
-            }
+            s = to_array(scope);
             if (s.length === 0) {
-                o.push('<div><i>No new global variables introduced.</i></div>');
+                if (jsonmode) {
+                    if (k === 0) {
+                        o.push('<p>JSON: good.</p>');
+                    } else {
+                        o.push('<p>JSON: bad.</p>');
+                    }
+                } else {
+                    o.push('<div><i>No new global variables introduced.</i></div>');
+                }
             } else {
-                o.push('<div><i>Global</i> ' + s.join(', ') + '</div>');
+                o.push('<div><i>Global</i> ' + s.sort().join(', ') + '</div>');
             }
 
             for (i = 0; i < functions.length; i += 1) {
@@ -3321,31 +3802,29 @@ JSLINT = function () {
                 ou = [];
                 gl = [];
                 la = [];
-                for (k in f) {
-                    if (f.hasOwnProperty(k)) {
-                        v = f[k];
-                        switch (v) {
-                        case 'closure':
-                            cl.push(k);
-                            break;
-                        case 'var':
-                            va.push(k);
-                            break;
-                        case 'unused':
-                            un.push(k);
-                            break;
-                        case 'label':
-                            la.push(k);
-                            break;
-                        case 'outer':
-                            ou.push(k);
-                            break;
-                        case true:
-                            if (k !== '(context)') {
-                                gl.push(k);
-                            }
-                            break;
+                for (k in f) if (f.hasOwnProperty(k)) {
+                    v = f[k];
+                    switch (v) {
+                    case 'closure':
+                        cl.push(k);
+                        break;
+                    case 'var':
+                        va.push(k);
+                        break;
+                    case 'unused':
+                        un.push(k);
+                        break;
+                    case 'label':
+                        la.push(k);
+                        break;
+                    case 'outer':
+                        ou.push(k);
+                        break;
+                    case true:
+                        if (k !== '(context)') {
+                            gl.push(k);
                         }
+                        break;
                     }
                 }
                 o.push('<br><div class=function><i>' + f['(line)'] + '</i> ' +
@@ -3358,6 +3837,7 @@ JSLINT = function () {
                 detail('Outer', ou);
                 detail('Global', gl);
             }
+            a = [];
             for (k in member) {
                 if (typeof member[k] === 'number') {
                     a.push(k);
@@ -3365,14 +3845,14 @@ JSLINT = function () {
             }
             if (a.length) {
                 a = a.sort();
-                m = '<br><div class=function>/*members ';
+                m = '<br><pre>/*members ';
                 l = 10;
                 for (i = 0; i < a.length; i += 1) {
                     k = a[i];
                     n = k.name();
                     if (l + n.length > 72) {
-                        o.push(m + '</div>');
-                        m = '<div> ';
+                        o.push(m + '<br>');
+                        m = '    ';
                         l = 1;
                     }
                     l += n.length + 2;
@@ -3384,7 +3864,7 @@ JSLINT = function () {
                     }
                     m += n;
                 }
-                o.push(m + ' */</div>');
+                o.push(m + '<br>*/</pre>');
             }
             o.push('</div>');
         }
