@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="YuiCommonTargets">
+
+    <echo level="info">Starting Build For ${component}</echo>
+
+    <echo level="info">Ant Properties</echo>
+    <echo level="info">    Home : ${ant.home}</echo>
+    <echo level="info">    Ant Version : ${ant.version}</echo>
+    <echo level="info">    Build File : ${ant.file}</echo>
+    <echo level="info">Local Build Properties</echo>
+    <echo level="info">    version : ${yui.version}</echo>
+    <echo level="info">    srcdir : ${srcdir}</echo>
+    <echo level="info">    builddir : ${builddir}</echo>
+    <echo level="info">    component : ${component}</echo>
+    <echo level="info">    component.basefilename : ${component.basefilename}</echo>
+    <echo level="info">    component.basedir : ${component.basedir}</echo>
+    <echo level="info">    component.srcdir : ${component.srcdir}</echo>
+    <echo level="info">    component.builddir : ${component.builddir}</echo>
+    <echo level="info">Global Build Properties</echo>
+    <echo level="info">    global.build.base : ${global.build.base}</echo>
+    <echo level="info">    global.build.component : ${global.build.component}</echo>
+    <echo level="info">    global.build.component.assets : ${global.build.component.assets}</echo>
+    <echo level="info">    global.src.base : ${global.src.base}</echo>
+    <echo level="info">    global.src.component : ${global.src.component}</echo>
+
+    <import file="${builddir}/macrolib.xml" description="Macrodef definitions - jslint, jsmin, registerversion" />
+
+    <target name="all" depends="local, deploy" description="Build and Deploy to Global Build Directory" />
+    <target name="local" depends="clean, init, build, register, minifyjs, lint" description="Build and Deploy to Local Build Directory" />
+
+    <target name="init">
+        <tstamp/>
+        <mkdir dir="${component.builddir}" />
+        <createdetails />
+    </target>
+
+    <target name="clean" description="Clean Local Build Directory" unless="skip.clean">
+       <delete dir="${component.builddir}" />
+    </target>
+
+    <target name="build" />
+
+    <target name="register" />
+
+    <!-- MIN -->
+    <target name="minifyjs" description="Create component-min.js from component.js">
+        <yuicompress dir="${component.builddir}" file="${component.basefilename}.js" args="${yuicompressor.args}" />
+    </target>
+
+    <target name="lint" description="Run jslint over the local build files (default settings)" unless="skip.lint">
+        <jslint>
+            <jsfiles>
+                <fileset dir="${component.builddir}" includes="*.js" />
+            </jsfiles>
+        </jslint>
+    </target>
+
+    <!-- DEPLOY -->
+    <target name="deploy" description="Copy files to global build location" depends="-deployassets, -deployskins, -deployreadme, -deploysrc">
+        <copy todir="${global.build.component}" preservelastmodified="true">
+            <fileset dir="${component.builddir}" includes="*.js" />
+        </copy>
+    </target>
+
+    <target name="-deployassets" if="component.assetfiles">
+        <copy todir="${global.build.component.assets}" flatten="true" preservelastmodified="true">
+            <fileset dir="${component.srcdir}" includes="${component.assetfiles}"  />
+        </copy>
+    </target>
+
+    <target name="-deployskins" if="component.skins.base">
+        <copy todir="${global.build.component.assets}/skins/sam" preservelastmodified="true">
+            <fileset dir="${component.builddir}/assets/skins/sam" includes="${component}.css"  />
+        </copy>
+
+        <copy todir="${global.build.component.assets}/skins/sam" preservelastmodified="true">
+            <fileset dir="${component.skins.base}/skins/sam" includes="${component}-skin.css"  />
+        </copy>
+
+        <copy todir="${global.build.component.assets}" preservelastmodified="true">
+            <fileset dir="${component.skins.base}" includes="${component}-core.css"  />
+        </copy>
+
+        <copy todir="${global.build.component.assets}/skins/sam" preservelastmodified="true">
+            <fileset dir="${component.skins.base}/skins/sam" includes="${component.skins.imgfiles}" />
+        </copy>
+    </target>
+
+    <target name="-deploysrc" unless="component.rollup">
+        <copy todir="${global.src.component}" preservelastmodified="true">
+            <fileset dir="${component.jsfiles.base}" includes="${component.jsfiles}" />
+        </copy>
+    </target>
+
+    <target name="-deployreadme" if="readme.exists">
+        <copy file="${component.basedir}/README" todir="${global.build.component}" preservelastmodified="true" />
+    </target>
+</project>

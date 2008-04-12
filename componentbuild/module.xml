@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="YuiModuleTargets">
+
+    <import file="${builddir}/common.xml" description="Targets common to Rollup/Module" />
+
+    <target name="build" depends="corebuild, debugbuild, skinsbuild" />
+    <target name="register" depends="-register, -rollupjs" />
+
+    <!-- CORE -->
+    <target name="corebuild" depends="-concatcore, -stripdebug" description="Create component.js">
+        <fixcrlf srcdir="${component.builddir}" includes="${component.basefilename}.js" eol="${buildfiles.eol}" />
+    </target>
+
+    <target name="-concatcore">
+        <concatsource destfile="${component.builddir}/${component.basefilename}.js" sourcedir="${component.jsfiles.base}" sourcefiles="${component.jsfiles}" />
+    </target>
+
+    <target name="-stripdebug" if="component.logger.regex">
+        <echo level="info">Replacing Logger Statements in ${component.builddir}/${component.basefilename}.js</echo>
+        <replaceregexp file="${component.builddir}/${component.basefilename}.js"
+                            byline="${component.logger.regex.byline}"
+                            match="${component.logger.regex}"
+                            replace="${component.logger.regex.replace}"
+                            flags="${component.logger.regex.flags}" />
+    </target>
+
+    <target name="-register">
+        <addmodule module="${component.module}" file="${component.builddir}/${component.basefilename}.js" details="${component.details.hash}" />
+        <addmodule module="${component.module}" file="${component.builddir}/${component.basefilename}-debug.js" details="${component.details.hash}" />
+    </target>
+
+    <target name="-rollupjs" if="rollup">
+		<echo>Here</echo>
+        <concatsource destfile="${rollup.builddir}/${rollup.component.basefilename}.js" sourcedir="${component.builddir}" sourcefiles="${component.basefilename}.js" />
+        <concatsource destfile="${rollup.builddir}/${rollup.component.basefilename}-debug.js" sourcedir="${component.builddir}" sourcefiles="${component.basefilename}-debug.js" />
+    </target>
+
+    <!-- DEBUG -->
+    <target name="debugbuild" depends="-concatdebug" description="Create component-debug.js">
+        <fixcrlf srcdir="${component.builddir}" includes="${component.basefilename}-debug.js" eol="${buildfiles.eol}" />
+    </target>
+
+    <target name="-concatdebug">
+        <concatsource destfile="${component.builddir}/${component.basefilename}-debug.js" sourcedir="${component.jsfiles.base}" sourcefiles="${component.jsfiles}" />
+    </target>
+
+    <!-- SKINS -->
+    <target name="skinsbuild" depends="-concatskins" description="Create skin rollup in local component build directory" if="component.skins.base">
+        <fixcrlf srcdir="${component.builddir}/assets/skins/sam" includes="${component}.css" eol="${buildfiles.eol}" />
+    </target>
+
+    <target name="-concatskins" if="component.skins.base">
+        <concatsource destfile="${component.builddir}/assets/skins/sam/${component}.css" sourcedir="${component.skins.base}" sourcefiles="${component}-core.css, skins/sam/${component}-skin.css" />
+        <cssmin dir="${component.builddir}/assets/skins/sam" file="${component}.css" />
+    </target>
+</project>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="YuiDefault">
+
+    <taskdef resource="antcontrib.properties">
+      <classpath>
+        <pathelement location="${builddir}/lib/ant-contrib/ant-contrib-1.0b3-modified.jar" />
+      </classpath>
+    </taskdef>
+
+    <dirname property="buildfile.dir" file="${ant.file}" />
+
+	<!-- Default Library Version Build -->
+    <property name="yui.version" value="3"/>
+    <property name="component.rollup" value="false"/>
+
+    <property name="buildfiles.eol" value="lf"/>
+
+    <!-- Default Logger Regex values if not provided -->
+    <property name="component.logger.regex.replace" value="" />
+    <property name="component.logger.regex.flags" value="mg" />
+
+    <!-- Supporting Tools -->
+    <property name="jsmin.jar" location="${builddir}/lib/jsmin/jsmin.jar" />
+    <property name="rhino.jar" location="${builddir}/lib/rhino/js.jar" />
+    <property name="jslintconsole.js" location="${builddir}/lib/jslint/jslint-console.js" />
+    <property name="jslintsrc.js" location="${builddir}/lib/jslint/fulljslint.js" />
+
+    <property name="yuicompressor.jar" location="${builddir}/lib/yuicompressor/yuicompressor-2.3.3.jar" />
+    <property name="yuicompressor.args" value="-v --disable-optimizations --preserve-semi --line-break 6000" />
+
+    <!-- Global Directories -->
+    <property name="global.build.base" location="${srcdir}/build" />
+    <property name="global.build.component" location="${global.build.base}/${component}" />
+    <property name="global.build.component.assets" location="${global.build.component}/assets" />
+
+    <property name="global.src.base" location="${srcdir}/src" />
+    <property name="global.src.component" location="${global.src.base}/${component}" />
+
+    <property name="workingdir" location="${component.builddir}/anttemp" />
+
+    <available file="${component.basedir}/README" property="readme.exists"></available>
+
+    <condition property="component.basefilename" value="${component}-${component.releasetype}" else="${component}">
+        <isset property="component.releasetype"/>
+    </condition>
+
+    <condition property="targetbase" value="rollup.xml" else="module.xml">
+        <istrue value="${component.rollup}"/>
+    </condition>
+
+    <property name="component.skins.imgfiles" value="*.png, *.gif, *.jpg"/>
+
+    <import file="${builddir}/${targetbase}" description="Base Build Targets" />
+</project>

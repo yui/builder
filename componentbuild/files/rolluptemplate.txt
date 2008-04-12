@@ -1,0 +1,3 @@
+@CODE@
+
+YUI.add("@MODULE@", null, "@VERSION@" @DETAILS@);

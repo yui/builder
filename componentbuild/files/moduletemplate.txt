@@ -1,0 +1,5 @@
+YUI.add("@MODULE@", function(Y) {
+
+@CODE@
+
+}, "@VERSION@" @DETAILS@);
