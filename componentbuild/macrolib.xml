@@ -2,6 +2,69 @@
 
 <project name="YuiMacroLib">
 
+    <macrodef name="arrayliteral">
+        <attribute name="from" />
+        <attribute name="to" />
+        <attribute name="key" />
+        <sequential>
+            <if>
+                <isset property="@{from}" />
+                <then>
+                    <propertyregex property="array"
+                                   override="true"
+                                   input="${@{from}}"
+                                   casesensitive="false"
+                                   regexp="(\w+)"
+                                   replace="'\1'"
+                                    />
+    
+                    <property name="@{to}" value="@{key}:[${array}]" />
+                </then>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="createdetails">
+        <sequential>
+            <arrayliteral from="component.use" to="component.details.use" key="use" />
+            <arrayliteral from="component.supercedes" to="component.details.supercedes" key="supercedes" />
+            <arrayliteral from="component.requires" to="component.details.requires" key="requires" />
+            <arrayliteral from="component.optional" to="component.details.optional" key="optional" />
+            <if>
+                <isset property="component.skinnable" />
+                <then>
+                    <property name="component.details.skinnable" value="skinnable:${component.skinnable}" />
+                </then>
+            </if>
+
+            <propertyselector property="details.list"
+                             delimiter=","
+                             match="component\.details.([^\.]*)"
+                             select="\1"
+                             casesensitive="false" />
+    
+            <var name="details" value="" />
+            <if>
+                <isset property="details.list" />
+                <then>
+                    <for list="${details.list}" param="val">
+                        <sequential>
+                            <var name="details" value="${component.details.@{val}}, ${details}" />
+                        </sequential>
+                    </for>
+                    <propertyregex property="component.details.hash"
+                      input="{${details}}"
+                      regexp="(\,\s*?\})"
+                      replace="}"
+                      casesensitive="false" />
+                </then>
+                <else>
+                    <property name="component.details.hash" value="" />
+                </else>
+            </if>
+        </sequential>
+    </macrodef>
+
     <macrodef name="jsmin">
         <attribute name="dir" />
         <attribute name="file" />
@@ -18,7 +81,7 @@
     <macrodef name="yuicompress">
         <attribute name="dir" />
         <attribute name="file" />
-    <attribute name="args" />
+        <attribute name="args" />
 
         <sequential>
             <echo level="info">Running yuicompressor on @{dir}/@{file}</echo>
@@ -149,4 +212,57 @@
         </sequential>
     </macrodef>
 
+    <macrodef name="addmodule">
+        <attribute name="file" />
+        <attribute name="module" />
+        <attribute name="details" default="" />
+
+        <sequential>
+            <if>
+                <equals arg1="@{details}" arg2="" />
+                <then>
+                    <property name="@{module}-details" value="" />
+                </then>
+                <else>
+                    <property name="@{module}-details" value=",@{details}" />
+                </else>
+            </if>
+            <loadfile srcfile="@{file}" property="@{module}-@{file}-code" />
+            <echo level="info">Wrapping @{file} in YUI.add module</echo>
+            <copy file="${builddir}/files/moduletemplate.txt" tofile="@{file}" overwrite="true">
+                <filterset>
+                    <filter token="CODE" value="${@{module}-@{file}-code}"/>
+                    <filter token="MODULE" value="@{module}"/>
+                    <filter token="DETAILS" value="${@{module}-details}"/>
+                </filterset>
+            </copy>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="addrollup">
+        <attribute name="file" />
+        <attribute name="module" />
+        <attribute name="details" default="" />
+
+        <sequential>
+            <if>
+                <equals arg1="@{details}" arg2="" />
+                <then>
+                    <property name="@{module}-details" value="" />
+                </then>
+                <else>
+                    <property name="@{module}-details" value=",@{details}" />
+                </else>
+            </if>
+            <loadfile srcfile="@{file}" property="@{module}-@{file}-code" />
+            <echo level="info">Adding Rollup @{file} using YUI.add</echo>
+            <copy file="${builddir}/files/rolluptemplate.txt" tofile="@{file}" overwrite="true">
+                <filterset>
+                    <filter token="CODE" value="${@{module}-@{file}-code}"/>
+                    <filter token="MODULE" value="@{module}"/>
+                    <filter token="DETAILS" value="${@{module}-details}"/>
+                </filterset>
+            </copy>
+        </sequential>
+    </macrodef>
 </project>
