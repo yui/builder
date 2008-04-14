@@ -231,9 +231,10 @@
             <echo level="info">Wrapping @{file} in YUI.add module</echo>
             <copy file="${builddir}/files/moduletemplate.txt" tofile="@{file}" overwrite="true">
                 <filterset>
-                    <filter token="CODE" value="${@{module}-@{file}-code}"/>
-                    <filter token="MODULE" value="@{module}"/>
-                    <filter token="DETAILS" value="${@{module}-details}"/>
+                    <filter token="CODE" value="${@{module}-@{file}-code}" />
+                    <filter token="YUIVAR" value="${yui.variable}" />
+                    <filter token="MODULE" value="@{module}" />
+                    <filter token="DETAILS" value="${@{module}-details}" />
                 </filterset>
             </copy>
         </sequential>
@@ -259,6 +260,7 @@
             <copy file="${builddir}/files/rolluptemplate.txt" tofile="@{file}" overwrite="true">
                 <filterset>
                     <filter token="CODE" value="${@{module}-@{file}-code}"/>
+                    <filter token="YUIVAR" value="${yui.variable}" />
                     <filter token="MODULE" value="@{module}"/>
                     <filter token="DETAILS" value="${@{module}-details}"/>
                 </filterset>

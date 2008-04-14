@@ -9,9 +9,12 @@
 
     <dirname property="buildfile.dir" file="${ant.file}" />
 
-	<!-- Default Library Version Build -->
+    <!-- Default Library Version Build -->
     <property name="yui.version" value="3"/>
+    <property name="yui.variable" value="Y"/>
+
     <property name="component.rollup" value="false"/>
+    <property name="component.rollup.target" value="all"/>
 
     <property name="buildfiles.eol" value="lf"/>
 
@@ -24,11 +27,10 @@
     <property name="rhino.jar" location="${builddir}/lib/rhino/js.jar" />
     <property name="jslintconsole.js" location="${builddir}/lib/jslint/jslint-console.js" />
     <property name="jslintsrc.js" location="${builddir}/lib/jslint/fulljslint.js" />
-
     <property name="yuicompressor.jar" location="${builddir}/lib/yuicompressor/yuicompressor-2.3.3.jar" />
     <property name="yuicompressor.args" value="-v --disable-optimizations --preserve-semi --line-break 6000" />
 
-    <!-- Global Directories -->
+    <!-- Top Level Directories (e.g. 3.x/build, 3.x/src) -->
     <property name="global.build.base" location="${srcdir}/build" />
     <property name="global.build.component" location="${global.build.base}/${component}" />
     <property name="global.build.component.assets" location="${global.build.component}/assets" />
@@ -36,9 +38,14 @@
     <property name="global.src.base" location="${srcdir}/src" />
     <property name="global.src.component" location="${global.src.base}/${component}" />
 
-    <property name="workingdir" location="${component.builddir}/anttemp" />
+    <!-- Component Defaults -->
+    <property name="component.module" value="${component}" />
+    <property name="component.basedir" value="${buildfile.dir}" />
+    <property name="component.builddir" value="${component.basedir}/build_tmp" />
+    <property name="component.srcdir" value="${component.basedir}/src" />
+    <property name="component.jsfiles.base" value="${component.srcdir}/js" />
 
-    <available file="${component.basedir}/README" property="readme.exists"></available>
+    <property name="workingdir" location="${component.builddir}/anttemp" />
 
     <condition property="component.basefilename" value="${component}-${component.releasetype}" else="${component}">
         <isset property="component.releasetype"/>
@@ -49,6 +56,8 @@
     </condition>
 
     <property name="component.skins.imgfiles" value="*.png, *.gif, *.jpg"/>
+
+    <available file="${component.basedir}/README" property="readme.exists"></available>
 
     <import file="${builddir}/${targetbase}" description="Base Build Targets" />
 </project>

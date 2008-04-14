@@ -6,6 +6,7 @@
 
     <target name="build" depends="corebuild, debugbuild, skinsbuild" />
     <target name="register" depends="-register, -rollupjs" />
+    <target name="skinsbuild" depends="-skinsbuild, -rollupcss" />
 
     <!-- CORE -->
     <target name="corebuild" depends="-concatcore, -stripdebug" description="Create component.js">
@@ -31,7 +32,6 @@
     </target>
 
     <target name="-rollupjs" if="rollup">
-		<echo>Here</echo>
         <concatsource destfile="${rollup.builddir}/${rollup.component.basefilename}.js" sourcedir="${component.builddir}" sourcefiles="${component.basefilename}.js" />
         <concatsource destfile="${rollup.builddir}/${rollup.component.basefilename}-debug.js" sourcedir="${component.builddir}" sourcefiles="${component.basefilename}-debug.js" />
     </target>
@@ -46,12 +46,16 @@
     </target>
 
     <!-- SKINS -->
-    <target name="skinsbuild" depends="-concatskins" description="Create skin rollup in local component build directory" if="component.skins.base">
+    <target name="-skinsbuild" depends="-concatskins" description="Create skin rollup in local component build directory" if="component.skins.base">
         <fixcrlf srcdir="${component.builddir}/assets/skins/sam" includes="${component}.css" eol="${buildfiles.eol}" />
     </target>
 
     <target name="-concatskins" if="component.skins.base">
         <concatsource destfile="${component.builddir}/assets/skins/sam/${component}.css" sourcedir="${component.skins.base}" sourcefiles="${component}-core.css, skins/sam/${component}-skin.css" />
         <cssmin dir="${component.builddir}/assets/skins/sam" file="${component}.css" />
+    </target>
+
+    <target name="-rollupcss" if="rollup">
+        <concatsource destfile="${rollup.builddir}/assets/skins/sam/${rollup.component}.css" sourcedir="${component.builddir}/assets/skins/sam" sourcefiles="${component}.css" />
     </target>
 </project>

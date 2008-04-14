@@ -1,4 +1,4 @@
-YUI.add("@MODULE@", function(Y) {
+YUI.add("@MODULE@", function(@YUIVAR@) {
 
 @CODE@
 
