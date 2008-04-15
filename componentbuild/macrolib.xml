@@ -14,10 +14,10 @@
                                    override="true"
                                    input="${@{from}}"
                                    casesensitive="false"
-                                   regexp="(\w+)"
+                                   regexp="([^\,\s]+)"
                                    replace="'\1'"
                                     />
-    
+
                     <property name="@{to}" value="@{key}:[${array}]" />
                 </then>
             </if>

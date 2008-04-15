@@ -1,5 +1,5 @@
-YUI.add("@MODULE@", function(@YUIVAR@) {
+YUI.add('@MODULE@', function(@YUIVAR@) {
 
 @CODE@
 
-}, "@VERSION@" @DETAILS@);
+}, '@VERSION@' @DETAILS@);
