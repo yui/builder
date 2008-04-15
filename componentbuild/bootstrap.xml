@@ -12,15 +12,7 @@
     <!-- Default Library Version Build -->
     <property name="yui.version" value="3"/>
     <property name="yui.variable" value="Y"/>
-
-    <property name="component.rollup" value="false"/>
-    <property name="component.rollup.target" value="all"/>
-
     <property name="buildfiles.eol" value="lf"/>
-
-    <!-- Default Logger Regex values if not provided -->
-    <property name="component.logger.regex.replace" value="" />
-    <property name="component.logger.regex.flags" value="mg" />
 
     <!-- Supporting Tools -->
     <property name="jsmin.jar" location="${builddir}/lib/jsmin/jsmin.jar" />
@@ -34,7 +26,6 @@
     <property name="global.build.base" location="${srcdir}/build" />
     <property name="global.build.component" location="${global.build.base}/${component}" />
     <property name="global.build.component.assets" location="${global.build.component}/assets" />
-
     <property name="global.src.base" location="${srcdir}/src" />
     <property name="global.src.component" location="${global.src.base}/${component}" />
 
@@ -44,20 +35,26 @@
     <property name="component.builddir" value="${component.basedir}/build_tmp" />
     <property name="component.srcdir" value="${component.basedir}/src" />
     <property name="component.jsfiles.base" value="${component.srcdir}/js" />
-
-    <property name="workingdir" location="${component.builddir}/anttemp" />
-
     <condition property="component.basefilename" value="${component}-${component.releasetype}" else="${component}">
         <isset property="component.releasetype"/>
     </condition>
+    <property name="component.skins.imgfiles" value="*.png, *.gif, *.jpg"/>
+
+    <!-- Default Logger Regex values if not provided -->
+    <property name="component.logger.regex.replace" value="" />
+    <property name="component.logger.regex.flags" value="mg" />
+
+    <!-- Rollup Support -->
+    <property name="component.rollup" value="false"/>
+    <property name="component.rollup.target" value="all"/>
 
     <condition property="targetbase" value="rollup.xml" else="module.xml">
         <istrue value="${component.rollup}"/>
     </condition>
 
-    <property name="component.skins.imgfiles" value="*.png, *.gif, *.jpg"/>
-
     <available file="${component.basedir}/README" property="readme.exists"></available>
+
+    <property name="workingdir" location="${component.builddir}/anttemp" />
 
     <import file="${builddir}/${targetbase}" description="Base Build Targets" />
 </project>
