@@ -56,5 +56,5 @@
 
     <property name="workingdir" location="${component.builddir}/anttemp" />
 
-    <import file="${builddir}/${targetbase}" description="Base Build Targets" />
+    <import file="${targetbase}" description="Base Build Targets" />
 </project>

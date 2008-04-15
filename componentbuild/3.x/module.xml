@@ -2,7 +2,7 @@
 
 <project name="YuiModuleTargets">
 
-    <import file="${builddir}/common.xml" description="Targets common to Rollup/Module" />
+    <import file="common.xml" description="Targets common to Rollup/Module" />
 
     <target name="build" depends="corebuild, debugbuild, skinsbuild" />
     <target name="register" depends="-register, -rollupjs" />
@@ -32,8 +32,13 @@
     </target>
 
     <target name="-rollupjs" if="rollup">
-        <concatsource destfile="${rollup.builddir}/${rollup.component.basefilename}.js" sourcedir="${component.builddir}" sourcefiles="${component.basefilename}.js" />
-        <concatsource destfile="${rollup.builddir}/${rollup.component.basefilename}-debug.js" sourcedir="${component.builddir}" sourcefiles="${component.basefilename}-debug.js" />
+        <echo level="info">Rolling up ${component.basefilename}.js into ${rollup.component.basefilename}.js</echo>
+        <concat destfile="${rollup.builddir}/${rollup.component.basefilename}.js" append="true" fixlastline="true">
+            <filelist dir="${component.builddir}" files="${component.basefilename}.js" />
+        </concat>
+        <concat destfile="${rollup.builddir}/${rollup.component.basefilename}-debug.js" append="true" fixlastline="true">
+            <filelist dir="${component.builddir}" files="${component.basefilename}-debug.js" />
+        </concat>
     </target>
 
     <!-- DEBUG -->
@@ -56,6 +61,9 @@
     </target>
 
     <target name="-rollupcss" if="rollup">
-        <concatsource destfile="${rollup.builddir}/assets/skins/sam/${rollup.component}.css" sourcedir="${component.builddir}/assets/skins/sam" sourcefiles="${component}.css" />
+        <echo level="info">Rolling up ${component}.css into ${rollup.component}.css</echo>
+        <concat destfile="${rollup.builddir}/assets/skins/sam/${rollup.component}.css" append="true" fixlastline="true">
+            <filelist dir="${component.builddir}/assets/skins/sam" files="${component}.css" />
+        </concat>
     </target>
 </project>

@@ -2,7 +2,7 @@
 
 <project name="YuiRollupTargets">
 
-    <import file="${builddir}/common.xml" description="Targets common to Rollup/Module" />
+    <import file="common.xml" description="Targets common to Rollup/Module" />
 
     <target name="build" description="Create component.js">
         <subant target="${component.rollup.target}" inheritall="false" >
