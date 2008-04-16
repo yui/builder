@@ -87,7 +87,7 @@
         </copy>
     </target>
 
-    <target name="-deploysrc" unless="component.rollup">
+    <target name="-deploysrc" if="component.jsfiles">
         <copy todir="${global.src.component}" preservelastmodified="true">
             <fileset dir="${component.jsfiles.base}" includes="${component.jsfiles}" />
         </copy>
