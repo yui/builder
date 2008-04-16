@@ -27,7 +27,7 @@
     <macrodef name="createdetails">
         <sequential>
             <arrayliteral from="component.use" to="component.details.use" key="use" />
-            <arrayliteral from="component.supercedes" to="component.details.supercedes" key="supercedes" />
+            <arrayliteral from="component.supersedes" to="component.details.supersedes" key="supersedes" />
             <arrayliteral from="component.requires" to="component.details.requires" key="requires" />
             <arrayliteral from="component.optional" to="component.details.optional" key="optional" />
             <if>
