@@ -55,7 +55,7 @@ if($isYDNBuild === false) {
 	echo "\nCreating Root Index Page";
 	echo "\n=================================";
 
-	generateExampleFile("index.php", "index.html", false);
+	generateExampleFile("index.php", "index.html", $forceBuildPath);
 }
 
 echo "\n=================================";
@@ -63,7 +63,7 @@ echo "\nCreating Examples Index Page";
 echo "\n=================================";
 
 // 2. Examples Landing Page (uber example list)
-generateExampleFile("examples/index.php", "examples/index.html", false);
+generateExampleFile("examples/index.php", "examples/index.html", $forceBuildPath);
 
 // 3. Generate Examples
 generateExamples($modules, $examples);
@@ -303,7 +303,7 @@ function generateExamples($modules, $examples) {
 			// Left Nav for YDN
 			if ($isYDNBuild) {
 				generateExampleFile("examples/module/examplesLandingPageNav.php?module=".urlencode($moduleKey), 
-						"inc/examplesNav/$moduleKey.inc", false);
+						"inc/examplesNav/$moduleKey.inc", $useBuildPath);
 			}
 
 			$moduleExamples = getExamplesByModule($moduleKey, $examples);
