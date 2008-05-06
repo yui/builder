@@ -99,7 +99,7 @@
     </target>
 
     <!-- DEPLOY -->
-    <target name="deploy" description="Move files to 2.x/build, 2.x/src" depends="customassets, -copyassets, -copyskins, examples, readme, deploysrc">
+    <target name="deploy" description="Move files to 2.x/build, 2.x/src" depends="customassets, -copyassets, -copyskins, examples, readme, deploysrc, deployas">
         <copy todir="${global.build.component}" preservelastmodified="true">
             <fileset dir="${component.builddir}" includes="*.js" />
         </copy>
@@ -113,11 +113,11 @@
 
     <target name="-copyskins" if="component.skins.base">
         <copy todir="${global.build.component.assets}/skins/sam" preservelastmodified="true">
-            <fileset dir="${component.builddir}/assets/skins/sam" includes="${component}.css"  />
+            <fileset dir="${component.builddir}/assets/skins/sam" includes="${component}.css" />
         </copy>
 
         <copy todir="${global.build.component.assets}/skins/sam" preservelastmodified="true">
-            <fileset dir="${component.skins.base}/skins/sam" includes="${component}-skin.css"  />
+            <fileset dir="${component.skins.base}/skins/sam" includes="${component}-skin.css" />
         </copy>
 
         <copy todir="${global.build.component.assets}" preservelastmodified="true">
@@ -134,6 +134,18 @@
             <fileset dir="${component.jsfiles.base}" includes="${component.jsfiles}" />
         </copy>
     </target>
+
+    <target name="deployas" if="component.asfiles.base" depends="deployastra">
+        <copy todir="${global.as.src.component}" preservelastmodified="true">
+            <fileset dir="${component.asfiles.base}" includes="${component.asfiles}" />
+        </copy>
+    </target>
+
+	<target name="deployastra" if="component.astrafiles.base">
+        <copy todir="${global.as.src.component}" preservelastmodified="true">
+            <fileset dir="${component.astrafiles.base}" includes="${component.astrafiles}" />
+        </copy>
+	</target>
 
     <target name="readme" if="readme.exists">
         <copy file="${component.basedir}/README" todir="${global.build.component}" preservelastmodified="true" /> 

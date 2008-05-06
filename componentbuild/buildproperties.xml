@@ -22,6 +22,9 @@
     <property name="global.src.base" location="${srcdir}/src" />
     <property name="global.src.component" location="${global.src.base}/${component}" />
 
+    <property name="global.as.src.base" location="${srcdir}/as-src" />
+    <property name="global.as.src.component" location="${global.as.src.base}/${component}" />
+
     <property name="workingdir" location="${component.builddir}/anttemp" />
 
     <available file="${component.basedir}/README" property="readme.exists"></available>
