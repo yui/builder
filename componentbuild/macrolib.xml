@@ -270,25 +270,31 @@
 
     <macrodef name="asdoc">
         <sequential>
+            <!-- WORK IN PROGRESS, HARDCODED VALUES -->
+            <property name="flex.home" value="C:/dev/flexsdk3" />
+            <property name="asdoc.class" value="flex2.tools.ASDoc" />
+            <property name="asdoc.templatepath" value="${flex.home}/asdoc/templates" />
+            <property name="asdoc.windowtitle" value="YUI Flash Component Documentation" />
+            <property name="asdoc.maintitle" value="YUI Flash Component Documentation" />
 
-			<!-- WORK IN PROGRESS, HARDCODED VALUES -->
-
-            <!--
-            <java className="${asdoc}" fork="true" failonerror="true">
+            <java className="${asdoc.class}" fork="true" failonerror="true">
                 <classpath>
-                    <fileset dir="${FLEX_HOME}/asdoc/lib" includes="*.jar" />
-                    <fileset dir="${FLEX_HOME}/lib" includes="*.jar" />
+                    <!-- <fileset dir="${FLEX_HOME}/asdoc/lib" includes="*.jar" /> -->
+                    <fileset dir="${flex.home}/lib" includes="*.jar" />
                 </classpath>
-                <jvmarg line="-Dapplication.home=${flex.home} -Xms32m -Xmx768m -Dsun.io.useCanonCaches=false -Xbootclasspath/p:${flex.home}/asdoc/lib/xalan.jar"/>
-                <arg line="-library-path+=${lib}" />
-                <arg line="-source-path ${basedir}" />
-                <arg line="-doc-sources ${basedir}/${view.main}" />
-                <arg line="-main-title ${apidoc.title}" />
-                <arg line="-window-title ${apidoc.title}" />
-                <arg line="-output ${doc}/${app.name}-API" />
+                <jvmarg line="-Dapplication.home=${flex.home} -Xms32m -Xmx768m -Dsun.io.useCanonCaches=false -Xbootclasspath/p:${flex.home}/lib/xalan.jar"/>
+                <arg line="-source-path+='${srcdir}/as-src/charts'"/>
+                <arg line="-source-path+='${srcdir}/as-src/uploader'"/>
+                <arg line="-library-path+='${srcdir}/as-src/charts/charts.swc'" />
+                <arg line="-doc-sources+='${srcdir}/as-src/charts'"/>
+                <arg line="-doc-sources+='${srcdir}/as-src/uploader'"/>
+                <arg line="-window-title '${asdoc.windowtitle}'"/>
+                <arg line="-main-title '${asdoc.maintitle}'"/>
+                <arg line="-templates-path '${asdoc.templatepath}'"/>
+                <arg line="-output '${srcdir}/as-docs'"/>
             </java>
-            -->
 
+           <!--
             <property name="asdoc.executable" value="C:\dev\flexsdk3\bin\asdoc.exe" />
             <property name="asdoc.templatepath" value="C:\dev\flexsdk3\asdoc\templates" />
             <property name="asdoc.windowtitle" value="YUI Flash Component Documentation" />
@@ -305,6 +311,7 @@
                 <arg line="-templates-path '${asdoc.templatepath}'"/>
                 <arg line="-output '${srcdir}/as-docs'"/>
             </exec>
+            -->
         </sequential>
     </macrodef>
 </project>
