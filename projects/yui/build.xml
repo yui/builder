@@ -8,28 +8,35 @@
     -->
 
     <property name="builddir" value="/Users/adamoore/dev/yahoo/presentation/tools/builder/componentbuild" />
+    <property name="basedir" location="."/>
     <property name="yuicompressor.jar" value="/Users/adamoore/dev/yahoo/presentation/tools/builder/componentbuild/lib/yuicompressor/yuicompressor-2.1.2.jar" />
+    <property name="flex.home" location="${builddir}/lib/flex_sdk_3"/>
+
+    <property name="src" location="${basedir}/yahoo/presentation/2.x"/>
+    <property name="srcdir" location="${src}" />
 
     <import file="${builddir}/macrolib.xml" description="Macrodef definitions - jslint, jsmin, registerversion" />
 
     <property name="cvs.root" value="vault.yahoo.com:/CVSROOT" />
     <property name="cvs.rsh" value="yssh" />
 
-    <property name="basedir" location="."/>
 
     <property name="build" location="${basedir}/target"/>
     <property name="yui" location="${build}/yui"/>
     <property name="examplesdist" location="${basedir}/examples_dist"/>
     <property name="examplesydn" location="${basedir}/examples_ydn"/>
-    <property name="src" location="${basedir}/yahoo/presentation/2.x"/>
+    <property name="examplesprod" location="${basedir}/examples_prod"/>
     <property name="verify" location="${basedir}/verify"/>
     <property name="tmp" location="${basedir}/tmp"/>
+
     <loadfile property="version.internal" srcFile="${basedir}/version.internal.txt">
         <filterchain>
             <striplinebreaks/>
         </filterchain>
     </loadfile>
+
     <property name="akamai" location="${build}/akamai/${version.internal}"/>
+
     <!--
     <property name="makeover" location="${build}/makeover/${version.internal}"/>
     -->
@@ -58,6 +65,7 @@
         <delete dir="${tmp}"/>
         <delete dir="${examplesdist}"/>
         <delete dir="${examplesydn}"/>
+        <delete dir="${examplesprod}"/>
         <mkdir dir="${build}"/>
         <mkdir dir="${tmp}"/>
         <mkdir dir="${akamai}"/>
@@ -186,6 +194,18 @@
             </filterchain>
         </copy>
 
+        <asdoc />
+
+        <copy todir="${yui}/as-docs" preservelastmodified="true">
+            <fileset dir="${src}/as-docs" />
+        </copy>
+
+        <copy todir="${yui}/as-src" preservelastmodified="true">
+            <fileset dir="${src}/as-src" />
+        </copy>
+
+        <!-- TODO copy to YDN too?  Need another copy with instrumentation first, prob -->
+
         <!-- Generate docs and copy to the yui zip dir -->
         <exec dir="." executable="./caboodle.sh" outputproperty="docgen.output" />
         <copy todir="${yui}/docs" preservelastmodified="true">
@@ -218,7 +238,13 @@
         </copy>
         -->
 
-        <exec dir="." executable="./examples.sh" output="examples_dist.log" />
+        <exec dir="." executable="./examples.sh" output="examples_dist.log">
+            <arg value="-b" />
+            <arg value="true" />
+            <arg value="-v" />
+            <arg value="${version.internal}" />
+        </exec>
+    
         <copy todir="${yui}" preservelastmodified="true">
             <fileset dir="${examplesdist}/"/>
         </copy>
@@ -230,10 +256,26 @@
             <arg value="examples_ydn" />
             <arg value="-b" />
             <arg value="true" />
+            <arg value="-v" />
+            <arg value="${version.internal}" />
         </exec>
         <copy todir="${build}/ydn/examples" preservelastmodified="true">
             <fileset dir="${examplesydn}/"/>
         </copy>
+
+        <exec dir="." executable="./examples.sh" output="examples_prod.log">
+            <arg value="-y" />
+            <arg value="true" />
+            <arg value="-d" />
+            <arg value="examples_prod" />
+            <arg value="-v" />
+            <arg value="${version.internal}" />
+        </exec>
+        <copy todir="${build}/prod/examples" preservelastmodified="true">
+            <fileset dir="${examplesprod}/"/>
+        </copy>
+
+
 
         <!-- copy tests -->
         <copy todir="${yui}/tests" preservelastmodified="true">
@@ -270,7 +312,9 @@
         <checksum file="${build}/yui_${version.internal}.zip" />
 
         <!-- ydn examples -->
+        <!--
         <zip destfile="${build}/ydn_${version.internal}.zip" basedir="${build}/ydn/examples" />
+        -->
 
     </target>
 
