@@ -41,8 +41,10 @@
     <property name="component.skins.imgfiles" value="*.png, *.gif, *.jpg"/>
 
     <!-- Default Logger Regex values if not provided -->
+    <property name="component.logger.regex" value="^.*?(?:logger|Y.log).*?(?:;|\).*;|(?:\r?\n.*?)*?\).*;).*;?.*?\r?\n" />
     <property name="component.logger.regex.replace" value="" />
     <property name="component.logger.regex.flags" value="mg" />
+    <property name="component.logger.regex.byline" value="false" />
 
     <!-- Rollup Support -->
     <property name="component.rollup" value="false"/>
