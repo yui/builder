@@ -6,7 +6,7 @@ define("BUILDPATH", "../../build/");
 // Default values for input arguments
 $templatesBaseUrl = "http://localhost/templates";
 $yuiDistRoot = "examples_dist";
-$templatesRoot = "../../../../3.x/templates";
+$templatesRoot = "yahoo/presentation/3.x/templates";
 $isYDNBuild = false;
 $forceBuildPath = false;
 $yuiVersion = null;
@@ -320,7 +320,7 @@ function generateExamples($modules, $examples) {
 	
 						// Requires New Window (XXX_source.html) - Dist: build path, YDN: yui.yahooapis
 						if ($example["newWindow"] == "require") {
-							generateExampleFile("examples/$moduleKey/$exampleKey"."_source.php",
+							generateExampleFile("examples/data/$moduleKey/$exampleKey"."_source.php",
 										"examples/$moduleKey/$exampleKey"."_source.html", $useBuildPath);
 						}
 					
