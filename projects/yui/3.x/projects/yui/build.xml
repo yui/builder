@@ -1,0 +1,348 @@
+<project name="yui" default="all">
+    <!--
+    This is the master build for yui.  It generates rollup files, the API docs, the 
+    zip distribution, and the files that go to akamai
+
+    Requires ant 1.6.5+
+    Requires ant-contrib tasks: http://ant-contrib.sourceforge.net/
+    -->
+    <property name="basedir"  location="."/>
+    <property name="src"      location="${basedir}/yahoo/presentation/3.x"/>
+    <property name="tools"    location="${basedir}/yahoo/presentation/tools/builder" />
+    <property name="build"    location="${basedir}/target"/>
+    <property name="verify"   location="${basedir}/verify"/>
+    <property name="tmp"      location="${basedir}/tmp"/>
+
+    <property name="examples.script" location="${tools}/projects/yui/genexamples3.php" />
+    <property name="apidocs.script" location="./apidocs.sh" />
+
+    <property name="yui"      location="${build}/yui"/>
+
+    <!--
+    <property name="examplesdist" location="${basedir}/examples_dist"/>
+    <property name="examplesydn"  location="${basedir}/examples_ydn"/>
+    <property name="examplesprod" location="${basedir}/examples_prod"/>
+    -->
+
+    <property name="cvs.root" value="vault.yahoo.com:/CVSROOT" />
+    <property name="cvs.rsh"  value="yssh" />
+
+    <property name="pr1.builddirs" value="animation/**/*, attribute/**/*, base/**/*, compat/**/*, dd/**/*, dom/**/*, fonts/**/*, io/**/*, json/**/*, node/**/*, profiler/**/*, queue/**/*, reset/**/*, yui/**/*, yuitest/**/*, reset-fonts/**/*" />
+
+    <property name="pr1.srcdirs"   value="animation/**/*, attribute/**/*, base/**/*, dd/**/*, dom/**/*, io/**/*, json-parse/**/*, json-stringify/**/*, node/**/*, profiler/**/*, queue/**/*, yui/**/*, yuitest/**/*" />
+
+<!--
+    <property name="pr1.srcdirs"   value="animation/**/*, attribute/**/*, base/**/*, dom/**/*, io/**/*, json-parse/**/*, json-stringify/**/*, node/**/*, queue/**/*, yui/**/*" />
+-->
+
+    <property name="pr1.testdirs"   value="**/*" />
+
+    <!--
+    <propertyregex property="pr1.builddirs"
+                   override="true"
+                   input="${pr1.components}"
+                   regexp="\s*?,"
+                   replace="/**/*," />
+    -->
+
+    <loadfile property="version" srcFile="${basedir}/version.txt">
+        <filterchain>
+            <striplinebreaks/>
+        </filterchain>
+    </loadfile>
+    <property name="akamai" location="${build}/akamai/${version}"/>
+
+    <taskdef resource="net/sf/antcontrib/antcontrib.properties">
+      <classpath>
+        <pathelement location="${tools}/componentbuild/lib/ant-contrib/ant-contrib-1.0b3-modified.jar" />
+      </classpath>
+    </taskdef>
+
+<!--
+    <target name="all" depends="test, examples, apidocs, compile, package, verify, akamai"/>
+-->
+    <target name="all" depends="test, compile, apidocs, examples, package, verify, akamai"/>
+
+    <target name="compile">
+
+        <!-- label property ex: yui3-xxx ... strip "yui3-" for Y.add VERSION token -->
+        <propertyregex property="version.build"
+              input="${label}"
+              regexp="yui3\-(.*)"
+              replace="\1"
+              casesensitive="false"
+              defaultValue="" />
+
+        <!-- clean up build dir and recreate -->
+        <delete dir="${build}"/>
+        <delete dir="${tmp}"/>
+
+        <!--
+        <delete dir="${examplesdist}"/>
+        <delete dir="${examplesydn}"/>
+        <delete dir="${examplesprod}"/>
+        -->
+
+        <mkdir dir="${build}"/>
+        <mkdir dir="${tmp}"/>
+        <mkdir dir="${tmp}/apisrc"/>
+        <mkdir dir="${akamai}"/>
+
+        <!--
+        <concat destfile="${src}/build/reset-fonts-grids/reset-fonts-grids.css">
+            <filelist dir="${src}/build" files="reset/reset-min.css,fonts/fonts-min.css,grids/grids-min.css"/>
+        </concat>
+        -->
+        <concat destfile="${src}/build/reset-fonts/reset-fonts.css">
+            <filelist dir="${src}/build" files="reset/reset.css,fonts/fonts.css"/>
+        </concat>
+
+        <!-- copy global README ... @todo extract latest release notes from all components -->
+        <copy file="${src}/README" tofile="${yui}/README" preservelastmodified="true" />
+  
+        <!-- copy everything in build except the js/css files -->
+        <echo message="Copying non JS/CSS files" level="info" />
+        <copy todir="${yui}/build" includeEmptyDirs="false"  preservelastmodified="true">
+            <fileset dir="${src}/build" includes="${pr1.builddirs}">
+                <none>
+                    <filename name="**/*.js" />
+                    <filename name="**/*.css" />
+                </none>
+            </fileset>
+        </copy>
+
+        <!-- copy build js/css files, updating version token and prepending the copyright info 
+             do NOT preservelastmodified because the file is being modified with the current
+             build number
+
+             includeEmptryDirs needs to be turned off since removed
+             directories in CVS are not completely removed.
+        -->
+
+        <echo message="Copying JS/CSS files" level="info" />
+        <copy todir="${yui}/build" includeEmptyDirs="false">
+            <fileset dir="${src}/build" includes="${pr1.builddirs}">
+                <or>
+                    <filename name="**/*.css" />
+                    <filename name="**/*.js" />
+                </or>
+            </fileset>
+            <filterchain>
+                <concatfilter prepend="copyright.txt"/>
+                <replacetokens>
+                    <token key="VERSION" value="${version}"/>
+                    <token key="BUILD" value="${version.build}"/>
+                </replacetokens>
+            </filterchain>
+        </copy>
+
+        <copy todir="${yui}/tests" preservelastmodified="true">
+            <fileset dir="${src}/tests" includes="${pr1.testdirs}" />
+        </copy>
+
+        <copy todir="${build}/ydnsite" includeEmptyDirs="false" preservelastmodified="true">
+            <fileset dir="${src}/site" includes="**/*" />
+        </copy>
+    </target>
+
+    <target name="examples">
+        <exec dir="." executable="${examples.script}" output="examples_dist.log">
+            <arg value="-b" />
+            <arg value="true" />
+            <arg value="-t" />
+            <arg value="yahoo/presentation/3.x/templates" />
+            <arg value="-d" />
+            <arg value="${yui}" />
+            <arg value="-v" />
+            <arg value="${version}" />
+        </exec>
+
+        <exec dir="." executable="${examples.script}" output="examples_ydn.log">
+            <arg value="-y" />
+            <arg value="true" />
+            <arg value="-t" />
+            <arg value="yahoo/presentation/3.x/templates" />
+            <arg value="-d" />
+            <arg value="${build}/ydn" />
+            <arg value="-b" />
+            <arg value="true" />
+            <arg value="-v" />
+            <arg value="${version}" />
+        </exec>
+
+        <exec dir="." executable="${examples.script}" output="examples_prod.log">
+            <arg value="-y" />
+            <arg value="true" />
+            <arg value="-t" />
+            <arg value="yahoo/presentation/3.x/templates" />
+            <arg value="-d" />
+            <arg value="${build}/prod" />
+            <arg value="-v" />
+            <arg value="${version}" />
+        </exec>
+    
+        <!--
+        <exec dir="." executable="${examples.script}" output="examples_dist.log">
+            <arg value="-b" />
+            <arg value="true" />
+            <arg value="-t" />
+            <arg value="yahoo/presentation/3.x/templates" />
+            <arg value="-v" />
+            <arg value="${version.internal}" />
+        </exec>
+        <copy todir="${yui}" preservelastmodified="true">
+            <fileset dir="${examplesdist}/"/>
+        </copy>
+
+        <exec dir="." executable="${examples.script}" output="examples_ydn.log">
+            <arg value="-y" />
+            <arg value="true" />
+            <arg value="-t" />
+            <arg value="yahoo/presentation/3.x/templates" />
+            <arg value="-d" />
+            <arg value="examples_ydn" />
+            <arg value="-b" />
+            <arg value="true" />
+            <arg value="-v" />
+            <arg value="${version.internal}" />
+        </exec>
+        <copy todir="${build}/ydn/examples" preservelastmodified="true">
+            <fileset dir="${examplesydn}/"/>
+        </copy>
+
+        <exec dir="." executable="${examples.script}" output="examples_prod.log">
+            <arg value="-y" />
+            <arg value="true" />
+            <arg value="-t" />
+            <arg value="yahoo/presentation/3.x/templates" />
+            <arg value="-d" />
+            <arg value="examples_prod" />
+            <arg value="-v" />
+            <arg value="${version.internal}" />
+        </exec>
+        <copy todir="${build}/prod/examples" preservelastmodified="true">
+            <fileset dir="${examplesprod}/"/>
+        </copy>
+        -->
+    </target>
+
+    <target name="apidocs" depends="compile">
+        <!-- Generate docs and copy to the yui zip dir -->
+        <copy todir="${tmp}/apisrc" includeEmptyDirs="false"  preservelastmodified="true">
+            <fileset dir="${src}/src" includes="${pr1.srcdirs}">
+                <filename name="**/*.js" />
+            </fileset>
+        </copy>
+ 
+        <exec dir="." executable="${apidocs.script}" outputproperty="docgen.output" />
+
+        <copy todir="${yui}/api" preservelastmodified="true">
+            <fileset dir="${tmp}/api" />
+        </copy>
+
+        <!-- generate the ydn specific docs -->
+        <exec dir="." executable="${apidocs.script}" outputproperty="docgen.output" >
+            <arg value="-y" />
+        </exec>
+
+        <copy todir="${build}/ydn/api" preservelastmodified="true">
+            <fileset dir="${tmp}/api" />
+        </copy>
+    </target>
+
+    <!-- @todo run tests -->
+    <target name="test">
+    </target>
+
+    <!-- zip up everything in the build directory -->
+    <target name="package" depends="compile">
+        <zip destfile="${build}/yui_${version}.zip" basedir="${build}" includes="yui/**" />
+        <checksum file="${build}/yui_${version}.zip" />
+
+        <!-- ydn examples -->
+        <!--
+        <zip destfile="${build}/ydn_${version}.zip" basedir="${build}/ydn/examples" />
+        -->
+
+        <copy todir="${build}/ydnsite" includeEmptyDirs="false" preservelastmodified="true">
+            <fileset dir="${build}/ydn" includes="**/*" />
+            <fileset dir="${yui}" includes="build/**/*" />
+        </copy>
+    </target>
+
+    <target name="akamai" depends="compile">
+        <!-- copy only the build files that belong on akamai -->
+        <copy todir="${akamai}/build">
+            <fileset dir="${yui}/build">
+              <patternset id="just.min">
+                <include name="**/*.js"/>
+                <include name="**/*.css"/>
+                <include name="**/assets/**"/>
+              </patternset>
+            </fileset>
+        </copy>
+        <!-- deal with makefiles? -->
+        <!-- generate script to make all of the subdirs -->
+        <copy file="push_all.py" tofile="${build}/akamai/${version}/push_all.py" preservelastmodified="true" />
+        <zip destfile="${build}/akamai_${version}.zip" basedir="${build}/akamai" />
+    </target>
+
+    <target name="verify" depends="compile">
+        <!-- copy build verification files -->
+        <!--
+        <copy todir="${build}/verify" preservelastmodified="true">
+            <fileset dir="${verify}"/>
+        </copy>
+        -->
+        <copy file="${basedir}/latest_build.html" tofile="${build}/latest_build.html" preservelastmodified="true" />
+        <copy file="${basedir}/latest_build_ydn.html" tofile="${build}/latest_build_ydn.html" preservelastmodified="true" />
+    </target>
+
+    <target name="updatecvs">
+
+        <!-- periods are not allowed in cvs labels -->
+        <!--
+        <propertyregex property="label.scrubbed"
+              input="${label}"
+              regexp="yui3\-(.*)"
+              replace="yui3-\1"
+              casesensitive="false" 
+              defaultValue="" />
+        -->
+        <!-- committing these files to this location will cause another
+             build to happen unless I specifically itemize all of the
+             directories I want to monitor.  Added ignoreFiles in
+             config.xml that will hopefully take care of this -->
+
+        <echo message="Build successful, committing rollups" level="info" />
+
+        <cvs cvsroot="${cvs.root}" cvsrsh="${cvs.rsh}" dest=".">
+            <commandline>
+                <argument value="commit"/>
+                <argument value="-m"/>
+                <argument value="${label}"/>
+<!--
+		        <argument value="yahoo/presentation/2.x/build/assets/skins/sam"/>
+                <argument value="yahoo/presentation/2.x/build/utilities"/>
+                <argument value="yahoo/presentation/2.x/build/yahoo-dom-event"/>
+                <argument value="yahoo/presentation/2.x/build/yuiloader-dom-event"/>
+                <argument value="yahoo/presentation/3.x/build/reset-fonts-grids"/>
+-->
+                <argument value="yahoo/presentation/3.x/build/reset-fonts"/>
+            </commandline>
+        </cvs>
+        <echo message="labeling cvs ${label}" level="info" />
+      
+        <cvs cvsroot="${cvs.root}" cvsrsh="${cvs.rsh}" dest=".">
+            <commandline>
+                <argument value="tag"/>
+                <argument value="${label}"/>
+                <argument value="yahoo/presentation/3.x"/>
+                <!--
+                <argument value="yahoo/presentation/templates"/>
+                <argument value="yahoo/presentation/tools"/>
+                -->
+            </commandline>
+        </cvs>
+    </target>
+</project>
