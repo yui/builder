@@ -57,7 +57,7 @@
     </target>
 
     <!-- DEPLOY -->
-    <target name="deploy" description="Copy files to global build location" depends="-deployassets, -deployskins, -deployreadme, -deploysrc">
+    <target name="deploy" description="Copy files to global build location" depends="-deployassets, -deployskins, -deployreadme, -deploysrc, -deployas, -deployastra">
         <copy todir="${global.build.component}" preservelastmodified="true">
             <fileset dir="${component.builddir}" includes="*.js" />
         </copy>
@@ -90,6 +90,18 @@
     <target name="-deploysrc" if="component.jsfiles">
         <copy todir="${global.src.component}" preservelastmodified="true">
             <fileset dir="${component.jsfiles.base}" includes="${component.jsfiles}" />
+        </copy>
+    </target>
+
+    <target name="-deployas" if="component.asfiles.base">
+        <copy todir="${global.as.src.component}" preservelastmodified="true">
+            <fileset dir="${component.asfiles.base}" includes="${component.asfiles}" />
+        </copy>
+    </target>
+
+    <target name="-deployastra" if="component.astrafiles.base">
+        <copy todir="${global.as.src.component}" preservelastmodified="true">
+            <fileset dir="${component.astrafiles.base}" includes="${component.astrafiles}" />
         </copy>
     </target>
 

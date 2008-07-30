@@ -29,6 +29,9 @@
     <property name="global.src.base" location="${srcdir}/src" />
     <property name="global.src.component" location="${global.src.base}/${component}" />
 
+    <property name="global.as.src.base" location="${srcdir}/as-src" />
+    <property name="global.as.src.component" location="${global.as.src.base}/${component}" />
+
     <!-- Component Defaults -->
     <property name="component.module" value="${component}" />
     <property name="component.basedir" value="${buildfile.dir}" />
