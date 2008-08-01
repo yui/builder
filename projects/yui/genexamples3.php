@@ -320,7 +320,9 @@ function generateExamples($modules, $examples) {
 	
 						// Requires New Window (XXX_source.html) - Dist: build path, YDN: yui.yahooapis
 						if ($example["newWindow"] == "require") {
-							generateExampleFile("examples/data/$moduleKey/$exampleKey"."_source.php",
+//							generateExampleFile("examples/data/$moduleKey/$exampleKey"."_source.php",
+//										"examples/$moduleKey/$exampleKey"."_source.html", $useBuildPath);
+							generateExampleFile("examples/module/example.php?name=".urlencode($exampleKey)."&clean=true", 
 										"examples/$moduleKey/$exampleKey"."_source.html", $useBuildPath);
 						}
 					
