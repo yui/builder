@@ -98,7 +98,7 @@ function createFolders($modules) {
 
 		if (file_exists($folderPath) === false) {
 			echo "\nCreating $folderPath";
-			if (mkdir($folderPath, 0777, true)) {
+			if (mkdir($folderPath, 0755, true)) {
 				echo " - OK";
 			} else {
 				echo " - Failed";
@@ -111,7 +111,7 @@ function createFolders($modules) {
 
 	if (file_exists($assetsPath) === false) {
 		echo "\nCreating $assetsPath";
- 		if(mkdir($assetsPath, 0777, true)) {
+ 		if(mkdir($assetsPath, 0755, true)) {
 			echo " - OK";
 		} else {
 			echo " - Failed";
@@ -123,7 +123,7 @@ function createFolders($modules) {
 	
 		if (file_exists($incFolderPath) === false) {
 			echo "\nCreating $incFolderPath";
-			if (mkdir($incFolderPath, 0777, true)) {
+			if (mkdir($incFolderPath, 0755, true)) {
 				echo " - OK";
 			} else {
 				echo " - Failed";
