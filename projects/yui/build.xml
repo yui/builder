@@ -10,6 +10,7 @@
     <property name="builddir" value="/Users/adamoore/dev/yahoo/presentation/tools/builder/componentbuild" />
     <property name="basedir" location="."/>
     <property name="yuicompressor.jar" value="/Users/adamoore/dev/yahoo/presentation/tools/builder/componentbuild/lib/yuicompressor/yuicompressor-2.1.2.jar" />
+    <property name="cssProcessor.jar" value="/Users/adamoore/dev/yahoo/presentation/tools/cssProcessor/CSSProcessor-0.1.0.jar" />
     <property name="flex.home" location="${builddir}/lib/flex_sdk_3"/>
 
     <property name="src" location="${basedir}/yahoo/presentation/2.x"/>
@@ -85,7 +86,7 @@
         <!-- create yuiloader-dom-event.js -->
         <concat destfile="${src}/build/yuiloader-dom-event/yuiloader-dom-event.js">
             <filelist dir="${src}/build" 
-                      files="yuiloader/yuiloader-beta-min.js,dom/dom-min.js,event/event-min.js"/>
+                      files="yuiloader/yuiloader-min.js,dom/dom-min.js,event/event-min.js"/>
         </concat>
         <registerversion classname="YAHOO" module="yuiloader-dom-event" 
                 file="${src}/build/yuiloader-dom-event/yuiloader-dom-event.js" />
@@ -93,7 +94,7 @@
         <!-- create utilities.js -->
         <concat destfile="${src}/build/utilities/utilities.js">
             <filelist dir="${src}/build" 
-                      files="yuiloader/yuiloader-beta-min.js,dom/dom-min.js,event/event-min.js,connection/connection-min.js,animation/animation-min.js,dragdrop/dragdrop-min.js,element/element-beta-min.js"/>
+                      files="yuiloader/yuiloader-min.js,dom/dom-min.js,event/event-min.js,connection/connection-min.js,animation/animation-min.js,dragdrop/dragdrop-min.js,element/element-beta-min.js"/>
         </concat>
         <registerversion classname="YAHOO" module="utilities" 
                 file="${src}/build/utilities/utilities.js" />
@@ -288,13 +289,13 @@
     <target name="test">
 
     <!--
-	<java jar="lib/crosscheck.jar" fork="true" failonerror="true" maxmemory="128m" >
+    <java jar="lib/crosscheck.jar" fork="true" failonerror="true" maxmemory="128m" >
          <arg value="-h"/>
          <classpath>
            <pathelement location="lib/crosscheck.jar"/>
            <pathelement path="${java.class.path}"/>
          </classpath>
-	 <arg value="tests" />
+     <arg value="tests" />
        </java>
      -->
 
@@ -302,12 +303,13 @@
 
     <!-- zip up everything in the build directory -->
         <!--
-		excludes="yui/build/selector"
+        excludes="yui/build/selector"
         -->
     <target name="package" depends="compile">
         <zip destfile="${build}/yui_${version.internal}.zip" 
-		basedir="${build}" 
-		includes="yui/**"
+        basedir="${build}" 
+        includes="yui/**"
+        excludes="yui/build/stylesheet,yui/build/stylesheet/**"
         />
         <checksum file="${build}/yui_${version.internal}.zip" />
 
@@ -339,9 +341,11 @@
             </fileset>
         </copy>
 
-        <!-- deal with makefiles? -->
-
-        <!-- generate script to make all of the subdirs -->
+        <java jar="${cssProcessor.jar}" failonerror="true" fork="true">
+            <arg value="-b" />
+            <arg value="http://yui.yahooapis.com/${version.internal}/build/" />
+            <arg file="${akamai}/build" />
+        </java>
 
         <copy file="push_all.py" tofile="${build}/akamai/${version.internal}/push_all.py" preservelastmodified="true" />
 

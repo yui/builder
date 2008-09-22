@@ -3,9 +3,9 @@
 ##############################################################################
 
 # The location of your yuidoc install
-# yuidoc_home=yahoo/presentation/tools/yuidoc
+yuidoc_home=~/dev/yahoo/presentation/tools/yuidoc
 # yuidoc_home=~/www/yuidoc/yuidoc
-yuidoc_home=yahoo/presentation/tools/yuidoc
+# yuidoc_home=yahoo/presentation/tools/yuidoc
 
 basedir=yahoo/presentation/2.x
 util=$basedir/util
@@ -20,11 +20,13 @@ parser_in="$src/animation \
           $src/autocomplete \
           $src/button \
           $src/calendar \
+          $src/carousel \
           $src/charts \
           $src/colorpicker \
           $src/connection \
           $src/container \
           $src/cookie \
+          $src/datastore \
           $src/datasource \
           $src/datatable \
           $src/dom \
@@ -40,6 +42,7 @@ parser_in="$src/animation \
           $src/layout \
           $src/logger \
           $src/menu \
+          $src/paginator \
           $src/profiler \
           $src/profilerviewer \
           $src/resize \
@@ -52,6 +55,7 @@ parser_in="$src/animation \
           $src/yuiloader \
           $src/yuitest"
 
+          # $src/datasource \
 # The location to output the parser data.  This output is a file containing a 
 # json string, and copies of the parsed files.
 parser_out=tmp/yuidoc_tmp
