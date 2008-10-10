@@ -38,11 +38,9 @@
 
     <target name="-rollupjs" if="rollup">
         <echo level="info">Rolling up ${component.basefilename}-debug.js into ${rollup.component.basefilename}-debug.js</echo>
-		<!--
         <concat destfile="${rollup.builddir}/${rollup.component.basefilename}.js" append="true" fixlastline="true">
             <filelist dir="${component.builddir}" files="${component.basefilename}.js" />
         </concat>
-		-->
         <concat destfile="${rollup.builddir}/${rollup.component.basefilename}-debug.js" append="true" fixlastline="true">
             <filelist dir="${component.builddir}" files="${component.basefilename}-debug.js" />
         </concat>

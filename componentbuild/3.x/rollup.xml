@@ -4,23 +4,13 @@
 
     <import file="common.xml" description="Targets common to Rollup/Module" />
 
-    <target name="build" depends="corebuild" description="Create component.js"></target>
+    <target name="build" depends="buildmodules" description="Create component.js"></target>
 
-	<target name="corebuild" depends="debugbuild">
-		<copy file="${component.builddir}/${component.basefilename}-debug.js" tofile="${component.builddir}/${component.basefilename}.js" />
-
-        <replaceregexp file="${component.builddir}/${component.basefilename}.js"
-                            byline="${component.logger.regex.byline}"
-                            match="${component.logger.regex}"
-                            replace="${component.logger.regex.replace}"
-                            flags="${component.logger.regex.flags}" />
+	<target name="buildmodules" depends="-buildmodules, -registerall, -prependall, -appendall">
+        <fixcrlf srcdir="${component.builddir}" eol="${buildfiles.eol}" />
 	</target>
 
-    <target name="debugbuild" depends="-concatdebug, -registerdebug, -prependdebug, -appenddebug" description="Create component-debug.js">
-        <fixcrlf srcdir="${component.builddir}" eol="${buildfiles.eol}" />
-    </target>
-
-    <target name="-concatdebug">
+    <target name="-buildmodules">
         <subant target="${component.rollup.target}" inheritall="false" >
             <filelist dir="${buildfile.dir}" files="${component.rollup.modules.buildfiles}" />
             <property name="rollup" value="true" />
@@ -30,8 +20,12 @@
         </subant>
     </target>
 
-    <target name="-registerdebug" unless="skip.register">
+	<target name="-prependall" depends="-prependdebug, -prepend" if="component.prependfiles" />
+	<target name="-appendall" depends="-appenddebug, -append" if="component.appendfiles" />
+
+    <target name="-registerall" unless="skip.register">
         <addrollup module="${component.module}" file="${component.builddir}/${component.basefilename}-debug.js" details="${component.details.hash}" />
+        <addrollup module="${component.module}" file="${component.builddir}/${component.basefilename}.js" details="${component.details.hash}" />
     </target>
 
 	<!--

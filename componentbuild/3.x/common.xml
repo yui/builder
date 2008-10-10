@@ -107,14 +107,41 @@
         <copy file="${component.basedir}/README" todir="${global.build.component}" preservelastmodified="true" />
     </target>
 
-	<target name="-prependdebug" if="component.prependfiles">
-		<!--
+	<target name="-prepend" if="component.prependfiles">
 		<concat destfile="${workingdir}/${component.basefilename}.js.tmp" fixlastline="true">
 			<filelist dir="${component.basedir}" files="${component.prependfiles}" />
+			<filterchain>
+				<tokenfilter>
+    				<filetokenizer/>
+    		        <replaceregex
+                        pattern="${component.logger.regex}"
+                        replace="${component.logger.regex.replace}"
+                        flags="${component.logger.regex.flags}" />
+				</tokenfilter>
+			</filterchain>
+		</concat>
+		<concat destfile="${workingdir}/${component.basefilename}.js.tmp" fixlastline="true" append="true">
 			<filelist dir="${component.builddir}" files="${component.basefilename}.js" />
 		</concat>
 		<move file="${workingdir}/${component.basefilename}.js.tmp" tofile="${component.builddir}/${component.basefilename}.js" />
-		-->
+	</target>
+
+	<target name="-append" if="component.appendfiles">
+		<concat destfile="${component.builddir}/${component.basefilename}.js" fixlastline="true" append="true">
+			<filelist dir="${component.basedir}" files="${component.appendfiles}" />
+			<filterchain>
+    			<tokenfilter>
+    				<filetokenizer/>
+    		        <replaceregex
+                        pattern="${component.logger.regex}"
+                        replace="${component.logger.regex.replace}"
+                        flags="${component.logger.regex.flags}" />
+				</tokenfilter>
+			</filterchain>
+		</concat>
+	</target>
+
+	<target name="-prependdebug" if="component.prependfiles">
 		<concat destfile="${workingdir}/${component.basefilename}-debug.js.tmp" fixlastline="true" >
 			<filelist dir="${component.basedir}" files="${component.prependfiles}" />
 			<filelist dir="${component.builddir}" files="${component.basefilename}-debug.js" />
@@ -123,11 +150,6 @@
 	</target>
 
 	<target name="-appenddebug" if="component.appendfiles">
-		<!--
-		<concat destfile="${component.builddir}/${component.basefilename}.js" fixlastline="true" append="true">
-			<filelist dir="${component.basedir}" files="${component.appendfiles}" />
-		</concat>
-		-->
 		<concat destfile="${component.builddir}/${component.basefilename}-debug.js" fixlastline="true" append="true">
 			<filelist dir="${component.basedir}" files="${component.appendfiles}" />
 		</concat>
