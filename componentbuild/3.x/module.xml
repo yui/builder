@@ -4,51 +4,55 @@
 
     <import file="common.xml" description="Targets common to Rollup/Module" />
 
-    <target name="build" depends="corebuild, debugbuild, skinsbuild" />
-    <target name="register" depends="-register, -rollupjs" />
+    <target name="build" depends="corebuild, -rollupjs, skinsbuild" />
     <target name="skinsbuild" depends="-skinsbuild, -rollupcss" />
 
     <!-- CORE -->
-    <target name="corebuild" depends="-concatcore, -stripdebug" description="Create component.js">
-        <fixcrlf srcdir="${component.builddir}" includes="${component.basefilename}.js" eol="${buildfiles.eol}" />
-    </target>
-
-    <target name="-concatcore">
-        <concatsource destfile="${component.builddir}/${component.basefilename}.js" sourcedir="${component.jsfiles.base}" sourcefiles="${component.jsfiles}" />
-    </target>
-
-    <target name="-stripdebug" if="component.logger.regex">
+    <target name="corebuild" depends="debugbuild" description="Create component.js">
         <echo level="info">Replacing Logger Statements in ${component.builddir}/${component.basefilename}.js</echo>
+
+		<copy file="${component.builddir}/${component.basefilename}-debug.js" tofile="${component.builddir}/${component.basefilename}.js" />
+
         <replaceregexp file="${component.builddir}/${component.basefilename}.js"
                             byline="${component.logger.regex.byline}"
                             match="${component.logger.regex}"
                             replace="${component.logger.regex.replace}"
                             flags="${component.logger.regex.flags}" />
-    </target>
 
-    <target name="-register">
-        <addmodule module="${component.module}" file="${component.builddir}/${component.basefilename}.js" details="${component.details.hash}" />
-        <addmodule module="${component.module}" file="${component.builddir}/${component.basefilename}-debug.js" details="${component.details.hash}" />
-    </target>
-
-    <target name="-rollupjs" if="rollup">
-        <echo level="info">Rolling up ${component.basefilename}.js into ${rollup.component.basefilename}.js</echo>
-        <concat destfile="${rollup.builddir}/${rollup.component.basefilename}.js" append="true" fixlastline="true">
-            <filelist dir="${component.builddir}" files="${component.basefilename}.js" />
-        </concat>
-        <concat destfile="${rollup.builddir}/${rollup.component.basefilename}-debug.js" append="true" fixlastline="true">
-            <filelist dir="${component.builddir}" files="${component.basefilename}-debug.js" />
-        </concat>
+        <fixcrlf srcdir="${component.builddir}" includes="${component.basefilename}.js" eol="${buildfiles.eol}" />
     </target>
 
     <!-- DEBUG -->
-    <target name="debugbuild" depends="-concatdebug" description="Create component-debug.js">
+    <target name="debugbuild" depends="-concatdebug, -registerdebug, -prependdebug, -appenddebug" description="Create component-debug.js">
         <fixcrlf srcdir="${component.builddir}" includes="${component.basefilename}-debug.js" eol="${buildfiles.eol}" />
     </target>
 
     <target name="-concatdebug">
         <concatsource destfile="${component.builddir}/${component.basefilename}-debug.js" sourcedir="${component.jsfiles.base}" sourcefiles="${component.jsfiles}" />
     </target>
+
+    <target name="-registerdebug" unless="skip.register">
+        <!--<addmodule module="${component.module}" file="${component.builddir}/${component.basefilename}.js" details="${component.details.hash}" />-->
+        <addmodule module="${component.module}" file="${component.builddir}/${component.basefilename}-debug.js" details="${component.details.hash}" />
+    </target>
+
+    <target name="-rollupjs" if="rollup">
+        <echo level="info">Rolling up ${component.basefilename}-debug.js into ${rollup.component.basefilename}-debug.js</echo>
+		<!--
+        <concat destfile="${rollup.builddir}/${rollup.component.basefilename}.js" append="true" fixlastline="true">
+            <filelist dir="${component.builddir}" files="${component.basefilename}.js" />
+        </concat>
+		-->
+        <concat destfile="${rollup.builddir}/${rollup.component.basefilename}-debug.js" append="true" fixlastline="true">
+            <filelist dir="${component.builddir}" files="${component.basefilename}-debug.js" />
+        </concat>
+    </target>
+
+	<!-- DON'T KNOW WHY I WAS DOING THIS INSTEAD OF JUST WORKING FROM THE DEBUG VERSION
+	    <target name="-concatcore">
+	        <concatsource destfile="${component.builddir}/${component.basefilename}.js" sourcedir="${component.jsfiles.base}" sourcefiles="${component.jsfiles}" />
+	    </target>
+	-->
 
     <!-- SKINS -->
     <target name="-skinsbuild" depends="-concatskins" description="Create skin rollup in local component build directory" if="component.skins.base">
@@ -66,4 +70,5 @@
             <filelist dir="${component.builddir}/assets/skins/sam" files="${component}.css" />
         </concat>
     </target>
+
 </project>

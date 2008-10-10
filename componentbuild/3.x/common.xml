@@ -27,7 +27,7 @@
     <import file="${builddir}/macrolib.xml" description="Macrodef definitions - jslint, jsmin, registerversion" />
 
     <target name="all" depends="local, deploy" description="Build and Deploy to Global Build Directory" />
-    <target name="local" depends="clean, init, build, register, append, prepend, minifyjs, lint" description="Build and Deploy to Local Build Directory" />
+    <target name="local" depends="clean, init, build, minifyjs, lint" description="Build and Deploy to Local Build Directory" />
 
     <target name="init">
         <tstamp/>
@@ -40,8 +40,6 @@
     </target>
 
     <target name="build" />
-
-    <target name="register" />
 
     <!-- MIN -->
     <target name="minifyjs" description="Create component-min.js from component.js">
@@ -109,13 +107,14 @@
         <copy file="${component.basedir}/README" todir="${global.build.component}" preservelastmodified="true" />
     </target>
 
-	<target name="prepend" if="component.prependfiles">
+	<target name="-prependdebug" if="component.prependfiles">
+		<!--
 		<concat destfile="${workingdir}/${component.basefilename}.js.tmp" fixlastline="true">
 			<filelist dir="${component.basedir}" files="${component.prependfiles}" />
 			<filelist dir="${component.builddir}" files="${component.basefilename}.js" />
 		</concat>
 		<move file="${workingdir}/${component.basefilename}.js.tmp" tofile="${component.builddir}/${component.basefilename}.js" />
-		
+		-->
 		<concat destfile="${workingdir}/${component.basefilename}-debug.js.tmp" fixlastline="true" >
 			<filelist dir="${component.basedir}" files="${component.prependfiles}" />
 			<filelist dir="${component.builddir}" files="${component.basefilename}-debug.js" />
@@ -123,10 +122,12 @@
 		<move file="${workingdir}/${component.basefilename}-debug.js.tmp" tofile="${component.builddir}/${component.basefilename}-debug.js" />
 	</target>
 
-	<target name="append" if="component.appendfiles">
+	<target name="-appenddebug" if="component.appendfiles">
+		<!--
 		<concat destfile="${component.builddir}/${component.basefilename}.js" fixlastline="true" append="true">
 			<filelist dir="${component.basedir}" files="${component.appendfiles}" />
 		</concat>
+		-->
 		<concat destfile="${component.builddir}/${component.basefilename}-debug.js" fixlastline="true" append="true">
 			<filelist dir="${component.basedir}" files="${component.appendfiles}" />
 		</concat>
