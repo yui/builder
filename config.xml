@@ -1,29 +1,30 @@
 <cruisecontrol>
-    <project name="yui">
-
+    <project name="yui3">
         <listeners>
             <currentbuildstatuslistener file="logs/${project.name}/status.txt"/>
         </listeners>
 
         <bootstrappers>
-            <cvsbootstrapper localWorkingCopy="projects/${project.name}" 
-                    file="yahoo/presentation" />
+            <gitbootstrapper localWorkingCopy="projects/${project.name}/src/yui3" />
+		<!-- tools -->
+            <gitbootstrapper localWorkingCopy="projects/${project.name}/src/builder" />
+            <gitbootstrapper localWorkingCopy="projects/${project.name}/src/yuidoc" />
+            <gitbootstrapper localWorkingCopy="projects/${project.name}/src/yuicompressor" />
+            <gitbootstrapper localWorkingCopy="projects/${project.name}/src/cssProcessor" />
         </bootstrappers>
 
-        <modificationset quietperiod="25" ignoreFiles="utilities*,*dom-event*,reset-fonts*">
-            <cvs localWorkingCopy="projects/${project.name}/yahoo/presentation/2.x/build" />
-            <cvs localWorkingCopy="projects/${project.name}/yahoo/presentation/templates" />
-            <!--
-            <cvs localWorkingCopy="projects/${project.name}/yahoo/presentation/2.x/build" tag='ydn-2_3_1+' />
-            <cvs localWorkingCopy="projects/${project.name}/yahoo/presentation/templates" tag='ydn-2_3_1+' />
-            <cvs localWorkingCopy="projects/${project.name}/yahoo/presentation/2.x/build" tag='yui-2_3_1' />
-            <cvs localWorkingCopy="projects/${project.name}/yahoo/presentation/templates" tag='yui-2_3_1' />
-            <cvs localWorkingCopy="projects/${project.name}/yahoo/presentation/2.x/examples" />
-            -->
+        <!-- Ignoring file checkins which are not part of PR1 -->
+        <modificationset quietperiod="0" ignoreFiles="reset-fonts*,css*,slider*,tabview*">
+            <git localWorkingCopy="projects/${project.name}/src/yui3" />
+		<!--
+            <git localWorkingCopy="projects/${project.name}/src/yui3/site" />
+            <git localWorkingCopy="projects/${project.name}/src/yui3/src" />
+            <git localWorkingCopy="projects/${project.name}/src/yui3/templates" />
+		-->
         </modificationset>
 
-        <schedule interval="5000">
-            <ant anthome="apache-ant-1.6.5" buildfile="projects/${project.name}/build.xml"/>
+        <schedule interval="3000">
+            <ant anthome="apache-ant-1.7.0" buildfile="projects/${project.name}/build.xml"/>
         </schedule>
 
         <log>
@@ -32,28 +33,33 @@
 
         <publishers>
             <htmlemail mailhost="smtp.yahoo.com"
-                    returnaddress="adamoore@yahoo-inc.com"
-                    buildresultsurl="http://feelbuild-mac.corp.yahoo.com:8080/buildresults/yui/"
-                    skipusers="true" spamwhilebroken="true"
+                    returnaddress="yuibuild@yahoo-inc.com"
+                    buildresultsurl="http://presentbright.corp.yahoo.com:8080/buildresults/yui3/"
+                    skipusers="true"
+                    spamwhilebroken="true"
                     css="webapps/cruisecontrol/css/cruisecontrol.css"
                     xsldir="webapps/cruisecontrol/xsl"
-                    logdir="logs/yui">
+                    logdir="logs/yui3">
+
+                <failure address="sdesai@yahoo-inc.com"/>
                 <failure address="adamoore@yahoo-inc.com"/>
+                <failure address="miraglia@yahoo-inc.com"/>
                 <success address="yui-authors@yahoo-inc.com"/>
-                <!--
+
+		<!--
                 <always address="adamoore@yahoo-inc.com"/>
-                <always address="tsha@yahoo-inc.com"/>
-                <always address="miraglia@yahoo-inc.com"/>
-                <failure address="failed-builds@mydomain.com"/>
-                -->
+		-->
+                <!--<always address="sdesai@yahoo-inc.com"/>-->
             </htmlemail>
+
             <onsuccess>
                 <artifactspublisher dest="artifacts/${project.name}" dir="projects/${project.name}/target"/>
-                <antpublisher anthome="apache-ant-1.6.5" 
+                <antpublisher anthome="apache-ant-1.7.0" 
                               buildfile="projects/${project.name}/build.xml"
-                              target="updatecvs" />
+                              target="updategit" />
+              
             </onsuccess>
         </publishers>
-        <labelincrementer defaultLabel="yui.200"/>
+        <labelincrementer defaultLabel="yui3-260" separator="-" />
     </project>
 </cruisecontrol>
