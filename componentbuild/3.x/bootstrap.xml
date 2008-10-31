@@ -19,7 +19,7 @@
     <property name="rhino.jar" location="${builddir}/lib/rhino/js.jar" />
     <property name="jslintconsole.js" location="${builddir}/lib/jslint/jslint-console.js" />
     <property name="jslintsrc.js" location="${builddir}/lib/jslint/fulljslint.js" />
-    <property name="yuicompressor.jar" location="${builddir}/lib/yuicompressor/yuicompressor-2.3.3.jar" />
+    <property name="yuicompressor.jar" location="${builddir}/lib/yuicompressor/yuicompressor-2.4.jar" />
     <property name="yuicompressor.args" value="-v --disable-optimizations --preserve-semi --line-break 6000" />
 
     <!-- Top Level Directories (e.g. 3.x/build, 3.x/src) -->
