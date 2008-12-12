@@ -14,10 +14,10 @@ load(jslintsrc);
 (function(){ // Just to keep stuff seperate from JSLINT code
 
 	var OPTS = {
-		widget : true,
 		browser : true,
 		//laxLineEnd : true,
-        undef: true
+        	undef: true,
+		newcap: false
 	};
 	
 	function test(jsFile) {
