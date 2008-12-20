@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="YuiDefault">
+<project name="YuiDefaultProperties">
 
     <taskdef resource="antcontrib.properties">
-      <classpath>
-        <pathelement location="${builddir}/lib/ant-contrib/ant-contrib-1.0b3-modified.jar" />
-      </classpath>
+        <classpath>
+            <pathelement location="${builddir}/lib/ant-contrib/ant-contrib-1.0b3-modified.jar" />
+        </classpath>
     </taskdef>
 
     <dirname property="buildfile.dir" file="${ant.file}" />
+
+    <property name="builddir" location="../../../builder/componentbuild" />
+    <property name="srcdir" location="../.." />
 
     <!-- Default Library Version Build -->
     <property name="yui.version" value="3"/>
@@ -26,22 +29,30 @@
     <property name="global.build.base" location="${srcdir}/build" />
     <property name="global.build.component" location="${global.build.base}/${component}" />
     <property name="global.build.component.assets" location="${global.build.component}/assets" />
-    <property name="global.src.base" location="${srcdir}/src" />
-    <property name="global.src.component" location="${global.src.base}/${component}" />
-
-    <property name="global.as.src.base" location="${srcdir}/as-src" />
-    <property name="global.as.src.component" location="${global.as.src.base}/${component}" />
 
     <!-- Component Defaults -->
     <property name="component.module" value="${component}" />
-    <property name="component.basedir" value="${buildfile.dir}" />
-    <property name="component.builddir" value="${component.basedir}/build_tmp" />
-    <property name="component.srcdir" value="${component.basedir}/src" />
+    <property name="component.basedir" location="${buildfile.dir}" />
+    <property name="component.srcdir" value="${component.basedir}" />
     <property name="component.jsfiles.base" value="${component.srcdir}/js" />
+    <property name="component.assets.base" value="${component.srcdir}/assets" />
+    <property name="component.skins.base" location="${component.srcdir}/css" />
+    <property name="component.skins.files" value="*.png, *.gif, *.jpg"/>
+    <property name="component.assets.files" value="**/*.*"/>
+    <property name="component.rollup" value="false"/>
+
+    <available file="${component.skins.base}" type="dir" property="component.skins.exist"/>
+    <available file="${component.assets.base}" type="dir" property="component.assets.exist"/>
+
+    <condition property="component.builddir" value="${component.basedir}/build_rollup_tmp" else="${component.basedir}/build_tmp">
+        <istrue value="${component.rollup}"/>
+    </condition>
+
+    <property name="workingdir" location="${component.builddir}/ant" />
+
     <condition property="component.basefilename" value="${component}-${component.releasetype}" else="${component}">
         <isset property="component.releasetype"/>
     </condition>
-    <property name="component.skins.imgfiles" value="*.png, *.gif, *.jpg"/>
 
     <!-- Default Logger Regex values if not provided -->
     <property name="component.logger.regex" value="^.*?(?:logger|Y.log).*?(?:;|\).*;|(?:\r?\n.*?)*?\).*;).*;?.*?\r?\n" />
@@ -50,16 +61,18 @@
     <property name="component.logger.regex.byline" value="false" />
 
     <!-- Rollup Support -->
-    <property name="component.rollup" value="false"/>
     <property name="component.rollup.target" value="all"/>
 
-    <condition property="targetbase" value="rollup.xml" else="module.xml">
+    <condition property="rollup.skins.exist">
+        <and>
+            <istrue value="${component.rollup}" />
+            <istrue value="${component.skins.exist}" />
+        </and>
+    </condition>
+
+    <condition property="targetdefs" value="rollup.xml" else="module.xml">
         <istrue value="${component.rollup}"/>
     </condition>
 
-    <available file="${component.basedir}/README" property="readme.exists"></available>
-
-    <property name="workingdir" location="${component.builddir}/anttemp" />
-
-    <import file="${targetbase}" description="Base Build Targets" />
+    <import file="${targetdefs}" description="Build Targets" />
 </project>

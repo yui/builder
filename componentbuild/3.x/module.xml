@@ -53,16 +53,16 @@
 	-->
 
     <!-- SKINS -->
-    <target name="-skinsbuild" depends="-concatskins" description="Create skin rollup in local component build directory" if="component.skins.base">
+    <target name="-skinsbuild" depends="-concatskins" description="Create skin rollup in local component build directory" if="component.skins.exist">
         <fixcrlf srcdir="${component.builddir}/assets/skins/sam" includes="${component}.css" eol="${buildfiles.eol}" />
     </target>
 
-    <target name="-concatskins" if="component.skins.base">
+    <target name="-concatskins" if="component.skins.exist">
         <concatsource destfile="${component.builddir}/assets/skins/sam/${component}.css" sourcedir="${component.skins.base}" sourcefiles="${component}-core.css, skins/sam/${component}-skin.css" />
         <cssmin dir="${component.builddir}/assets/skins/sam" file="${component}.css" />
     </target>
 
-    <target name="-rollupcss" if="rollup">
+    <target name="-rollupcss" if="rollup.skins.exist">
         <echo level="info">Rolling up ${component}.css into ${rollup.component}.css</echo>
         <concat destfile="${rollup.builddir}/assets/skins/sam/${rollup.component}.css" append="true" fixlastline="true">
             <filelist dir="${component.builddir}/assets/skins/sam" files="${component}.css" />

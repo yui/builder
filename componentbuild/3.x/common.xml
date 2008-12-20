@@ -21,8 +21,6 @@
     <echo level="info">    global.build.base : ${global.build.base}</echo>
     <echo level="info">    global.build.component : ${global.build.component}</echo>
     <echo level="info">    global.build.component.assets : ${global.build.component.assets}</echo>
-    <echo level="info">    global.src.base : ${global.src.base}</echo>
-    <echo level="info">    global.src.component : ${global.src.component}</echo>
 
     <import file="${builddir}/macrolib.xml" description="Macrodef definitions - jslint, jsmin, registerversion" />
 
@@ -55,19 +53,21 @@
     </target>
 
     <!-- DEPLOY -->
-    <target name="deploy" description="Copy files to global build location" depends="-deployassets, -deployskins, -deployreadme, -deploysrc, -deployas, -deployastra">
+    <target name="deploy" description="Copy files to global location" depends="deploybuild, deploydocs"></target>
+
+    <target name="deploybuild" description="Copy built files to global build location" depends="-deployassets, -deployskins">
         <copy todir="${global.build.component}" preservelastmodified="true">
             <fileset dir="${component.builddir}" includes="*.js" />
         </copy>
     </target>
 
-    <target name="-deployassets" if="component.assetfiles">
+    <target name="-deployassets" if="component.assets.exist">
         <copy todir="${global.build.component.assets}" flatten="true" preservelastmodified="true">
-            <fileset dir="${component.srcdir}" includes="${component.assetfiles}"  />
+            <fileset dir="${component.assets.base}" includes="${component.assets.files}"  />
         </copy>
     </target>
 
-    <target name="-deployskins" if="component.skins.base">
+    <target name="-deployskins" if="component.skins.exist">
         <copy todir="${global.build.component.assets}/skins/sam" preservelastmodified="true">
             <fileset dir="${component.builddir}/assets/skins/sam" includes="${component}.css"  />
         </copy>
@@ -81,77 +81,57 @@
         </copy>
 
         <copy todir="${global.build.component.assets}/skins/sam" preservelastmodified="true">
-            <fileset dir="${component.skins.base}/skins/sam" includes="${component.skins.imgfiles}" />
+            <fileset dir="${component.skins.base}/skins/sam" includes="**/*.*" excludes="**/*.css" />
         </copy>
     </target>
 
-    <target name="-deploysrc" if="component.jsfiles">
-        <copy todir="${global.src.component}" preservelastmodified="true">
-            <fileset dir="${component.jsfiles.base}" includes="${component.jsfiles}" />
-        </copy>
-    </target>
+    <target name="deploydocs" description="Copy doc files to global doc locations"></target>
 
-    <target name="-deployas" if="component.asfiles.base">
-        <copy todir="${global.as.src.component}" preservelastmodified="true">
-            <fileset dir="${component.asfiles.base}" includes="${component.asfiles}" />
-        </copy>
-    </target>
-
-    <target name="-deployastra" if="component.astrafiles.base">
-        <copy todir="${global.as.src.component}" preservelastmodified="true">
-            <fileset dir="${component.astrafiles.base}" includes="${component.astrafiles}" />
-        </copy>
-    </target>
-
-    <target name="-deployreadme" if="readme.exists">
-        <copy file="${component.basedir}/README" todir="${global.build.component}" preservelastmodified="true" />
-    </target>
-
-	<target name="-prepend" if="component.prependfiles">
-		<concat destfile="${workingdir}/${component.basefilename}.js.tmp" fixlastline="true">
-			<filelist dir="${component.basedir}" files="${component.prependfiles}" />
-			<filterchain>
-				<tokenfilter>
-    				<filetokenizer/>
-    		        <replaceregex
+    <target name="-prepend" if="component.prependfiles">
+        <concat destfile="${workingdir}/${component.basefilename}.js.tmp" fixlastline="true">
+            <filelist dir="${component.basedir}" files="${component.prependfiles}" />
+            <filterchain>
+                <tokenfilter>
+                    <filetokenizer/>
+                    <replaceregex
                         pattern="${component.logger.regex}"
                         replace="${component.logger.regex.replace}"
                         flags="${component.logger.regex.flags}" />
-				</tokenfilter>
-			</filterchain>
-		</concat>
-		<concat destfile="${workingdir}/${component.basefilename}.js.tmp" fixlastline="true" append="true">
-			<filelist dir="${component.builddir}" files="${component.basefilename}.js" />
-		</concat>
-		<move file="${workingdir}/${component.basefilename}.js.tmp" tofile="${component.builddir}/${component.basefilename}.js" />
-	</target>
+                </tokenfilter>
+            </filterchain>
+        </concat>
+        <concat destfile="${workingdir}/${component.basefilename}.js.tmp" fixlastline="true" append="true">
+            <filelist dir="${component.builddir}" files="${component.basefilename}.js" />
+        </concat>
+        <move file="${workingdir}/${component.basefilename}.js.tmp" tofile="${component.builddir}/${component.basefilename}.js" />
+    </target>
 
-	<target name="-append" if="component.appendfiles">
-		<concat destfile="${component.builddir}/${component.basefilename}.js" fixlastline="true" append="true">
-			<filelist dir="${component.basedir}" files="${component.appendfiles}" />
-			<filterchain>
-    			<tokenfilter>
-    				<filetokenizer/>
-    		        <replaceregex
+    <target name="-append" if="component.appendfiles">
+        <concat destfile="${component.builddir}/${component.basefilename}.js" fixlastline="true" append="true">
+            <filelist dir="${component.basedir}" files="${component.appendfiles}" />
+            <filterchain>
+                <tokenfilter>
+                    <filetokenizer/>
+                    <replaceregex
                         pattern="${component.logger.regex}"
                         replace="${component.logger.regex.replace}"
                         flags="${component.logger.regex.flags}" />
-				</tokenfilter>
-			</filterchain>
-		</concat>
-	</target>
+                </tokenfilter>
+            </filterchain>
+        </concat>
+    </target>
 
-	<target name="-prependdebug" if="component.prependfiles">
-		<concat destfile="${workingdir}/${component.basefilename}-debug.js.tmp" fixlastline="true" >
-			<filelist dir="${component.basedir}" files="${component.prependfiles}" />
-			<filelist dir="${component.builddir}" files="${component.basefilename}-debug.js" />
-		</concat>
-		<move file="${workingdir}/${component.basefilename}-debug.js.tmp" tofile="${component.builddir}/${component.basefilename}-debug.js" />
-	</target>
+    <target name="-prependdebug" if="component.prependfiles">
+        <concat destfile="${workingdir}/${component.basefilename}-debug.js.tmp" fixlastline="true" >
+            <filelist dir="${component.basedir}" files="${component.prependfiles}" />
+            <filelist dir="${component.builddir}" files="${component.basefilename}-debug.js" />
+        </concat>
+        <move file="${workingdir}/${component.basefilename}-debug.js.tmp" tofile="${component.builddir}/${component.basefilename}-debug.js" />
+    </target>
 
-	<target name="-appenddebug" if="component.appendfiles">
-		<concat destfile="${component.builddir}/${component.basefilename}-debug.js" fixlastline="true" append="true">
-			<filelist dir="${component.basedir}" files="${component.appendfiles}" />
-		</concat>
-	</target>
+    <target name="-appenddebug" if="component.appendfiles">
+        <concat destfile="${component.builddir}/${component.basefilename}-debug.js" fixlastline="true" append="true">
+            <filelist dir="${component.basedir}" files="${component.appendfiles}" />
+        </concat>
+    </target>
 </project>
