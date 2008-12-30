@@ -2,7 +2,7 @@
 
 <project name="YuiRollupTargets">
 
-    <import file="common.xml" description="Targets common to Rollup/Module" />
+    <import file="${builddir}/shared/targets.xml" description="Targets common to Rollup/Module" />
 
     <target name="build" depends="buildmodules" description="Create component.js"></target>
 

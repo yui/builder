@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="YuiMacroLib">
+
+    <macrodef name="arrayliteral">
+        <attribute name="from" />
+        <attribute name="to" />
+        <attribute name="key" />
+        <sequential>
+            <if>
+                <isset property="@{from}" />
+                <then>
+                    <propertyregex property="array"
+                                   override="true"
+                                   input="${@{from}}"
+                                   casesensitive="false"
+                                   regexp="([^\,\s]+)"
+                                   replace="'\1'"
+                                    />
+
+                    <property name="@{to}" value="@{key}:[${array}]" />
+                </then>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="createdetails">
+        <sequential>
+            <arrayliteral from="component.use" to="component.details.use" key="use" />
+            <arrayliteral from="component.supersedes" to="component.details.supersedes" key="supersedes" />
+            <arrayliteral from="component.requires" to="component.details.requires" key="requires" />
+            <arrayliteral from="component.optional" to="component.details.optional" key="optional" />
+            <if>
+                <isset property="component.skinnable" />
+                <then>
+                    <property name="component.details.skinnable" value="skinnable:${component.skinnable}" />
+                </then>
+            </if>
+
+            <propertyselector property="details.list"
+                             delimiter=","
+                             match="component\.details.([^\.]*)"
+                             select="\1"
+                             casesensitive="false" />
+    
+            <var name="details" value="" />
+            <if>
+                <isset property="details.list" />
+                <then>
+                    <for list="${details.list}" param="val">
+                        <sequential>
+                            <var name="details" value="${component.details.@{val}}, ${details}" />
+                        </sequential>
+                    </for>
+                    <propertyregex property="component.details.hash"
+                      input="{${details}}"
+                      regexp="(\,\s*?\})"
+                      replace="}"
+                      casesensitive="false" />
+                </then>
+                <else>
+                    <property name="component.details.hash" value="" />
+                </else>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="jsmin">
+        <attribute name="dir" />
+        <attribute name="file" />
+
+        <sequential>
+            <echo level="info">Running JSMin on @{dir}/@{file}</echo>
+            <basename file="@{file}" suffix=".js" property="basename" />
+            <java jar="${jsmin.jar}" output="@{dir}/${basename}-min.js" fork="true">
+                <arg file="@{dir}/@{file}" />
+            </java>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="yuicompress">
+        <attribute name="dir" />
+        <attribute name="file" />
+        <attribute name="args" />
+
+        <sequential>
+            <echo level="info">Running yuicompressor on @{dir}/@{file}</echo>
+            <basename file="@{file}" suffix=".js" property="basename" />
+            <java jar="${yuicompressor.jar}" fork="true">
+                <arg line="@{args}" />
+                <arg value="-o" />
+                <arg file="@{dir}/${basename}-min.js" />
+                <arg file="@{dir}/@{file}" />
+            </java>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="cssmin">
+        <attribute name="dir" />
+        <attribute name="file" />
+
+        <sequential>
+            <echo level="info">Running cssmin on @{dir}/@{file}</echo>
+
+            <!-- REMOVE COMMENTS -->
+            <replaceregexp file="@{dir}/@{file}"
+                                byline="false"
+                                match="/\*.*?\*/"
+                                replace=""
+                                flags="sg" />
+
+            <!-- REMOVE NEW LINES -->
+            <replaceregexp file="@{dir}/@{file}"
+                                byline="false"
+                                match="\r?\n"
+                                replace=""
+                                flags="sg" />
+
+            <!-- REMOVE ANY REMAINING UNNECESSARY WHITESPACE -->
+
+            <!-- Any whitespace around { } : ; or , -->
+            <replaceregexp file="@{dir}/@{file}"
+                                byline="false"
+                                match="\s*([{|:|;|}|,])\s*"
+                                replace="\1"
+                                flags="g" />
+
+            <!-- Collapse consecutive whitespace chars -->
+            <replaceregexp file="@{dir}/@{file}"
+                                byline="false"
+                                match="\s+"
+                                replace=" "
+                                flags="g" />
+
+            <!-- Trim -->
+            <replaceregexp file="@{dir}/@{file}"
+                                byline="false"
+                                match="(^\s+|\s+$)"
+                                replace=""
+                                flags="g" />
+        </sequential>
+    </macrodef>
+
+    <macrodef name="concatsource">
+        <attribute name="destfile" />
+        <attribute name="sourcedir" />
+        <attribute name="sourcefiles" />
+        <attribute name="workingdir" default="${workingdir}" />
+
+        <element name="filters" optional="true" description="Additonal filters to apply to individual files"/>
+
+        <sequential>
+            <echo level="info">Concatenating</echo>
+            <echo level="info">    Source Files : @{sourcefiles}</echo>
+            <echo level="info">    In Source Dir : @{sourcedir}</echo>
+            <echo level="info">    To : @{destfile}</echo>
+        
+            <delete dir="@{workingdir}" quiet="true"/>
+            <copy todir="@{workingdir}">
+                <filelist dir="@{sourcedir}" files="@{sourcefiles}" />
+                <filterchain>
+                    <filters />
+                    <fixcrlf fixlast="true" eof="remove"/>
+                </filterchain>
+            </copy>
+
+            <concat destfile="@{destfile}" fixlastline="true" >
+                <filelist dir="@{workingdir}" files="@{sourcefiles}" />
+            </concat>
+            
+            <delete dir="${workingdir}" quiet="true"/>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="jslint">
+        <element name="jsfiles" optional="false" />
+        <sequential>
+            <!-- 
+               Need to find a way to convert fileset to args (script?) to 
+               avoid ' ', which will break for files with ' in them
+               
+               Evaluates to the following java execution line...
+               java -r js.jar jslintconsole.js 'file1.js' 'file2.js' 'file3.js'
+            -->
+            <pathconvert pathsep="' '" property="jsfileargs">
+                <jsfiles />
+            </pathconvert>
+
+            <java jar="${rhino.jar}" fork="true">
+                <arg file="${jslintconsole.js}" />
+                <arg value="${jslintsrc.js}" />
+                <arg line="'${jsfileargs}'" />
+            </java>
+
+        </sequential>
+    </macrodef>
+
+    <macrodef name="registerversion">
+        <attribute name="module" />
+        <attribute name="classname" />
+        <attribute name="file" />
+        <sequential>
+            <loadfile srcfile="${builddir}/files/versioncode.txt" property="@{module}-@{classname}-version" >
+                <filterchain>
+                    <replacetokens>
+                        <token key="MODULE" value="@{module}"/>
+                        <token key="CLASSNAME" value="@{classname}"/>
+                    </replacetokens>
+                </filterchain>
+            </loadfile>
+            <echo level="info">Adding Version Registration Code to @{file}</echo>
+            <concat destfile="@{file}" append="true" fixlastline="true">${@{module}-@{classname}-version}</concat>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="addmodule">
+        <attribute name="file" />
+        <attribute name="module" />
+        <attribute name="details" default="" />
+
+        <sequential>
+            <if>
+                <equals arg1="@{details}" arg2="" />
+                <then>
+                    <property name="@{module}-details" value="" />
+                </then>
+                <else>
+                    <property name="@{module}-details" value=",@{details}" />
+                </else>
+            </if>
+            <loadfile srcfile="@{file}" property="@{module}-@{file}-code" />
+            <echo level="info">Wrapping @{file} in YUI.add module</echo>
+            <copy file="${builddir}/files/moduletemplate.txt" tofile="@{file}" overwrite="true">
+                <filterset>
+                    <filter token="CODE" value="${@{module}-@{file}-code}" />
+                    <filter token="YUIVAR" value="${yui.variable}" />
+                    <filter token="MODULE" value="@{module}" />
+                    <filter token="DETAILS" value="${@{module}-details}" />
+                </filterset>
+            </copy>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="addrollup">
+        <attribute name="file" />
+        <attribute name="module" />
+        <attribute name="details" default="" />
+
+        <sequential>
+            <if>
+                <equals arg1="@{details}" arg2="" />
+                <then>
+                    <property name="@{module}-details" value="" />
+                </then>
+                <else>
+                    <property name="@{module}-details" value=",@{details}" />
+                </else>
+            </if>
+            <loadfile srcfile="@{file}" property="@{module}-@{file}-code" />
+            <echo level="info">Adding Rollup @{file} using YUI.add</echo>
+            <copy file="${builddir}/files/rolluptemplate.txt" tofile="@{file}" overwrite="true">
+                <filterset>
+                    <filter token="CODE" value="${@{module}-@{file}-code}"/>
+                    <filter token="YUIVAR" value="${yui.variable}" />
+                    <filter token="MODULE" value="@{module}"/>
+                    <filter token="DETAILS" value="${@{module}-details}"/>
+                </filterset>
+            </copy>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="asdoc">
+        <sequential>
+            <!-- WORK IN PROGRESS, HARDCODED VALUES -->
+            <property name="flex.home" value="C:/dev/flexsdk3" />
+            <property name="asdoc.class" value="flex2.tools.ASDoc" />
+            <property name="asdoc.templatepath" value="${flex.home}/asdoc/templates" />
+            <property name="asdoc.windowtitle" value="YUI Flash Component Documentation" />
+            <property name="asdoc.maintitle" value="YUI Flash Component Documentation" />
+
+            <java className="${asdoc.class}" fork="true" failonerror="true">
+                <classpath>
+                    <fileset dir="${flex.home}/lib" includes="*.jar" />
+                </classpath>
+                <jvmarg line="-Dapplication.home=${flex.home} -Xms32m -Xmx768m -Dsun.io.useCanonCaches=false -Xbootclasspath/p:${flex.home}/lib/xalan.jar"/>
+                <arg line="-source-path+='${srcdir}/as-src/charts'"/>
+                <arg line="-source-path+='${srcdir}/as-src/uploader'"/>
+                <arg line="-library-path+='${srcdir}/as-src/charts/charts.swc'" />
+                <arg line="-doc-sources+='${srcdir}/as-src/charts'"/>
+                <arg line="-doc-sources+='${srcdir}/as-src/uploader'"/>
+                <arg line="-window-title '${asdoc.windowtitle}'"/>
+                <arg line="-main-title '${asdoc.maintitle}'"/>
+                <arg line="-templates-path '${asdoc.templatepath}'"/>
+                <arg line="-output '${srcdir}/as-docs'"/>
+            </java>
+        </sequential>
+    </macrodef>
+</project>

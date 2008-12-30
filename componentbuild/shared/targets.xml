@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project name="YuiCommonTargets">
+<project name="YuiSharedTargets">
 
     <echo level="info">Starting Build For ${component}</echo>
 
@@ -22,7 +22,7 @@
     <echo level="info">    global.build.component : ${global.build.component}</echo>
     <echo level="info">    global.build.component.assets : ${global.build.component.assets}</echo>
 
-    <import file="${builddir}/macrolib.xml" description="Macrodef definitions - jslint, jsmin, registerversion" />
+    <import file="${builddir}/shared/macrolib.xml" description="Macrodef definitions - jslint, jsmin, registerversion" />
 
     <target name="all" depends="local, deploy" description="Build and Deploy to Global Build Directory" />
     <target name="local" depends="clean, init, build, minifyjs, lint" description="Build and Deploy to Local Build Directory" />
