@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="YuiModuleTargets">
+
+    <import file="${builddir}/shared/targets.xml" description="Targets common to Rollup/Module" />
+
+    <target name="build" depends="corebuild, skinsbuild" />
+    <target name="skinsbuild" depends="-skinsbuild" />
+
+    <!-- CORE -->
+    <target name="corebuild" depends="debugbuild" description="Create component.js">
+        <echo level="info">Replacing Logger Statements in ${component.builddir}/${component.basefilename}.js</echo>
+
+        <copy file="${component.builddir}/${component.basefilename}-debug.js" tofile="${component.builddir}/${component.basefilename}.js" />
+
+        <replaceregexp file="${component.builddir}/${component.basefilename}.js"
+                            byline="${component.logger.regex.byline}"
+                            match="${component.logger.regex}"
+                            replace="${component.logger.regex.replace}"
+                            flags="${component.logger.regex.flags}" />
+
+        <fixcrlf srcdir="${component.builddir}" includes="${component.basefilename}.js" eol="${buildfiles.eol}" />
+    </target>
+
+    <!-- DEBUG -->
+    <target name="debugbuild" depends="-concatdebug, -registerdebug, -prependdebug, -appenddebug" description="Create component-debug.js">
+        <fixcrlf srcdir="${component.builddir}" includes="${component.basefilename}-debug.js" eol="${buildfiles.eol}" />
+    </target>
+
+    <target name="-concatdebug">
+        <concatsource destfile="${component.builddir}/${component.basefilename}-debug.js" sourcedir="${component.jsfiles.base}" sourcefiles="${component.jsfiles}" />
+    </target>
+
+    <target name="-registerdebug" unless="skip.register">
+        <registerversion classname="${component.mainclass}" module="${component.module}" file="${component.builddir}/${component.basefilename}-debug.js" />
+    </target>
+
+    <!-- SKINS -->
+    <target name="-skinsbuild" depends="-concatskins" description="Create skin file in local component build directory" if="component.skins.exist">
+        <fixcrlf srcdir="${component.builddir}/assets/skins/sam" includes="${component}.css" eol="${buildfiles.eol}" />
+    </target>
+
+    <target name="-concatskins" if="component.skins.exist">
+        <concatsource destfile="${component.builddir}/assets/skins/sam/${component}.css" sourcedir="${component.skins.base}" sourcefiles="${component}-core.css, skins/sam/${component}-skin.css" />
+        <cssmin dir="${component.builddir}/assets/skins/sam" file="${component}.css" />
+    </target>
+
+</project>

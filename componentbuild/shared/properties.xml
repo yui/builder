@@ -39,7 +39,7 @@
     <property name="component.skins.files" value="*.png, *.gif, *.jpg"/>
     <property name="component.assets.files" value="**/*.*"/>
 
-    <available file="${component.skins.base}" type="dir" property="component.skins.exist"/>
+    <available file="${component.skins.base}/${component}-core.css" type="file" property="component.skins.exist"/>
     <available file="${component.assets.base}" type="dir" property="component.assets.exist"/>
 
     <condition property="component.basefilename" value="${component}-${component.releasetype}" else="${component}">

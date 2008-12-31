@@ -77,7 +77,7 @@
         </copy>
 
         <copy todir="${global.build.component.assets}" preservelastmodified="true">
-            <fileset dir="${component.skins.base}" includes="${component}-core.css"  />
+            <fileset dir="${component.skins.base}" includes="${component}-core.css, ${component}.css"  />
         </copy>
 
         <copy todir="${global.build.component.assets}/skins/sam" preservelastmodified="true">

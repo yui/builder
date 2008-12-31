@@ -23,7 +23,7 @@
     <echo level="info">    global.src.base : ${global.src.base}</echo>
     <echo level="info">    global.src.component : ${global.src.component}</echo>
 
-    <import file="${builddir}/macrolib.xml" description="Macrodef definitions - jslint, jsmin, registerversion" />
+    <import file="${builddir}/shared/macrolib.xml" description="Macrodef definitions - jslint, jsmin, registerversion" />
 
     <target name="all" depends="local, deploy" description="Build and Deploy to Global Build Directory" />
     <target name="local" depends="clean, core, debug, customlocal, skinsbuild, jslint" description="Build and Deploy to Local Build Directory" />
