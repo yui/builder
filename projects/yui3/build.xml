@@ -6,7 +6,10 @@
     Requires ant 1.6.5+
     Requires ant-contrib tasks: http://ant-contrib.sourceforge.net/
     -->
+    <tstamp />
+    
     <property name="basedir"  location="."/>
+    <property name="localcheckoutdir" value="${basedir}/src" />
     <property name="src"      location="${basedir}/src/yui3"/>
     <property name="tools"    location="${basedir}/src/builder" />
     <property name="build"    location="${basedir}/target"/>
@@ -21,6 +24,7 @@
     <property name="as.src"   location="${src}/as-src" />
     <property name="as.dest"  location="${build}/yui/as-api" />
     <property name="flexhome" location="${basedir}/flex3sdk" />
+    <property name="cssProcessor.jar" value="${localcheckoutdir}/cssProcessor/CSSProcessor-0.1.0.jar" />
     <!--
     <property name="examplesdist" location="${basedir}/examples_dist"/>
     <property name="examplesydn"  location="${basedir}/examples_ydn"/>
@@ -32,10 +36,10 @@
     <property name="cvs.rsh"  value="yssh" />
 -->
 
-    <property name="pr1.builddirs" value="anim/**/*, attribute/**/*, base/**/*, classnamemanager/**/*, cssfonts/**/*, cssbase/**/*, cssreset/**/*, cssgrids/**/*, cookie/**/*, dd/**/*, dom/**/*, dump/**/*, event/**/*, get/**/*, io/**/*, json/**/*, logreader/**/*, loader/**/*, node/**/*, oop/**/*, plugin/**/*, queue/**/*, stylesheet/**/*, substitute/**/*, widget/**/*, yui/**/*, yui-base/**/*" />
+    <property name="pr1.builddirs" value="assets/**/*, anim/**/*, attribute/**/*, base/**/*, classnamemanager/**/*, console/**/*, cookie/**/*, cssfonts/**/*, cssbase/**/*, cssreset/**/*, cssgrids/**/*, dd/**/*, dom/**/*, dump/**/*, event/**/*, get/**/*, io/**/*, json/**/*, logreader/**/*, loader/**/*, node/**/*, node-menunav/**/*, oop/**/*, overlay/**/*, plugin/**/*, profiler/**/*, queue/**/*, slider/**/*, substitute/**/*, widget/**/*, yui/**/*, yui-base/**/*, test/**/*" />
 
 <!--
-    <property name="pr1.srcdirs"   value="animation/**/*, attribute/**/*, base/**/*, cookie/**/*, dd/**/*, dd-plugin/**/*, dom/**/*, dump/**/*, event/**/*, get/**/*, substitute/**/*, io/**/*, json-parse/**/*, json-stringify/**/*, loader/**/*, node/**/*, profiler/**/*, queue/**/*, yui/**/*, yuitest/**/*" />
+    <property name="pr1.srcdirs"   value="animation/**/*, attribute/**/*, base/**/*, cookie/**/*, dd/**/*, dd-plugin/**/*, dom/**/*, dump/**/*, event/**/*, get/**/*, substitute/**/*, io/**/*, json-parse/**/*, json-stringify/**/*, loader/**/*, node/**/*, profiler/**/*, queue/**/*, yui/**/*, test/**/*" />
 -->
 
     <!-- Temporarily, since we need to specify them anyway in apidocs.sh -->
@@ -64,7 +68,6 @@
       </classpath>
     </taskdef>
 
-    <!-- temporarily removed asapidocs -->
     <target name="all" depends="test, compile, apidocs, asapidocs, examples, package, verify, akamai"/>
 
     <target name="compile">
@@ -151,6 +154,8 @@
 
     <target name="examples">
         <exec dir="." executable="${examples.script}" output="examples_dist.log">
+            <arg value="-u" />
+            <arg value="http://localhost/yui3/templates" />
             <arg value="-b" />
             <arg value="true" />
             <arg value="-t" />
@@ -162,6 +167,8 @@
         </exec>
 
         <exec dir="." executable="${examples.script}" output="examples_ydn.log">
+            <arg value="-u" />
+            <arg value="http://localhost/yui3/templates" />
             <arg value="-y" />
             <arg value="true" />
             <arg value="-t" />
@@ -177,6 +184,8 @@
         <delete dir="${build}/ydn/assets" />
 
         <exec dir="." executable="${examples.script}" output="examples_prod.log">
+            <arg value="-u" />
+            <arg value="http://localhost/yui3/templates" />
             <arg value="-y" />
             <arg value="true" />
             <arg value="-t" />
@@ -223,6 +232,19 @@
         <zip destfile="${build}/yui_${version}.zip" basedir="${build}" includes="yui/**" />
         <checksum file="${build}/yui_${version}.zip" />
 
+        <property name="latestpackage" value="yui_${version}-${version.build}" />
+
+        <tar destfile="${build}/${latestpackage}_build.tar.gz" compression="gzip">
+            <tarfileset dir="${build}" includes="yui/build/**" />
+        </tar>
+        <checksum file="${build}/${latestpackage}_build.tar.gz" />
+
+        <tar destfile="${build}/${latestpackage}.tar.gz" compression="gzip">
+            <tarfileset dir="${build}" includes="yui/**" />
+            <tarfileset dir="${src}" includes="src/**" prefix="yui/" />
+        </tar>
+        <checksum file="${build}/${latestpackage}.tar.gz" />
+
         <zip destfile="${build}/ydn_${version}.zip" basedir="${build}" includes="ydn/**" />
 
         <copy todir="${build}/ydnsite" includeEmptyDirs="false" preservelastmodified="true">
@@ -242,6 +264,13 @@
               </patternset>
             </fileset>
         </copy>
+
+        <java jar="${cssProcessor.jar}" failonerror="true" fork="true">
+           <arg value="-b" />
+           <arg value="http://yui.yahooapis.com/${version}/build/" />
+           <arg file="${akamai}/build" />
+        </java>
+
         <!-- deal with makefiles? -->
         <!-- generate script to make all of the subdirs -->
         <copy file="push_all.py" tofile="${build}/akamai/${version}/push_all.py" preservelastmodified="true" />
@@ -300,9 +329,23 @@
             <arg value="${label}"/>
         </exec>
 
-        <exec dir="src/yui3" executable="git" outputproperty="git.push.output" >
+        <exec dir="src/yui3" executable="git" outputproperty="git.pushtag.output" >
             <arg value="push"/>
             <arg value="--tags"/>
+        </exec>
+
+<!--
+	git push git@yuilibrary.com:yui3 master:refs/heads/master
+            <arg value="git@yuilibrary.com:yui3"/>
+            <arg value="master:refs/heads/master"/>
+	git push hyphonhyphonmirror git@yuilibrary.com:builder
+            <arg value="hyphonhyphonmirror"/>
+            <arg value="git@yuilibrary.com:yui3"/>
+-->
+        <exec dir="src/yui3" executable="git" outputproperty="git.pushpublic.output" >
+            <arg value="push"/>
+            <arg value="git@yuilibrary.com:yui3"/>
+            <arg value="master:refs/heads/master"/>
         </exec>
 
     </target>
