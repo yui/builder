@@ -8,18 +8,21 @@
     <target name="skinsbuild" depends="-skinsbuild" />
 
     <!-- CORE -->
-    <target name="corebuild" depends="debugbuild" description="Create component.js">
-        <echo level="info">Replacing Logger Statements in ${component.builddir}/${component.basefilename}.js</echo>
+    <target name="corebuild" depends="debugbuild, -createcore, -loggerregex" description="Create component.js">
+        <fixcrlf srcdir="${component.builddir}" includes="${component.basefilename}.js" eol="${buildfiles.eol}" />
+    </target>
 
+    <target name="-createcore">
         <copy file="${component.builddir}/${component.basefilename}-debug.js" tofile="${component.builddir}/${component.basefilename}.js" />
+    </target>
 
+    <target name="-loggerregex" description="Replace logger statements" unless="component.logger.regex.skip">
+        <echo level="info">Replacing Logger Statements in ${component.builddir}/${component.basefilename}.js</echo>
         <replaceregexp file="${component.builddir}/${component.basefilename}.js"
                             byline="${component.logger.regex.byline}"
                             match="${component.logger.regex}"
                             replace="${component.logger.regex.replace}"
                             flags="${component.logger.regex.flags}" />
-
-        <fixcrlf srcdir="${component.builddir}" includes="${component.basefilename}.js" eol="${buildfiles.eol}" />
     </target>
 
     <!-- DEBUG -->
@@ -31,7 +34,7 @@
         <concatsource destfile="${component.builddir}/${component.basefilename}-debug.js" sourcedir="${component.jsfiles.base}" sourcefiles="${component.jsfiles}" />
     </target>
 
-    <target name="-registerdebug" unless="skip.register">
+    <target name="-registerdebug" unless="register.skip">
         <registerversion classname="${component.mainclass}" module="${component.module}" file="${component.builddir}/${component.basefilename}-debug.js" />
     </target>
 

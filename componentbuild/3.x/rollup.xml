@@ -23,7 +23,7 @@
 	<target name="-prependall" depends="-prependdebug, -prepend" if="component.prependfiles" />
 	<target name="-appendall" depends="-appenddebug, -append" if="component.appendfiles" />
 
-    <target name="-registerall" unless="skip.register">
+    <target name="-registerall" unless="register.skip">
         <addrollup module="${component.module}" file="${component.builddir}/${component.basefilename}-debug.js" details="${component.details.hash}" />
         <addrollup module="${component.module}" file="${component.builddir}/${component.basefilename}.js" details="${component.details.hash}" />
     </target>

@@ -33,7 +33,7 @@
         <createdetails />
     </target>
 
-    <target name="clean" description="Clean Local Build Directory" unless="skip.clean">
+    <target name="clean" description="Clean Local Build Directory" unless="clean.skip">
        <delete dir="${component.builddir}" />
     </target>
 
@@ -44,7 +44,7 @@
         <yuicompress dir="${component.builddir}" file="${component.basefilename}.js" args="${yuicompressor.args}" />
     </target>
 
-    <target name="lint" description="Run jslint over the local build files (default settings)" unless="skip.lint">
+    <target name="lint" description="Run jslint over the local build files (default settings)" unless="lint.skip">
         <jslint>
             <jsfiles>
                 <fileset dir="${component.builddir}" includes="*.js" />
