@@ -398,8 +398,7 @@
     </target>
 
     <target name="updategit">
-        <echo message="Tagging git ${label}" level="info" />
-
+        <echo message="Committing git ${label}" level="info" />
         <exec dir="src/yui2" executable="git" outputproperty="git.commit.output" >
             <arg value="commit"/>
             <arg value="-a"/>
@@ -407,6 +406,7 @@
             <arg value="${label}"/>
         </exec>
       
+        <echo message="Tagging git ${label}" level="info" />
         <exec dir="src/yui2" executable="git" outputproperty="git.tag.output" >
             <arg value="tag"/>
             <arg value="-a"/>
@@ -417,7 +417,7 @@
 
         <exec dir="src/yui2" executable="git" outputproperty="git.pushtag.output" >
             <arg value="push"/>
-            <arg value="--tags"/>
+            <arg value="--all"/>
         </exec>
 
         <exec dir="src/yui2" executable="git" outputproperty="git.pushpublic.output" >

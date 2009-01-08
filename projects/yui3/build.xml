@@ -281,7 +281,7 @@
 
         <exec dir="src/yui3" executable="git" outputproperty="git.pushtag.output" >
             <arg value="push"/>
-            <arg value="--tags"/>
+            <arg value="--all"/>
         </exec>
 
 <!--
