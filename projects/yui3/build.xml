@@ -25,35 +25,14 @@
     <property name="as.dest"  location="${build}/yui/as-api" />
     <property name="flexhome" location="${basedir}/flex3sdk" />
     <property name="cssProcessor.jar" value="${localcheckoutdir}/cssProcessor/CSSProcessor-0.1.0.jar" />
-    <!--
-    <property name="examplesdist" location="${basedir}/examples_dist"/>
-    <property name="examplesydn"  location="${basedir}/examples_ydn"/>
-    <property name="examplesprod" location="${basedir}/examples_prod"/>
-    -->
-
-<!--
-    <property name="cvs.root" value="vault.yahoo.com:/CVSROOT" />
-    <property name="cvs.rsh"  value="yssh" />
--->
 
     <property name="pr1.builddirs" value="assets/**/*, anim/**/*, attribute/**/*, base/**/*, classnamemanager/**/*, console/**/*, cookie/**/*, cssfonts/**/*, cssbase/**/*, cssreset/**/*, cssgrids/**/*, dd/**/*, dom/**/*, dump/**/*, event/**/*, get/**/*, io/**/*, json/**/*, logreader/**/*, loader/**/*, node/**/*, node-menunav/**/*, oop/**/*, overlay/**/*, plugin/**/*, profiler/**/*, queue/**/*, slider/**/*, substitute/**/*, widget/**/*, yui/**/*, yui-base/**/*, test/**/*" />
 
-<!--
-    <property name="pr1.srcdirs"   value="animation/**/*, attribute/**/*, base/**/*, cookie/**/*, dd/**/*, dd-plugin/**/*, dom/**/*, dump/**/*, event/**/*, get/**/*, substitute/**/*, io/**/*, json-parse/**/*, json-stringify/**/*, loader/**/*, node/**/*, profiler/**/*, queue/**/*, yui/**/*, test/**/*" />
--->
-
     <!-- Temporarily, since we need to specify them anyway in apidocs.sh -->
     <property name="pr1.srcdirs"   value="**/*" />
+
     <!-- Commenting for PR1, since we don't have critical mass on tests -->
     <!-- <property name="pr1.testdirs"   value="**/*" /> -->
-
-    <!--
-    <propertyregex property="pr1.builddirs"
-                   override="true"
-                   input="${pr1.components}"
-                   regexp="\s*?,"
-                   replace="/**/*," />
-    -->
 
     <loadfile property="version" srcFile="${basedir}/version.txt">
         <filterchain>
@@ -148,7 +127,7 @@
         -->
 
         <copy todir="${build}/ydnsite" includeEmptyDirs="false" preservelastmodified="true">
-            <fileset dir="${src}/site" includes="**/*" />
+            <fileset dir="${localcheckoutdir}/yui3-docs/site" includes="**/*" />
         </copy>
     </target>
 
@@ -159,7 +138,7 @@
             <arg value="-b" />
             <arg value="true" />
             <arg value="-t" />
-            <arg value="src/yui3/templates" />
+            <arg value="src/yui3-docs/templates" />
             <arg value="-d" />
             <arg value="${yui}" />
             <arg value="-v" />
@@ -172,7 +151,7 @@
             <arg value="-y" />
             <arg value="true" />
             <arg value="-t" />
-            <arg value="src/yui3/templates" />
+            <arg value="src/yui3-docs/templates" />
             <arg value="-d" />
             <arg value="${build}/ydn" />
             <arg value="-b" />
@@ -189,7 +168,7 @@
             <arg value="-y" />
             <arg value="true" />
             <arg value="-t" />
-            <arg value="src/yui3/templates" />
+            <arg value="src/yui3-docs/templates" />
             <arg value="-d" />
             <arg value="${build}/prod" />
             <arg value="-v" />
@@ -290,37 +269,8 @@
 
     <target name="updategit">
 
-        <!-- periods are not allowed in cvs labels -->
-        <!--
-        <propertyregex property="label.scrubbed"
-              input="${label}"
-              regexp="yui3\-(.*)"
-              replace="yui3-\1"
-              casesensitive="false" 
-              defaultValue="" />
-        -->
-        <!-- committing these files to this location will cause another
-             build to happen unless I specifically itemize all of the
-             directories I want to monitor.  Added ignoreFiles in
-             config.xml that will hopefully take care of this -->
-
-<!--
-        <cvs cvsroot="${cvs.root}" cvsrsh="${cvs.rsh}" dest=".">
-            <commandline>
-                <argument value="commit"/>
-                <argument value="-m"/>
-                <argument value="${label}"/>
-		        <argument value="yahoo/presentation/2.x/build/assets/skins/sam"/>
-                <argument value="yahoo/presentation/2.x/build/utilities"/>
-                <argument value="yahoo/presentation/2.x/build/yahoo-dom-event"/>
-                <argument value="yahoo/presentation/2.x/build/yuiloader-dom-event"/>
-                <argument value="yahoo/presentation/3.x/build/reset-fonts"/>
-                <argument value="yahoo/presentation/3.x/build/reset-fonts-grids"/>
-            </commandline>
-        </cvs>
--->
         <echo message="Tagging git ${label}" level="info" />
-      
+ 
         <exec dir="src/yui3" executable="git" outputproperty="git.tag.output" >
             <arg value="tag"/>
             <arg value="-a"/>
