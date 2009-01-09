@@ -35,7 +35,6 @@
     </target>
 
     <target name="-registerdebug" unless="register.skip">
-        <!--<addmodule module="${component.module}" file="${component.builddir}/${component.basefilename}.js" details="${component.details.hash}" />-->
         <addmodule module="${component.module}" file="${component.builddir}/${component.basefilename}-debug.js" details="${component.details.hash}" />
     </target>
 
@@ -49,12 +48,6 @@
         </concat>
     </target>
 
-	<!-- DON'T KNOW WHY I WAS DOING THIS INSTEAD OF JUST WORKING FROM THE DEBUG VERSION
-	    <target name="-concatcore">
-	        <concatsource destfile="${component.builddir}/${component.basefilename}.js" sourcedir="${component.jsfiles.base}" sourcefiles="${component.jsfiles}" />
-	    </target>
-	-->
-
     <!-- SKINS -->
     <target name="-skinsbuild" depends="-concatskins" description="Create skin rollup in local component build directory" if="component.skins.exist">
         <fixcrlf srcdir="${component.builddir}/assets/skins/sam" includes="${component}.css" eol="${buildfiles.eol}" />
@@ -62,7 +55,7 @@
 
     <target name="-concatskins" if="component.skins.exist">
         <concatsource destfile="${component.builddir}/assets/skins/sam/${component}.css" sourcedir="${component.skins.base}" sourcefiles="${component}-core.css, skins/sam/${component}-skin.css" />
-        <cssmin dir="${component.builddir}/assets/skins/sam" file="${component}.css" />
+        <yuicompress dir="${component.builddir}/assets/skins/sam" file="${component}.css" args="${yuicompressor.css.args.internal} -o ${component.builddir}/assets/skins/sam/${component}.css" />
     </target>
 
     <target name="-rollupcss" if="rollup.skins.exist">

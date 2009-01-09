@@ -45,7 +45,7 @@
 
     <target name="-concatskins" if="component.skins.exist">
         <concatsource destfile="${component.builddir}/assets/skins/sam/${component}.css" sourcedir="${component.skins.base}" sourcefiles="${component}-core.css, skins/sam/${component}-skin.css" />
-        <cssmin dir="${component.builddir}/assets/skins/sam" file="${component}.css" />
+        <yuicompress dir="${component.builddir}/assets/skins/sam" file="${component}.css" args="${yuicompressor.css.args.internal} -o ${component.builddir}/assets/skins/sam/${component}.css" />
     </target>
 
 </project>

@@ -22,7 +22,20 @@
     <property name="jslintconsole.js" location="${builddir}/lib/jslint/jslint-console.js" />
     <property name="jslintsrc.js" location="${builddir}/lib/jslint/fulljslint.js" />
     <property name="yuicompressor.jar" location="${builddir}/lib/yuicompressor/yuicompressor-2.4.jar" />
-    <property name="yuicompressor.args" value="-v --disable-optimizations --preserve-semi --line-break 6000" />
+
+    <property name="yuicompressor.css.args" value="--type css --line-break 6000" />
+    <property name="yuicompressor.js.args" value="--disable-optimizations --preserve-semi --line-break 6000" />
+
+    <property name="yuicompressor.js.verbose" value="true" />
+    <property name="yuicompressor.css.verbose" value="true" />
+
+    <condition property="yuicompressor.js.args.internal" value="-v ${yuicompressor.js.args}" else="${yuicompressor.js.args}">
+        <istrue value="${yuicompressor.js.verbose}" />
+    </condition>
+
+    <condition property="yuicompressor.css.args.internal" value="-v ${yuicompressor.css.args}" else="${yuicompressor.css.args}">
+        <istrue value="${yuicompressor.css.verbose}" />
+    </condition>
 
     <!-- Top Level Directories (e.g. <project>/build, <project>/src) -->
     <property name="global.build.base" location="${srcdir}/build" />

@@ -27,11 +27,4 @@
         <addrollup module="${component.module}" file="${component.builddir}/${component.basefilename}-debug.js" details="${component.details.hash}" />
         <addrollup module="${component.module}" file="${component.builddir}/${component.basefilename}.js" details="${component.details.hash}" />
     </target>
-
-	<!--
-    <target name="register" unless="skip.register">
-        <addrollup module="${component.module}" file="${component.builddir}/${component.basefilename}.js" details="${component.details.hash}" />
-        <addrollup module="${component.module}" file="${component.builddir}/${component.basefilename}-debug.js" details="${component.details.hash}" />
-    </target>
-	-->
 </project>

@@ -88,13 +88,12 @@
             <basename file="@{file}" suffix=".js" property="basename" />
             <java jar="${yuicompressor.jar}" fork="true">
                 <arg line="@{args}" />
-                <arg value="-o" />
-                <arg file="@{dir}/${basename}-min.js" />
                 <arg file="@{dir}/@{file}" />
             </java>
         </sequential>
     </macrodef>
 
+	<!-- Deprecated. Remove once everyone is over onto new build -->
     <macrodef name="cssmin">
         <attribute name="dir" />
         <attribute name="file" />
