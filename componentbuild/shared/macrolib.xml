@@ -282,10 +282,10 @@
                     <fileset dir="${flex.home}/lib" includes="*.jar" />
                 </classpath>
                 <jvmarg line="-Dapplication.home=${flex.home} -Xms32m -Xmx768m -Dsun.io.useCanonCaches=false -Xbootclasspath/p:${flex.home}/lib/xalan.jar"/>
-                <arg line="-source-path+='${srcdir}/as-src/charts'"/>
+                <arg line="-source-path+='${srcdir}/src/charts/as'"/>
                 <arg line="-source-path+='${srcdir}/as-src/uploader'"/>
-                <arg line="-library-path+='${srcdir}/as-src/charts/charts.swc'" />
-                <arg line="-doc-sources+='${srcdir}/as-src/charts'"/>
+                <arg line="-library-path+='${srcdir}/src/charts/as/charts.swc'" />
+                <arg line="-doc-sources+='${srcdir}/src/charts/as'"/>
                 <arg line="-doc-sources+='${srcdir}/as-src/uploader'"/>
                 <arg line="-window-title '${asdoc.windowtitle}'"/>
                 <arg line="-main-title '${asdoc.maintitle}'"/>
