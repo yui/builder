@@ -8,9 +8,5 @@
 
     <import file="${builddir}/shared/properties.xml" description="Properties common to yui2/yui3" />
 
-    <condition property="targetdefs" value="rollup.xml" else="module.xml">
-        <istrue value="${component.rollup}"/>
-    </condition>
-
-    <import file="${targetdefs}" description="Build Targets" />
+    <import file="${targets}" description="Build Targets" />
 </project>

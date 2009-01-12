@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="YuiCssModuleTargets">
+
+    <import file="${builddir}/shared/targets.xml" description="Targets common to Rollup/Module" />
+
+    <target name="build" depends="corebuild, contextbuild" />
+
+    <target name="corebuild">
+        <concatsource destfile="${component.builddir}/${component}.css" sourcedir="${component.basedir}/css" sourcefiles="${component.cssfiles}" />
+    </target>
+
+    <target name="contextbuild" if="component.csscontext">
+		<!--
+        <replaceregexp file="${component.builddir}/${component.basefilename}.js"
+                            byline="${component.logger.regex.byline}"
+                            match="${component.logger.regex}"
+                            replace="${component.logger.regex.replace}"
+                            flags="${component.logger.regex.flags}" />
+		-->
+    </target>
+
+    <target name="minify">
+        <yuicompress src="${component.builddir}/${component}.css" dest="${component.builddir}/${component}-min.css" args="${yuicompressor.css.args.internal}" />
+    </target>
+
+    <target name="lint">
+		<!-- TODO : Figure out how to use CSS lint -->
+		<!--
+        <jslint>
+            <jsfiles>
+                <fileset dir="${component.builddir}" includes="*.css" />
+            </jsfiles>
+        </jslint>
+		-->
+    </target>
+
+    <target name="deploybuild" description="Copy built files to global build location">
+        <copy todir="${global.build.component}" preservelastmodified="true">
+            <fileset dir="${component.builddir}" includes="*.css" />
+        </copy>
+    </target>
+</project>

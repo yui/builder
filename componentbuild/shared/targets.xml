@@ -25,7 +25,7 @@
     <import file="${builddir}/shared/macrolib.xml" description="Macrodef definitions - jslint, jsmin, registerversion" />
 
     <target name="all" depends="local, deploy" description="Build and Deploy to Global Build Directory" />
-    <target name="local" depends="clean, init, build, minifyjs, lint" description="Build and Deploy to Local Build Directory" />
+    <target name="local" depends="clean, init, build, minify, lint" description="Build and Deploy to Local Build Directory" />
 
     <target name="init">
         <tstamp/>
@@ -40,8 +40,8 @@
     <target name="build" />
 
     <!-- MIN -->
-    <target name="minifyjs" description="Create component-min.js from component.js">
-        <yuicompress dir="${component.builddir}" file="${component.basefilename}.js" args="${yuicompressor.js.args.internal} -o ${component.builddir}/${component.basefilename}-min.js" />
+    <target name="minify" description="Create component-min.js from component.js">
+        <yuicompress src="${component.builddir}/${component.basefilename}.js" dest="${component.builddir}/${component.basefilename}-min.js" args="${yuicompressor.js.args.internal}" />
     </target>
 
     <target name="lint" description="Run jslint over the local build files (default settings)" unless="lint.skip">

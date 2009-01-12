@@ -81,4 +81,13 @@
     </condition>
 
     <property name="workingdir" location="${component.builddir}/ant" />
+
+    <condition property="targetbase" value="rollup" else="module">
+        <istrue value="${component.rollup}"/>
+    </condition>
+
+    <condition property="targets" value="${builddir}/shared/cssmodule.xml" else="${targetbase}.xml">
+        <isset property="component.cssfiles" />
+    </condition>
+
 </project>
