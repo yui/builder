@@ -53,21 +53,21 @@
     </target>
 
     <!-- DEPLOY -->
-    <target name="deploy" description="Copy files to global location" depends="deploybuild, deploydocs"></target>
+    <target name="deploy" description="Copy files to global location" depends="deploybuild, deployassets, deployskins, deploydocs"></target>
 
-    <target name="deploybuild" description="Copy built files to global build location" depends="-deployassets, -deployskins">
+    <target name="deploybuild" description="Copy built files to global build location">
         <copy todir="${global.build.component}" preservelastmodified="true">
             <fileset dir="${component.builddir}" includes="*.js" />
         </copy>
     </target>
 
-    <target name="-deployassets" if="component.assets.exist">
+    <target name="deployassets" if="component.assets.exist">
         <copy todir="${global.build.component.assets}" flatten="true" preservelastmodified="true">
             <fileset dir="${component.assets.base}" includes="${component.assets.files}"  />
         </copy>
     </target>
 
-    <target name="-deployskins" if="component.skins.exist">
+    <target name="deployskins" if="component.skins.exist">
         <copy todir="${global.build.component.assets}/skins/sam" preservelastmodified="true">
             <fileset dir="${component.builddir}/assets/skins/sam" includes="${component}.css"  />
         </copy>
