@@ -62,26 +62,33 @@
     </target>
 
     <target name="deployassets" if="component.assets.exist">
-        <copy todir="${global.build.component.assets}" flatten="true" preservelastmodified="true">
-            <fileset dir="${component.assets.base}" includes="${component.assets.files}"  />
+        <copy todir="${global.build.component.assets}" flatten="${component.assets.flatten}" preservelastmodified="true">
+            <fileset dir="${component.assets.base}" includes="${component.assets.files}" excludes="skins/, legacy/" />
+        </copy>
+
+        <copy todir="${global.build.component.assets}" flatten="${component.assets.legacy.flatten}" preservelastmodified="true" failonerror="false">
+            <fileset dir="${component.assets.legacy.base}" includes="${component.assets.legacy.files}" excludes="skins/" />
         </copy>
     </target>
 
     <target name="deployskins" if="component.skins.exist">
-        <copy todir="${global.build.component.assets}/skins/sam" preservelastmodified="true">
-            <fileset dir="${component.builddir}/assets/skins/sam" includes="${component}.css"  />
-        </copy>
 
+        <!--
         <copy todir="${global.build.component.assets}/skins/sam" preservelastmodified="true">
-            <fileset dir="${component.skins.base}/skins/sam" includes="${component}-skin.css"  />
+            <fileset dir="${component.assets.base}/skins/sam" includes="${component}-skin.css"  />
         </copy>
 
         <copy todir="${global.build.component.assets}" preservelastmodified="true">
-            <fileset dir="${component.skins.base}" includes="${component}-core.css, ${component}.css"  />
+            <fileset dir="${component.assets.base}" includes="${component}-core.css" />
+        </copy>
+        -->
+
+        <copy todir="${global.build.component.assets}/skins/sam" preservelastmodified="true">
+            <fileset dir="${component.builddir}/assets/skins/sam" includes="${component}.css" />
         </copy>
 
         <copy todir="${global.build.component.assets}/skins/sam" preservelastmodified="true">
-            <fileset dir="${component.skins.base}/skins/sam" includes="**/*.*" excludes="**/*.css" />
+            <fileset dir="${component.assets.skins.base}/sam" includes="${component.assets.skins.files}" />
         </copy>
     </target>
 
