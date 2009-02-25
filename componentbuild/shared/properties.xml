@@ -2,6 +2,7 @@
 
 <project name="YuiSharedProperties">
 
+    <!-- ANT contrib library for loops, if/else support, with property fix for FOR task -->
     <taskdef resource="antcontrib.properties">
         <classpath>
             <pathelement location="${builddir}/lib/ant-contrib/ant-contrib-1.0b3-modified.jar" />
@@ -10,10 +11,14 @@
 
     <dirname property="buildfile.dir" file="${ant.file}" />
 
+    <!--
+        builddir : The path to the builder/componentbuild directory from the component build file
+        srcdir   : The path to top of the project source directory (e.g. yui2) from the component build file
+    -->
     <property name="builddir" location="../../../builder/componentbuild" />
     <property name="srcdir" location="../.." />
 
-    <!-- Default Library Version Build -->
+    <!-- buildfiles.eol : End of line char to use for built files -->
     <property name="buildfiles.eol" value="lf"/>
 
     <!-- Supporting Tools -->
@@ -22,9 +27,11 @@
     <property name="jslintsrc.js" location="${builddir}/lib/jslint/fulljslint.js" />
     <property name="yuicompressor.jar" location="${builddir}/lib/yuicompressor/yuicompressor-2.4.jar" />
 
+    <!-- YUI Compressor arguments for JS and CSS files -->
     <property name="yuicompressor.css.args" value="--type css --line-break 6000" />
     <property name="yuicompressor.js.args" value="--disable-optimizations --preserve-semi --line-break 6000" />
 
+    <!-- Enable/Disable YUI Compressor verbosity. NOTE: Checked in build files should not disable this flag -->
     <property name="yuicompressor.js.verbose" value="true" />
     <property name="yuicompressor.css.verbose" value="true" />
 
@@ -36,12 +43,50 @@
         <istrue value="${yuicompressor.css.verbose}" />
     </condition>
 
-    <!-- Top Level Directories (e.g. <project>/build, <project>/src) -->
+    <!-- Top Level Build Directories (e.g. yui2/build, yui3/build)-->
     <property name="global.build.base" location="${srcdir}/build" />
     <property name="global.build.component" location="${global.build.base}/${component}" />
     <property name="global.build.component.assets" location="${global.build.component}/assets" />
 
-    <!-- Component Defaults -->
+    <!-- Component Level Properties 
+
+    component                           Component name, lower-case. Used for build filenames(e.g. component.js, component-min.js)
+    component.module                    Module name, mostly always the same as component
+    component.mainclass                 Main JS class representing the module. Version code will be added to this class [ YUI2 Only ]
+
+    component.basedir                   Absolute path to the component's base directory (e.g. yui2/src/autocomplete)
+    component.srcdir                    Absolute path to the component's base directory  (e.g. yui2/src/autocomplete)
+    component.builddir                  Absolute path to the component's local build directory (e.g. yui2/src/autocomplete/build_tmp)
+
+    component.jsfiles.base              Base dir for component's js files (e.g. yui2/src/autocomplete/js)
+    component.jsfiles                   Comma seperated ordered list of source files to be concatenated, relative to component.jsfiles.base
+
+    component.assets.skins.base         Base directory for the component's skinning assets (e.g. yui2/src/autocomplete/assets/skins)
+
+                                        If this value is set, the build expects the following directory structure:
+
+                                        <component.assets.skins.base>
+                                            - <component>-core.css
+                                            - skins/sam/<component>-skin.css
+                                            - skins/sam/[component specific skin images]
+
+    component.assets.skins.files        Set of skinning assets to deploy (defaults to **/*)
+
+    component.assets.base               Base directory for the component's non-skinning related assets. E.g. swfs, non-skinned images
+    component.assets.files              Set of assets files to deploy (defaults to **/*)
+    component.assets.flatten            Whether or not to flatten the asset directory structure when deploying to build
+
+    component.logger.regex              Regex used to strip logger statements 
+    component.logger.regex.byline       If component.logger.regex.byline is false, regex will match against the 
+                                        entire file as opposed to line by line - required for multiline search.
+    component.logger.regex.flags        The set of standard Perl5 regex flags which apply. Defaults to mg if not provided
+    component.logger.regex.replace      The replacement string to use. Defaults to empty string
+
+	LOGGER REGEX NOTE: 
+	- Log statements need to end in semi-colons, otherwise the default regex will strip out code until the next semi-colon is hit.
+	- Any code on the same line as the start or end of a Log statement will be stripped. Hence Log statments should be on their own lines. 
+    -->
+
     <property name="component.module" value="${component}" />
     <property name="component.basedir" location="${buildfile.dir}" />
     <property name="component.srcdir" value="${component.basedir}" />
@@ -61,17 +106,21 @@
     <available file="${component.assets.base}/skins" type="dir" property="component.skins.exist"/>
     <available file="${component.assets.base}" type="dir" property="component.assets.exist"/>
 
-    <condition property="component.basefilename" value="${component}-${component.releasetype}" else="${component}">
+    <!-- 
+         component.basefilename, component.releasetype: Deprecated 
+         We used to mark filenames with suffixes (-beta, -experimental), which we no longer do 
+    -->
+    <condition property="component.basefilename" value="${component}" else="${component}">
         <isset property="component.releasetype"/>
     </condition>
 
-    <!-- Default Logger Regex values if not provided -->
+    <!-- Default logger regex values if not provided -->
     <property name="component.logger.regex" value="^.*?(?:logger|YAHOO.log).*?(?:;|\).*;|(?:\r?\n.*?)*?\).*;).*;?.*?\r?\n" />
     <property name="component.logger.regex.replace" value="" />
     <property name="component.logger.regex.flags" value="mg" />
     <property name="component.logger.regex.byline" value="false" />
 
-    <!-- Rollup Support -->
+    <!-- Rollup support, currently only used for YUI 3 -->
     <property name="component.rollup" value="false"/>
     <property name="component.rollup.target" value="all"/>
 
@@ -86,8 +135,10 @@
         </and>
     </condition>
 
+	<!-- The temporary working directory used by the build process -->
     <property name="workingdir" location="${component.builddir}/ant" />
 
+	<!-- The file which defines the default targets for the particular type of component (module, rollup, css) --> 
     <condition property="targetbase" value="rollup" else="module">
         <istrue value="${component.rollup}"/>
     </condition>

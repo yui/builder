@@ -1,111 +1,125 @@
-The YUI Team uses ANT to create component build files from individual 
-source files. 
+YUI uses ANT to create component build files from individual 
+source files.
 
 Each component has it's own ANT build script residing in the component's 
-base folder, with an associated properties file used to configure the 
-default build properties. 
+"src" folder, with an associated properties file used to configure the 
+default build properties e.g:
+
+	yui2/src/autocomplete/build.xml
+	yui2/src/autocomplete/build.properties
 
 The component build scripts will automate the conversion from component 
 source to <component>.js, <component>-min.js, <component>-debug.js by: 
 
-   a). Concatenating source files
-   b). Stripping logger statements
-   c). Running yuicompressor 
-   d). Running jslint all 3 built files
-   e). Attaching the appropriate suffix (e.g. beta, experimental etc.)
-   f). Adding version registration code
-   g). Deploying local built files to <2.x>/build
-   h). Deploying assets to <2.x>/build
-   i). Deploying src files to <2.x>/src, for Documentation parsing
+  a). Concatenating individual source files
+  b). Stripping logger statements
+  c). Running yuicompressor
+  d). Running jslint all 3 built files
+  e). Adding boiler plate module/version registration code
+  f). Building skin files from <component>-core.css and <component>-skin.css
+  g). Deploying built JS, CSS and assets to <project>/build
 
-NOTE: The scripts currently do not checkin any code to CVS 
+The same component build system is also used for CSS components such as 
+reset, base, fonts and grids.
 
-Below is a step-by-step guide to getting things setup for a new 
-component. 
+The scripts currently do not check in any code. The developer is 
+responsible for checking modified source code into the <project>/src 
+directory, and built code into the <project>/build directory, allowing 
+them to review diffs, before commiting changes.
 
-GETTING STARTED 
+Below is a step-by-step guide installing the build system, allowing
+you to build the "src" component code.
 
-0). If you have any work in progress, especially in your build 
-    directories, back it up before trying this. 
+SHORT VERSION
 
-1). Download and install ANT 1.7 (http://ant.apache.org/bindownload.cgi) 
+1). Install ANT 1.7 or above, and add ant to your path
 
-2). Run cvs update -D under yahoo/presentation/tools/builder. You'll 
-    pickup the componentbuild directory, if it's not there already. 
+2). Clone the YUI "builder" project from http://github.com/yui/builder/
 
-3). Set ANT_HOME to point to your ANT install root and add 
-    $ANT_HOME/bin/ant to your PATH 
+3). At the command line, cd to the source directory of the component 
+    you wish to build, and execute "ant all" to build, e.g.: 
 
-4). Set the following two environment variables, to point to your local 
-    working directory 
+    cd yui2/src/autocomplete
+    ant all
 
-   YUI_SRC_DIR = <CVSROOT>/yahoo/presentation/2.x
-   YUI_BUILD_DIR = <CVSROOT>/yahoo/presentation/tools/builder/componentbuild
+DETAILED VERSION
 
-   If you don't work directly in your CVS tree, wherever it is that you 
-   copy the yahoo/presentation code to. 
+To use the build system, you'll need to install ANT and obtain
+the YUI build infrastructure scripts from github. 
 
-5). To start with, copy $YUI_BUILD_DIR/build.common.xml and 
-    $YUI_BUILD_DIR/build.common.properties to your own component's 
-    base directory (the folder containing your src/asset files)
+These are one-time install tasks.
 
-    NOTE: You can also look at $YUI_BUILD_DIR/build.example.xml, 
-    build.example.properties. They're essentially READMEs and have 
-    detailed information about the full set of variables available.
+INSTALLING ANT
 
-6). Modify your version of build.properties to reflect your component 
-    requirements
+1). Download and install ANT 1.7 (or above)
 
-    IMPORTANT NOTES: 
+    http://ant.apache.org/bindownload.cgi
 
-    a). By default the local build location is set to the "build" 
-    directory under the component's base directory:
+2). Set ANT_HOME to point to your ANT install root and add 
+    $ANT_HOME/bin/ant to your PATH
 
-       component.basedir=${srcdir}/widget/${component} 
-       component.builddir=${component.basedir}/build
+INSTALLING YUI SCRIPTS
 
-    This directory gets created/over-ridden everytime you build.
-    
-    If your component has a persistant local "build" directory, you can 
-    specify another transient directory for ANT to use, using the 
-    above property.
+1). Clone the YUI "builder" project from github:
 
-    b). The logger.regex properties are designed to strip lines 
-    containing "logger"|"YAHOO.log", including multiline calls. 
-    
-    If using the default regex, you need to make sure your logger 
-    statements are on their own lines and end in semi-colons otherwise
-    and code on the same line as the logger statement will be stipped.
+    http://github.com/yui/builder/
 
-    Also, the default regex may not be appropriate for certain 
-    components. For example the Logger component or YAHOO may need 
-    to modify this regex to suit their needs.
-    
-    Individual component owners can define their own regex, based on 
-    their coding styles.
+2). Out of the box, the build system is designed to work
+    when cloned to the default "builder" directory, parallel 
+    to the project source directories:
 
-7). cd to your component's base directory and type "ant" at the command 
-    line.
-    
-    With no arguments, ANT will run look for a "build.xml" in the current 
-    folder, and invoke it's default target
+    <gitroot>/yui2       [ cloned yui2 project ]
+	<gitroot>/yui3		 [ cloned yui2 project ]
+	<gitroot>/builder    [ cloned builder project ]
 
-8). If all is good, this should run the "local" target (which is the default
-    target). This creates <component>.js and <component>-min.js in the local 
-    build directory specified by ${component.builddir}.
+	Cloning it to the default location will allow you to 
+	build any of the components without having to modify any 
+	component build scripts.
 
-9). If you run "ant all", the script will run the "local" target, building
-    to your local build directory and then deploy files to the top level 
-    2.x/build, 2.x/src directories.
+BUILDING AN EXISTING COMPONENT
 
-You can run other targets also by specifying them on the command line 
-using "ant <target>". 
+You should now be able run the build.xml file in any component's
+src folder, to build the component by typing in "ant all", e.g:
 
-If interested, you can also look at 
+   At the command prompt:
 
-   $YUI_BUILD_DIR/targetlib.xml : Target definitions
-   $YUI_BUILD_DIR/buildproperties.xml : Default property values
-   $YUI_BUILD_DIR/macrolib.xml : Macro tasks
+      cd yui2/src/autocomplete
+      ant all
 
-You can contact sdesai@yahoo-inc.com or yui-team@yahoo-inc.com for help, 
-information or to report issues with this infrastructure
+The "all" build target will build the autocomplete component from it's
+source files and deploy the built files to the yui2/build/autocomplete 
+folder.
+
+If you just type in "ant", without a target specified, it will 
+execute the default target, "local", which will build files to the 
+temporary src/<component>/build_tmp directory, without deploying
+them to the top level build directory.
+
+   At the command prompt:
+
+      cd yui2/src/autocomplete
+	  ant
+
+ANT will output build information to screen, as it runs through the 
+build, which can be redirected to a file if required:
+
+   prompt>ant all
+
+     Buildfile: build.xml
+        [echo] Starting Build For autocomplete
+        ...
+        [echo]     builddir : ../../../builder/componentbuild
+        ...
+        ...
+     BUILD SUCCESSFUL
+     Total time: 7 seconds
+
+   prompt>
+
+NOTE: Most components will have warnings which are output during the 
+"minify" and "lint" steps, which the component developer has evaluated 
+and determined to have no impact on functionality.
+
+CREATING BUILD FILES FOR A NEW COMPONENT
+
+TODO
