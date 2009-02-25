@@ -6,9 +6,9 @@
 
     <target name="build" depends="buildmodules" description="Create component.js"></target>
 
-	<target name="buildmodules" depends="-buildmodules, -registerall, -prependall, -appendall">
+    <target name="buildmodules" depends="-buildmodules, -registerall, -prependall, -appendall">
         <fixcrlf srcdir="${component.builddir}" eol="${buildfiles.eol}" />
-	</target>
+    </target>
 
     <target name="-buildmodules">
         <subant target="${component.rollup.target}" inheritall="false" >
@@ -20,8 +20,8 @@
         </subant>
     </target>
 
-	<target name="-prependall" depends="-prependdebug, -prepend" if="component.prependfiles" />
-	<target name="-appendall" depends="-appenddebug, -append" if="component.appendfiles" />
+    <target name="-prependall" depends="-prependdebug, -prepend" if="component.prependfiles" />
+    <target name="-appendall" depends="-appenddebug, -append" if="component.appendfiles" />
 
     <target name="-registerall" unless="register.skip">
         <addrollup module="${component.module}" file="${component.builddir}/${component.basefilename}-debug.js" details="${component.details.hash}" />

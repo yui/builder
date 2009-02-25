@@ -17,7 +17,6 @@
     <property name="buildfiles.eol" value="lf"/>
 
     <!-- Supporting Tools -->
-    <property name="jsmin.jar" location="${builddir}/lib/jsmin/jsmin.jar" />
     <property name="rhino.jar" location="${builddir}/lib/rhino/js.jar" />
     <property name="jslintconsole.js" location="${builddir}/lib/jslint/jslint-console.js" />
     <property name="jslintsrc.js" location="${builddir}/lib/jslint/fulljslint.js" />
@@ -71,12 +70,6 @@
     <property name="component.logger.regex.replace" value="" />
     <property name="component.logger.regex.flags" value="mg" />
     <property name="component.logger.regex.byline" value="false" />
-
-    <!-- Default csscontext support: Adds a csscontext in front of every rule in a CSS file -->
-    <property name="component.csscontext.regex" value="CSSCONTEXT_TODO" />
-    <property name="component.csscontext.regex.replace" value="CSSCONTEXT_TODO" />
-    <property name="component.csscontext.regex.flags" value="mg" />
-    <property name="component.csscontext.regex.byline" value="false" />
 
     <!-- Rollup Support -->
     <property name="component.rollup" value="false"/>

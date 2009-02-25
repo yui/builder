@@ -4,11 +4,11 @@
 
     <import file="${builddir}/shared/targets.xml" description="Targets common to Rollup/Module" />
 
-    <target name="build" depends="corebuild, skinsbuild" />
-    <target name="skinsbuild" depends="-skinsbuild" />
+    <target name="build" depends="buildcore, buildskins" />
+    <target name="buildskins" depends="-buildskins" />
 
     <!-- CORE -->
-    <target name="corebuild" depends="debugbuild, -createcore, -loggerregex" description="Create component.js">
+    <target name="buildcore" depends="builddebug, -createcore, -loggerregex" description="Create component.js">
         <fixcrlf srcdir="${component.builddir}" includes="${component.basefilename}.js" eol="${buildfiles.eol}" />
     </target>
 
@@ -26,7 +26,7 @@
     </target>
 
     <!-- DEBUG -->
-    <target name="debugbuild" depends="-concatdebug, -registerdebug, -prependdebug, -appenddebug" description="Create component-debug.js">
+    <target name="builddebug" depends="-concatdebug, -registerdebug, -prependdebug, -appenddebug" description="Create component-debug.js">
         <fixcrlf srcdir="${component.builddir}" includes="${component.basefilename}-debug.js" eol="${buildfiles.eol}" />
     </target>
 
@@ -39,7 +39,7 @@
     </target>
 
     <!-- SKINS -->
-    <target name="-skinsbuild" depends="-concatskins" description="Create skin file in local component build directory" if="component.skins.exist">
+    <target name="-buildskins" depends="-concatskins" description="Create skin file in local component build directory" if="component.skins.exist">
         <fixcrlf srcdir="${component.builddir}/assets/skins/sam" includes="${component}.css" eol="${buildfiles.eol}" />
     </target>
 

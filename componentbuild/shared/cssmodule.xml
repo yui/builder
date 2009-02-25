@@ -4,20 +4,10 @@
 
     <import file="${builddir}/shared/targets.xml" description="Targets common to Rollup/Module" />
 
-    <target name="build" depends="corebuild, contextbuild" />
+    <target name="build" depends="buildcore" />
 
-    <target name="corebuild">
+    <target name="buildcore">
         <concatsource destfile="${component.builddir}/${component}.css" sourcedir="${component.basedir}/css" sourcefiles="${component.cssfiles}" />
-    </target>
-
-    <target name="contextbuild" if="component.csscontext">
-		<!--
-        <replaceregexp file="${component.builddir}/${component.basefilename}.js"
-                            byline="${component.logger.regex.byline}"
-                            match="${component.logger.regex}"
-                            replace="${component.logger.regex.replace}"
-                            flags="${component.logger.regex.flags}" />
-		-->
     </target>
 
     <target name="minify">
@@ -25,14 +15,7 @@
     </target>
 
     <target name="lint">
-		<!-- TODO : Figure out how to use CSS lint -->
-		<!--
-        <jslint>
-            <jsfiles>
-                <fileset dir="${component.builddir}" includes="*.css" />
-            </jsfiles>
-        </jslint>
-		-->
+        <!-- TODO : CSS Lint support. Currently need to add @charset "UTF-8";-->
     </target>
 
     <target name="deploybuild" description="Copy built files to global build location">

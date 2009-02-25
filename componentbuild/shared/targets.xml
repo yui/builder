@@ -72,17 +72,6 @@
     </target>
 
     <target name="deployskins" if="component.skins.exist">
-
-        <!--
-        <copy todir="${global.build.component.assets}/skins/sam" preservelastmodified="true">
-            <fileset dir="${component.assets.base}/skins/sam" includes="${component}-skin.css"  />
-        </copy>
-
-        <copy todir="${global.build.component.assets}" preservelastmodified="true">
-            <fileset dir="${component.assets.base}" includes="${component}-core.css" />
-        </copy>
-        -->
-
         <copy todir="${global.build.component.assets}/skins/sam" preservelastmodified="true">
             <fileset dir="${component.builddir}/assets/skins/sam" includes="${component}.css" />
         </copy>
