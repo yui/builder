@@ -1,0 +1,26 @@
+html, body {
+    background-color:#F8F5EA
+}
+
+table {
+    margin:1em;
+}
+
+caption {
+    text-align:left;
+    font-weight:bold;
+}
+
+caption p {
+    margin:2px;
+}
+
+caption .filepath {
+    margin-top:0;
+    font-family:monospace;
+    color:#006600;
+}
+
+th, td.term {
+    background-color:#DFDBC3;
+}

@@ -48,45 +48,7 @@
     <property name="global.build.component" location="${global.build.base}/${component}" />
     <property name="global.build.component.assets" location="${global.build.component}/assets" />
 
-    <!-- Component Level Properties 
-
-    component                           Component name, lower-case. Used for build filenames(e.g. component.js, component-min.js)
-    component.module                    Module name, mostly always the same as component
-    component.mainclass                 Main JS class representing the module. Version code will be added to this class [ YUI2 Only ]
-
-    component.basedir                   Absolute path to the component's base directory (e.g. yui2/src/autocomplete)
-    component.srcdir                    Absolute path to the component's base directory  (e.g. yui2/src/autocomplete)
-    component.builddir                  Absolute path to the component's local build directory (e.g. yui2/src/autocomplete/build_tmp)
-
-    component.jsfiles.base              Base dir for component's js files (e.g. yui2/src/autocomplete/js)
-    component.jsfiles                   Comma seperated ordered list of source files to be concatenated, relative to component.jsfiles.base
-
-    component.assets.skins.base         Base directory for the component's skinning assets (e.g. yui2/src/autocomplete/assets/skins)
-
-                                        If this value is set, the build expects the following directory structure:
-
-                                        <component.assets.skins.base>
-                                            - <component>-core.css
-                                            - skins/sam/<component>-skin.css
-                                            - skins/sam/[component specific skin images]
-
-    component.assets.skins.files        Set of skinning assets to deploy (defaults to **/*)
-
-    component.assets.base               Base directory for the component's non-skinning related assets. E.g. swfs, non-skinned images
-    component.assets.files              Set of assets files to deploy (defaults to **/*)
-    component.assets.flatten            Whether or not to flatten the asset directory structure when deploying to build
-
-    component.logger.regex              Regex used to strip logger statements 
-    component.logger.regex.byline       If component.logger.regex.byline is false, regex will match against the 
-                                        entire file as opposed to line by line - required for multiline search.
-    component.logger.regex.flags        The set of standard Perl5 regex flags which apply. Defaults to mg if not provided
-    component.logger.regex.replace      The replacement string to use. Defaults to empty string
-
-	LOGGER REGEX NOTE: 
-	- Log statements need to end in semi-colons, otherwise the default regex will strip out code until the next semi-colon is hit.
-	- Any code on the same line as the start or end of a Log statement will be stripped. Hence Log statments should be on their own lines. 
-    -->
-
+	<!-- Component Properties -->
     <property name="component.module" value="${component}" />
     <property name="component.basedir" location="${buildfile.dir}" />
     <property name="component.srcdir" value="${component.basedir}" />
@@ -107,7 +69,7 @@
     <available file="${component.assets.base}" type="dir" property="component.assets.exist"/>
 
     <!-- 
-         component.basefilename, component.releasetype: Deprecated 
+         DEPRECATED: component.basefilename and component.releasetype are deprecated 
          We used to mark filenames with suffixes (-beta, -experimental), which we no longer do 
     -->
     <condition property="component.basefilename" value="${component}" else="${component}">
