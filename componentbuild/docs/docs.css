@@ -1,9 +1,11 @@
 html, body {
     background-color:#F8F5EA;
+    font-family:arial;
 }
 
 table.desc {
     margin:1em;
+    border-collapse:collapse;
 }
 
 table.desc caption {
@@ -21,6 +23,11 @@ table.desc caption .filepath {
     margin-top:0;
     font-family:monospace;
     color:#006600;
+}
+
+table.desc th, table.desc td {
+    border:1px solid #000;
+    padding:0.5em;
 }
 
 table.desc th {
