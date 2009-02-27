@@ -2,38 +2,6 @@
 
 <project name="YuiSharedTargets">
 
-    <!--
-
-    TARGET DEFINITIONS
-
-    This file defines the core set of targets which make up the build process, 
-    and which can be invoked via the ant command line, using ant <target>. 
-
-    all       Invokes "local" and then "deploy". This is what you would normally call 
-              when you're ready to check in your code.
-
-    local     Invokes "clean, init, build, minify, lint". This is what you would 
-              normally call, when going through a local build/test/build/test cycle.
-
-    clean     Deletes the local build dir
-    init      Creates the component's local build dir (e.g. yui2/src/autocomplete/build_tmp)
-
-    build     [abstract] Builds the component files in the local build dir. The work 
-              actually performed in the build step varies for the type of component and is 
-              defined by the type of build file pulled in (e.g. componentbuild/2.x/module.xml, 
-              componentbuild/3.x/rollup.xml, componentbuild/shard/cssmodule.xml etc)
-
-    minify    Compresses the built files
-    lint      Runs lint on the built files
-
-    deploy    Copies built code, along with any assets, to the top level build directory
-
-    The implementation of "build" is handled by the files in builder/componentbuild/2.x and 
-    builder/componentbuild/3.x, which define the build steps for yui2 and yui3 components and
-    also account for the different types of components - modules, rollups, css modules etc.
-
-    -->
-
     <echo level="info">Starting Build For ${component}</echo>
 
     <echo level="info">Ant Properties</echo>

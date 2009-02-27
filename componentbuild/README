@@ -211,10 +211,11 @@ If you're creating:
 FURTHER CUSTOMIZATION
 
 If required, you can define custom values for any of the properties 
-defined in README.properties to customize the build for your new component, 
-however as mentioned above, for most components, the properties defined in 
-the template files, should be sufficient.
+defined in builder/componentbuild/docs/properties.html to customize the 
+build for your new component, however as mentioned above, for most 
+components, the properties defined in the template files, should be 
+sufficient.
 
 You can also over-ride or extend existing targets, to customize the actual 
 build process for a component if required. The list of targets and their 
-role is defined in README.targets
+role is defined in builder/componentbuild/docs/targets.html. 
