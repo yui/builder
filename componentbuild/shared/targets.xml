@@ -15,7 +15,6 @@
     <echo level="info">    component : ${component}</echo>
     <echo level="info">    component.basefilename : ${component.basefilename}</echo>
     <echo level="info">    component.basedir : ${component.basedir}</echo>
-    <echo level="info">    component.srcdir : ${component.srcdir}</echo>
     <echo level="info">    component.builddir : ${component.builddir}</echo>
     <echo level="info">Global Build Properties</echo>
     <echo level="info">    global.build.base : ${global.build.base}</echo>

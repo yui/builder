@@ -51,11 +51,10 @@
 	<!-- Component Properties -->
     <property name="component.module" value="${component}" />
     <property name="component.basedir" location="${buildfile.dir}" />
-    <property name="component.srcdir" value="${component.basedir}" />
-    <property name="component.jsfiles.base" value="${component.srcdir}/js" />
+    <property name="component.jsfiles.base" value="${component.basedir}/js" />
 
     <property name="component.assets.flatten" value="true" />
-    <property name="component.assets.base" value="${component.srcdir}/assets" />
+    <property name="component.assets.base" value="${component.basedir}/assets" />
     <property name="component.assets.files" value="**/*" />
 
     <property name="component.assets.legacy.flatten" value="true" />
