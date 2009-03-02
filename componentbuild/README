@@ -13,27 +13,27 @@ parameters specific to the component e.g:
 The component build will automate the conversion from component source 
 to <component>.js, <component>-min.js, <component>-debug.js by: 
 
-   a). Concatenating individual source files
-   b). Stripping logger statements
-   c). Compressing files, using yuicompressor
-   d). Running jslint on all 3 built files
-   e). Adding boiler plate module/version registration code
-   f). Building skin files from <component>-core.css, <component>-skin.css
-   g). Deploying built JS, CSS and assets to <project>/build
+   a) Concatenating individual source files
+   b) Stripping logger statements
+   c) Compressing files, using yuicompressor
+   d) Running jslint on all 3 built files
+   e) Adding boiler plate module/version registration code
+   f) Building skin files from <component>-core.css, <component>-skin.css
+   g) Deploying built JS, CSS and assets to <project>/build
 
 The same component build system is also used for CSS components such as 
 reset, base, fonts and grids.
 
 The component build does not currently:
 
-   a). Check in any code
+   a) Check in any code
 
    The developer is responsible for checking modified source code 
    into the <project>/src directory, and built code into the 
    <project>/build directory, allowing them to review diffs, 
    before committing changes.
 
-   b). Generate API documentation
+   b) Generate API documentation
 
 INSTALLATION
 ------------
@@ -44,12 +44,12 @@ component code.
 
 SUMMARY
 
-1). Install ANT 1.7 or above, and add ant to your path
+1) Install ANT 1.7 or above, and add ant to your path
 
-2). Clone the YUI "builder" project from http://github.com/yui/builder/
+2) Clone the YUI "builder" project from http://github.com/yui/builder/
 
-3). At the command line, cd to the source directory of the component 
-    you wish to build, and execute "ant all" to build, e.g.: 
+3) At the command line, cd to the source directory of the component 
+   you wish to build, and execute "ant all" to build, e.g.: 
 
     cd yui2/src/autocomplete
     ant all
@@ -63,34 +63,34 @@ These are both one-time install tasks.
 
 INSTALLING ANT
 
-1). Download and install ANT 1.7 (or above)
+1) Download and install ANT 1.7 (or above)
 
-    http://ant.apache.org/bindownload.cgi
+   http://ant.apache.org/bindownload.cgi
 
-2). Be sure to define an ANT_HOME environment variable to point to 
-    your ANT install root, and add the ANT executable to your 
-    environment's PATH variable.
+2) Be sure to define an ANT_HOME environment variable to point to 
+   your ANT install root, and add the ANT executable to your 
+   environment's PATH variable.
 
 INSTALLING YUI BUILD INFRASTRUCTURE
 
-1). Clone the YUI "builder" project from github:
+1) Clone the YUI "builder" project from github:
 
-    http://github.com/yui/builder/
+   http://github.com/yui/builder/
 
-    This project contains the files used by the 
-    YUI ant build process.
+   This project contains the files used by the 
+   YUI ant build process.
 
-2). Out of the box, the build system is designed to work
-    when cloned to the default "builder" directory, parallel 
-    to the project source directories:
+2) Out of the box, the build system is designed to work
+   when cloned to the default "builder" directory, parallel 
+   to the project source directories:
 
-    <gitroot>/yui2       [ cloned yui2 project ]
-    <gitroot>/yui3       [ cloned yui2 project ]
-    <gitroot>/builder    [ cloned builder project ]
+   <gitroot>/yui2       [ cloned yui2 project ]
+   <gitroot>/yui3       [ cloned yui2 project ]
+   <gitroot>/builder    [ cloned builder project ]
 
-    Cloning it to the default location will allow you to 
-    build any of the components without having to modify any 
-    component build scripts.
+   Cloning it to the default location will allow you to 
+   build any of the components without having to modify any 
+   component build scripts.
 
 BUILDING AN EXISTING COMPONENT
 ------------------------------
