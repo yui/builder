@@ -31,19 +31,21 @@ to the Rhino source and binaries that are distributed under the
 
 3). lib/jslint/jslint-console.js:
 
-Is derived from rhino.js available at www.jslint.com/rhino/rhino.js, the contents 
-of which are in the public domain. See the contents of the file for licensing 
-information.
+Is derived from rhino.js available at www.jslint.com/rhino/rhino.js, 
+the contents of which are in the public domain. See the contents of the 
+file for licensing information.
 
 4). lib/jslint/fulljslint.js:
 
-Is derived from fulljslint.js, available at http://www.jslint.com/fulljslint.js, the 
-contents of which are in the public domain. See the contents of the file for 
-licensing information.
+Is derived from fulljslint.js, available at 
+http://www.jslint.com/fulljslint.js, the contents of which are in the public 
+domain. See the contents of the file for licensing information.
 
 5). lib/yuicompressor:
 
-Is covered by the BSD license, specified on http://developer.yahoo.com/yui/compressor/
+Is covered by the BSD license, specified on 
+http://developer.yahoo.com/yui/compressor/
 
-YUI Compressor bundles it's own version of Rhino, which is covered by the the Mozilla 
-Public License, further details of which can be found at the above url.
+YUI Compressor bundles it's own version of Rhino, which is covered by the 
+Mozilla Public License, further details of which can be found at the above 
+url.
