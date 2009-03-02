@@ -21,7 +21,7 @@
     <echo level="info">    global.build.component : ${global.build.component}</echo>
     <echo level="info">    global.build.component.assets : ${global.build.component.assets}</echo>
 
-    <import file="${builddir}/shared/macrolib.xml" description="Macrodef definitions - jslint, jsmin, registerversion" />
+    <import file="${builddir}/shared/macrolib.xml" description="Macrodef definitions - jslint, yuicompessor, registerversion" />
 
     <target name="all" depends="local, deploy" description="Build and Deploy to Global Build Directory" />
     <target name="local" depends="clean, init, build, minify, lint" description="Build and Deploy to Local Build Directory" />
