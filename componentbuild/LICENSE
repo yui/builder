@@ -1,0 +1,34 @@
+All code under this directory and any subdirectories, with the exception
+of the "lib" directory is licensed under the BSD license, presented below:
+
+    Copyright (c) 2008, Yahoo! Inc. All rights reserved.
+    Code licensed under the BSD License:
+    http://developer.yahoo.net/yui/license.txt
+
+The "lib" directory contains external build tools, which are 
+packaged along with the YUI component build code, in order to simplify 
+deployment for end users.
+
+The contents of "lib" are covered by the individual licenses specified 
+below:
+
+a). ant-contrib/ant-contrib-1.0b3-modified.jar is distributed under 
+the Apache Software License as noted below:
+
+   http://ant-contrib.sourceforge.net/
+   http://ant-contrib.sourceforge.net/LICENSE.txt
+    
+The ant-contrib 1.0b3 release has been modified by YUI to add the 
+missing "for" task to antcontrib.properties:
+
+   for=net.sf.antcontrib.logic.ForTask
+
+b). rhino: Rhino is issued under the Mozilla Public License (MPL), and 
+MPL applies to the Rhino source and binaries that are distributed under 
+builder/componentbuild/lib/rhino directory
+
+c). jslint/ jslint-console.js is derived from rhino.js available 
+at www.jslint.com/rhino/rhino.js
+
+d). jslint/fulljslint.js is derived from the fulljslint.js available 
+at http://www.jslint.com/fulljslint.js
