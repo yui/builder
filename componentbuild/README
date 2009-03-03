@@ -4,7 +4,7 @@ INTRODUCTION
 YUI uses ANT to create component build files from individual source files.
 
 Each component has its own ANT build file residing in the component's 
-source folder, with an associated properties file used to define build 
+source folder with an associated properties file used to define build 
 parameters specific to the component e.g:
 
    yui2/src/autocomplete/build.xml
@@ -112,7 +112,7 @@ e.g:
     prompt> cd yui2/src/autocomplete
     prompt> ant all
 
-The "all" build target will build the component from it's source files AND 
+The "all" build target will build the component from its source files AND 
 deploy the built files, as well as any assets, to the top level build 
 folder:
 
@@ -144,7 +144,7 @@ The locally built files are stored in the temporary directory:
 
     <project>/src/<component>/build_tmp
 
-So, for autocomplete, the built files can be found at the paths below:
+So, for autocomplete, the built files can be found in the directory below:
 
     yui2/src/autocomplete/build_tmp
 
@@ -174,7 +174,7 @@ CREATING BUILD FILES FOR A NEW COMPONENT
 ----------------------------------------
 
 The builder/componentbuild/templates directory has basic build.xml and 
-build.properties templates, for the various component types supported. 
+build.properties templates for the various component types supported. 
 
 For most new components, you should be able to start with the 
 appropriate template files and simply change the values of the basic 
@@ -213,9 +213,9 @@ FURTHER CUSTOMIZATION
 If required, you can define custom values for any of the properties 
 defined in builder/componentbuild/docs/properties.html to customize the 
 build for your new component, however as mentioned above, for most 
-components, the properties defined in the template files, should be 
+components the properties defined in the template files should be 
 sufficient.
 
-You can also over-ride or extend existing targets, to customize the actual 
+You can also override or extend existing targets, to customize the actual 
 build process for a component if required. The list of targets and their 
 role is defined in builder/componentbuild/docs/targets.html. 
