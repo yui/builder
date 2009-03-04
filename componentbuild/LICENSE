@@ -13,7 +13,7 @@ The contents of "lib" are covered by the individual licenses below:
 
 1). lib/ant-contrib/ant-contrib-1.0b3-modified.jar: 
 
-Is issued under the Apache Software License, as mentioned below:
+Is issued under the Apache Software License.  For more information, see:
 
    http://ant-contrib.sourceforge.net/
    http://ant-contrib.sourceforge.net/LICENSE.txt
@@ -27,7 +27,9 @@ missing lookup entry for the "for" task to antcontrib.properties:
 
 Rhino is issued under the Mozilla Public License (MPL), and MPL applies 
 to the Rhino source and binaries that are distributed under the
-"lib/rhino" directory.
+"lib/rhino" directory.  For more information on Rhino licensing, see:
+
+    https://developer.mozilla.org/en/Rhino_License
 
 3). lib/jslint/jslint-console.js:
 
@@ -46,6 +48,6 @@ domain. See the contents of the file for licensing information.
 Is covered by the BSD license, specified on 
 http://developer.yahoo.com/yui/compressor/
 
-YUI Compressor bundles it's own version of Rhino, which is covered by the 
-Mozilla Public License, further details of which can be found at the above 
+YUI Compressor ships with a modified version of Rhino, which is covered by 
+the Mozilla Public License, further details of which can be found at the above 
 url.
