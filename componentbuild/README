@@ -51,8 +51,8 @@ SUMMARY
 3) At the command line, cd to the source directory of the component 
    you wish to build, and execute "ant all" to build, e.g.: 
 
-    cd yui2/src/autocomplete
-    ant all
+    prompt> cd yui2/src/autocomplete
+    prompt> ant all
 
 DETAILED INSTRUCTIONS
 
@@ -91,6 +91,12 @@ INSTALLING YUI BUILD INFRASTRUCTURE
    Cloning it to the default location will allow you to 
    build any of the components without having to modify any 
    component build scripts.
+
+   NOTE: YUI Builder is also available for download as a zip from
+   http://yuilibrary.com/downloads. If downloading from this location
+   to build yui2 or yui3 source, make sure to unzip the contents into 
+   the directory structure mentioned above, to have the build work out 
+   of the box.
 
 BUILDING AN EXISTING COMPONENT
 ------------------------------
@@ -185,12 +191,14 @@ If you're creating:
 * A YUI 2 Component (either a JS or CSS component), use:
 
     builder/componentbuild/templates/yui2
+
        build.xml
        build.properties
        
 * A YUI 3 Component (either a JS or CSS component), use:
 
     builder/componentbuild/templates/yui3
+
        build.xml
        build.properties
        
