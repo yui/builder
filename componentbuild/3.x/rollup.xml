@@ -6,7 +6,7 @@
 
     <target name="build" depends="buildmodules" description="Create component.js"></target>
 
-    <target name="buildmodules" depends="-buildmodules, -registerall, -prependall, -appendall">
+    <target name="buildmodules" depends="-buildmodules, -registerall, -prependall, -appendall, -rollupjs">
         <fixcrlf srcdir="${component.builddir}" eol="${buildfiles.eol}" />
     </target>
 
@@ -18,6 +18,16 @@
             <property name="rollup.component" value="${component}" />
             <property name="rollup.component.basefilename" value="${component.basefilename}" />
         </subant>
+    </target>
+
+    <target name="-rollupjs" if="rollup">
+        <echo level="info">Rolling up ${component.basefilename}-debug.js into ${rollup.component.basefilename}-debug.js</echo>
+        <concat destfile="${rollup.builddir}/${rollup.component.basefilename}.js" append="true" fixlastline="true">
+            <filelist dir="${component.builddir}" files="${component.basefilename}.js" />
+        </concat>
+        <concat destfile="${rollup.builddir}/${rollup.component.basefilename}-debug.js" append="true" fixlastline="true">
+            <filelist dir="${component.builddir}" files="${component.basefilename}-debug.js" />
+        </concat>
     </target>
 
     <target name="-prependall" depends="-prependdebug, -prepend" if="component.prependfiles" />
