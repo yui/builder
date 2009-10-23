@@ -75,7 +75,7 @@
 
         <sequential>
             <echo level="info">Running yuicompressor on @{src}</echo>
-            <java jar="${yuicompressor.jar}" fork="true">
+            <java jar="${yuicompressor.jar}" fork="true" failonerror="true">
                 <arg line="@{args} -o" />
                 <arg file="@{dest}" />
                 <arg file="@{src}" />
@@ -96,7 +96,7 @@
             <echo level="info">    Source Files : @{sourcefiles}</echo>
             <echo level="info">    In Source Dir : @{sourcedir}</echo>
             <echo level="info">    To : @{destfile}</echo>
-        
+
             <delete dir="@{workingdir}" quiet="true"/>
             <copy todir="@{workingdir}">
                 <filelist dir="@{sourcedir}" files="@{sourcefiles}" />
@@ -106,11 +106,11 @@
                 </filterchain>
             </copy>
 
-            <concat destfile="@{destfile}" fixlastline="true" >
+            <concat destfile="@{destfile}" fixlastline="true">
                 <filelist dir="@{workingdir}" files="@{sourcefiles}" />
             </concat>
-            
-            <delete dir="${workingdir}" quiet="true"/>
+
+            <delete dir="${workingdir}" quiet="true" />
         </sequential>
     </macrodef>
 
@@ -128,7 +128,7 @@
                 <jsfiles />
             </pathconvert>
 
-            <java jar="${rhino.jar}" fork="true">
+            <java jar="${rhino.jar}" fork="true" failonerror="true">
                 <arg file="${jslintconsole.js}" />
                 <arg value="${jslintsrc.js}" />
                 <arg line="'${jsfileargs}'" />
