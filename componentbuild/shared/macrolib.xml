@@ -8,7 +8,10 @@
         <attribute name="key" />
         <sequential>
             <if>
-                <isset property="@{from}" />
+                <and>
+                    <isset property="@{from}" />
+                    <length string="${@{from}}" when="ne" length="0" />
+                </and>
                 <then>
                     <propertyregex property="array"
                                    override="true"
