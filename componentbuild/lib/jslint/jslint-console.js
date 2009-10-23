@@ -31,13 +31,19 @@ load(jslintsrc);
 			print("- OK");
 		} else {
 			print(" \n");
+
 			for (var i=0; i < JSLINT.errors.length; ++i) {
 				var e = JSLINT.errors[i];
 				if (e) {
 					print("\t" + e.line + ", " + e.character + ": " + e.reason + "\n\t" + clean(e.evidence) + "\n");
 				}
 			}
-		   print(" \n");
+		    print(" \n");
+            
+            // Last item is null if JSLint hit a fatal error
+            if (JSLINT.errors && JSLINT.errors[JSLINT.errors.length-1] === null) {
+                throw new Error("Fatal JSLint Exception. Stopped lint");
+            }
 		}
 	}
 	
