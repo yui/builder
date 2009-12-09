@@ -228,3 +228,4 @@ sufficient.
 You can also override or extend existing targets, to customize the actual 
 build process for a component if required. The list of targets and their 
 role is defined in builder/componentbuild/docs/targets.html. 
+
