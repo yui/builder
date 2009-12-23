@@ -58,7 +58,7 @@
         <yuicompress src="${component.builddir}/assets/skins/sam/${component}.css" dest="${component.builddir}/assets/skins/sam/${component}.css" args="${yuicompressor.css.args.internal}" />
     </target>
 
-    <target name="-rollupcss" if="rollup.skins.exist">
+    <target name="-rollupcss" if="rollupskins">
         <echo level="info">Rolling up ${component}.css into ${rollup.component}.css</echo>
         <concat destfile="${rollup.builddir}/assets/skins/sam/${rollup.component}.css" append="true" fixlastline="true">
             <filelist dir="${component.builddir}/assets/skins/sam" files="${component}.css" />

@@ -64,7 +64,21 @@
     <property name="component.assets.skins.base" value="${component.assets.base}/skins" />
     <property name="component.assets.skins.files" value="**/*" />
 
-    <available file="${component.assets.base}/skins" type="dir" property="component.skins.exist"/>
+    <condition property="component.skins.exist">
+        <and>
+            <available file="${component.assets.base}/${component}-core.css" type="file" />
+            <available file="${component.assets.base}/skins" type="dir" />
+        </and>
+    </condition>
+
+    <!-- component is part of a rollup build, so rollup skins to parent -->
+    <condition property="rollupskins">
+        <and>
+            <istrue value="${rollup}" />
+            <istrue value="${component.skins.exist}" />
+        </and>
+    </condition>
+
     <available file="${component.assets.base}" type="dir" property="component.assets.exist"/>
 
     <!-- 
@@ -92,9 +106,16 @@
     <condition property="rollup.skins.exist">
         <and>
             <istrue value="${component.rollup}" />
-            <istrue value="${component.skins.exist}" />
+            <available file="${component.assets.base}/skins" type="dir" />
         </and>
     </condition>
+
+    <condition property="skins.exist">
+        <or>
+            <istrue value="${rollup.skins.exist}" />
+            <istrue value="${component.skins.exist}" />
+        </or>
+    </condition>    
 
 	<!-- The temporary working directory used by the build process -->
     <property name="workingdir" location="${component.builddir}/ant" />
