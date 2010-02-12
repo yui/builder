@@ -156,6 +156,54 @@
         </sequential>
     </macrodef>
 
+    <macrodef name="addlang">
+
+        <attribute name="dir" />
+        <attribute name="module" />
+        <attribute name="dest" />
+        <attribute name="lang" default="" />
+    	<attribute name="details" default = ""/>
+
+        <sequential>
+            <if>
+                <equals arg1="@{details}" arg2="" />
+                <then>
+                    <property name="@{module}@{lang}_details" value="" />
+                </then>
+                <else>
+                    <property name="@{module}@{lang}_details" value=",@{details}" />
+                </else>
+            </if>
+
+            <if>
+                <equals arg1="@{lang}" arg2="" />
+                <then>
+                    <property name="@{module}@{lang}_strs" value="@{module}.js" />
+                </then>
+                <else>
+                    <property name="@{module}@{lang}_strs" value="@{module}_@{lang}.js" />
+                </else>
+            </if>
+
+            <loadfile srcfile="@{dir}/${@{module}@{lang}_strs}" property="@{module}@{lang}-strs-loaded" />
+
+            <echo level="info">Wrapping @{dir}/${@{module}@{lang}_strs} in YUI.add, Y.Intl.add</echo>
+
+            <copy file="${builddir}/files/langtemplate.txt" tofile="@{dest}/${@{module}@{lang}_strs}" overwrite="true">
+                <filterset>
+                	<!-- TODO - Integration -->
+                	<filter token="LANG" value="@{lang}" />
+                	<filter token="LANG_MODULE" value="@{module};lang:@{lang}" />
+                    <filter token="STRINGS" value="${@{module}@{lang}-strs-loaded}" />
+                    <filter token="YUIVAR" value="${yui.variable}" />
+                    <filter token="MODULE" value="@{module}" />
+                    <filter token="LANG_DETAILS" value="${@{module}@{lang}_details}" />
+                </filterset>
+            </copy>
+        </sequential>
+
+    </macrodef>
+	
     <macrodef name="addmodule">
         <attribute name="file" />
         <attribute name="module" />

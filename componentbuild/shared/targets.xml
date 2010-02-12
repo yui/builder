@@ -80,6 +80,12 @@
         </copy>
     </target>
 
+    <target name="deploylang" description="Copy language bundles to global build location" if="component.langs.exist">
+        <copy todir="${global.build.component.assets}/lang" preservelastmodified="true">
+            <fileset dir="${component.builddir}/lang" includes="*.js" />
+        </copy>
+    </target>
+
     <target name="deploydocs" description="Copy doc files to global doc locations">
         <!-- TODO -->
     </target>

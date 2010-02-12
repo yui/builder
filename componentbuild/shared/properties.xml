@@ -54,17 +54,19 @@
 	<!-- Component Properties -->
     <property name="component.module" value="${component}" />
     <property name="component.basedir" location="${buildfile.dir}" />
-    <property name="component.jsfiles.base" value="${component.basedir}/js" />
+    <property name="component.jsfiles.base" location="${component.basedir}/js" />
 
+	<property name="component.lang.base" location="${component.basedir}/lang" />
+	
     <property name="component.assets.flatten" value="true" />
-    <property name="component.assets.base" value="${component.basedir}/assets" />
+    <property name="component.assets.base" location="${component.basedir}/assets" />
     <property name="component.assets.files" value="**/*" />
 
     <property name="component.assets.legacy.flatten" value="true" />
-    <property name="component.assets.legacy.base" value="${component.assets.base}/legacy" />
+    <property name="component.assets.legacy.base" location="${component.assets.base}/legacy" />
     <property name="component.assets.legacy.files" value="**/*" />
 
-    <property name="component.assets.skins.base" value="${component.assets.base}/skins" />
+    <property name="component.assets.skins.base" location="${component.assets.base}/skins" />
     <property name="component.assets.skins.files" value="**/*" />
 
     <condition property="component.skins.exist">
@@ -83,6 +85,10 @@
     </condition>
 
     <available file="${component.assets.base}" type="dir" property="component.assets.exist"/>
+
+    <condition property="component.langs.exist">
+        <isset property="component.lang" />
+    </condition>
 
     <!-- 
          DEPRECATED: component.basefilename and component.releasetype are deprecated 

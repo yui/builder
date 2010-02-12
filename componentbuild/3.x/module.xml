@@ -4,8 +4,9 @@
 
     <import file="${builddir}/shared/targets.xml" description="Targets common to Rollup/Module" />
 
-    <target name="build" depends="buildcore, -rollupjs, buildskins" />
+    <target name="build" depends="buildcore, -rollupjs, buildskins, buildlangs" />
     <target name="buildskins" depends="-buildskins, -rollupcss" />
+    <target name="buildlangs" depends="-buildlangs" />
 
     <!-- CORE -->
     <target name="buildcore" depends="builddebug, -createcore, -loggerregex" description="Create component.js">
@@ -51,6 +52,21 @@
     <!-- SKINS -->
     <target name="-buildskins" depends="-concatskins" description="Create skin rollup in local component build directory" if="component.skins.exist">
         <fixcrlf srcdir="${component.builddir}/assets/skins/sam" includes="${component}.css" eol="${buildfiles.eol}" />
+    </target>
+
+    <target name="-buildlangs" description="Create language packs in the local component build directory" if="component.langs.exist">
+    	<mkdir dir="${component.builddir}/lang" />
+
+        <for list="${component.lang}" param="lang" trim="true">
+            <sequential>
+            	<addlang dir="${component.lang.base}" module="${component}" lang="@{lang}" dest="${component.builddir}/lang" />
+                <yuicompress src="${component.builddir}/lang/${component}_@{lang}.js" dest="${component.builddir}/lang/${component}_@{lang}-min.js" args="${yuicompressor.js.args.internal}" />
+            </sequential>
+        </for>
+
+    	<addlang dir="${component.lang.base}" module="${component}" lang="" dest="${component.builddir}/lang/" />
+        <yuicompress src="${component.builddir}/lang/${component}.js" dest="${component.builddir}/lang/${component}-min.js" args="${yuicompressor.js.args.internal}" />
+    	
     </target>
 
     <target name="-concatskins" if="component.skins.exist">
