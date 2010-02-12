@@ -31,15 +31,18 @@
     <property name="yuicompressor.css.args" value="--type css --line-break 6000" />
     <property name="yuicompressor.js.args" value="--disable-optimizations --preserve-semi --line-break 6000" />
 
+    <property name="yuicompressor.js.charset" value="utf-8" />
+    <property name="yuicompressor.css.charset" value="utf-8" />
+
     <!-- Enable/Disable YUI Compressor verbosity. NOTE: Checked in build files should not disable this flag -->
     <property name="yuicompressor.js.verbose" value="true" />
     <property name="yuicompressor.css.verbose" value="true" />
 
-    <condition property="yuicompressor.js.args.internal" value="-v ${yuicompressor.js.args}" else="${yuicompressor.js.args}">
+    <condition property="yuicompressor.js.args.internal" value="-v --charset ${yuicompressor.js.charset} ${yuicompressor.js.args}" else="--charset ${yuicompressor.js.charset} ${yuicompressor.js.args}">
         <istrue value="${yuicompressor.js.verbose}" />
     </condition>
 
-    <condition property="yuicompressor.css.args.internal" value="-v ${yuicompressor.css.args}" else="${yuicompressor.css.args}">
+    <condition property="yuicompressor.css.args.internal" value="-v --charset ${yuicompressor.css.charset} ${yuicompressor.css.args}" else="--charset ${yuicompressor.css.charset} ${yuicompressor.css.args}">
         <istrue value="${yuicompressor.css.verbose}" />
     </condition>
 
