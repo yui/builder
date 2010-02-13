@@ -87,9 +87,19 @@
     <available file="${component.assets.base}" type="dir" property="component.assets.exist"/>
 
     <condition property="component.langs.exist">
-        <isset property="component.lang" />
+    	<and>
+            <isset property="component.lang" />
+            <available file="${component.lang.base}" type="dir" />
+    	</and>
     </condition>
 
+    <condition property="rolluplangs">
+        <and>
+            <istrue value="${rollup}" />
+            <istrue value="${component.langs.exist}" />
+        </and>
+    </condition>
+	
     <!-- 
          DEPRECATED: component.basefilename and component.releasetype are deprecated 
          We used to mark filenames with suffixes (-beta, -experimental), which we no longer do 

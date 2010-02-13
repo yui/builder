@@ -52,7 +52,7 @@
     </target>
 
     <!-- DEPLOY -->
-    <target name="deploy" description="Copy files to global location" depends="deploybuild, deployassets, deployskins, deploydocs"></target>
+    <target name="deploy" description="Copy files to global location" depends="deploybuild, deployassets, deployskins, deploylang, deploydocs"></target>
 
     <target name="deploybuild" description="Copy built files to global build location">
         <copy todir="${global.build.component}" preservelastmodified="true">
@@ -80,8 +80,8 @@
         </copy>
     </target>
 
-    <target name="deploylang" description="Copy language bundles to global build location" if="component.langs.exist">
-        <copy todir="${global.build.component.assets}/lang" preservelastmodified="true">
+    <target name="deploylang" description="Copy language bundles to global build location">
+        <copy todir="${global.build.component}/lang" preservelastmodified="true" failonerror="false">
             <fileset dir="${component.builddir}/lang" includes="*.js" />
         </copy>
     </target>

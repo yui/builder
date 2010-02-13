@@ -6,7 +6,7 @@
 
     <target name="build" depends="buildcore, -rollupjs, buildskins, buildlangs" />
     <target name="buildskins" depends="-buildskins, -rollupcss" />
-    <target name="buildlangs" depends="-buildlangs" />
+    <target name="buildlangs" depends="-buildlangs, -rolluplangs" />
 
     <!-- CORE -->
     <target name="buildcore" depends="builddebug, -createcore, -loggerregex" description="Create component.js">
@@ -57,6 +57,7 @@
     <target name="-buildlangs" description="Create language packs in the local component build directory" if="component.langs.exist">
     	<mkdir dir="${component.builddir}/lang" />
 
+    	<!-- TODO: Break compress/concat out into separate pieces -->
         <for list="${component.lang}" param="lang" trim="true">
             <sequential>
             	<addlang dir="${component.lang.base}" module="${component}" lang="@{lang}" dest="${component.builddir}/lang" />
@@ -66,8 +67,27 @@
 
     	<addlang dir="${component.lang.base}" module="${component}" lang="" dest="${component.builddir}/lang/" />
         <yuicompress src="${component.builddir}/lang/${component}.js" dest="${component.builddir}/lang/${component}-min.js" args="${yuicompressor.js.args.internal}" />
-    	
+
     </target>
+
+    <target name="-rolluplangs" if="rolluplangs">
+        <for list="${component.lang}" param="lang" trim="true">
+            <sequential>
+                <concat destfile="${rollup.builddir}/lang/${rollup.component}_@{lang}.js" append="true" fixlastline="true">
+                    <fileset dir="${component.builddir}/lang" includes="*_@{lang}.js" />
+                </concat>
+                <concat destfile="${rollup.builddir}/lang/${rollup.component}_@{lang}-min.js" append="true" fixlastline="true">
+                    <fileset dir="${component.builddir}/lang" includes="*_@{lang}-min.js" />
+                </concat>
+            </sequential>
+        </for>
+    	<concat destfile="${rollup.builddir}/lang/${rollup.component}.js" append="true" fixlastline="true">
+            <filelist dir="${component.builddir}/lang" files="${component}.js" />
+        </concat>
+        <concat destfile="${rollup.builddir}/lang/${rollup.component}-min.js" append="true" fixlastline="true">
+            <filelist dir="${component.builddir}/lang" files="${component}-min.js" />
+        </concat>
+	</target>
 
     <target name="-concatskins" if="component.skins.exist">
         <concatsource destfile="${component.builddir}/assets/skins/sam/${component}.css" sourcedir="${component.assets.base}" sourcefiles="${component}-core.css, skins/sam/${component}-skin.css" />
