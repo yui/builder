@@ -142,8 +142,9 @@
         <attribute name="module" />
         <attribute name="classname" />
         <attribute name="file" />
+        <attribute name="versioncode" default="${builddir}/files/versioncode.txt" />
         <sequential>
-            <loadfile srcfile="${builddir}/files/versioncode.txt" property="@{module}-@{classname}-version" >
+            <loadfile srcfile="@{versioncode}" property="@{module}-@{classname}-version" >
                 <filterchain>
                     <replacetokens>
                         <token key="MODULE" value="@{module}"/>
@@ -162,7 +163,8 @@
         <attribute name="module" />
         <attribute name="dest" />
         <attribute name="lang" default="" />
-    	<attribute name="details" default = ""/>
+    	<attribute name="details" default=""/>
+    	<attribute name="langtemplate" default="${builddir}/files/langtemplate.txt"/>
 
         <sequential>
             <if>
@@ -189,7 +191,7 @@
 
             <echo level="info">Wrapping @{dir}/${@{module}@{lang}_strs} in YUI.add, Y.Intl.add</echo>
 
-            <copy file="${builddir}/files/langtemplate.txt" tofile="@{dest}/${@{module}@{lang}_strs}" overwrite="true">
+            <copy file="@{langtemplate}" tofile="@{dest}/${@{module}@{lang}_strs}" overwrite="true">
                 <filterset>
                 	<!-- TODO - Integration -->
                 	<filter token="LANG" value="@{lang}" />
@@ -208,6 +210,7 @@
         <attribute name="file" />
         <attribute name="module" />
         <attribute name="details" default="" />
+        <attribute name="moduletemplate" default="${builddir}/files/moduletemplate.txt" />
 
         <sequential>
             <if>
@@ -221,7 +224,7 @@
             </if>
             <loadfile srcfile="@{file}" property="@{module}-@{file}-code" />
             <echo level="info">Wrapping @{file} in YUI.add module</echo>
-            <copy file="${builddir}/files/moduletemplate.txt" tofile="@{file}" overwrite="true">
+            <copy file="@{moduletemplate}" tofile="@{file}" overwrite="true">
                 <filterset>
                     <filter token="CODE" value="${@{module}-@{file}-code}" />
                     <filter token="YUIVAR" value="${yui.variable}" />
@@ -236,6 +239,7 @@
         <attribute name="file" />
         <attribute name="module" />
         <attribute name="details" default="" />
+        <attribute name="rolluptemplate" default="${builddir}/files/rolluptemplate.txt" />
 
         <sequential>
             <if>
@@ -249,7 +253,7 @@
             </if>
             <loadfile srcfile="@{file}" property="@{module}-@{file}-code" />
             <echo level="info">Adding Rollup @{file} using YUI.add</echo>
-            <copy file="${builddir}/files/rolluptemplate.txt" tofile="@{file}" overwrite="true">
+            <copy file="@{rolluptemplate}" tofile="@{file}" overwrite="true">
                 <filterset>
                     <filter token="CODE" value="${@{module}-@{file}-code}"/>
                     <filter token="YUIVAR" value="${yui.variable}" />
