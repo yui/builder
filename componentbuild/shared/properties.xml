@@ -88,8 +88,10 @@
 
     <condition property="component.langs.exist">
     	<and>
-            <isset property="component.lang" />
-            <available file="${component.lang.base}" type="dir" />
+    		<or>
+    		    <isset property="component.lang" />
+    			<isset property="component.rollup.lang" />
+    		</or>
     	</and>
     </condition>
 

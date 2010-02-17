@@ -41,6 +41,20 @@
     <!-- MIN -->
     <target name="minify" description="Create component-min.js from component.js">
         <yuicompress src="${component.builddir}/${component.basefilename}.js" dest="${component.builddir}/${component.basefilename}-min.js" args="${yuicompressor.js.args.internal}" />
+    	<if>
+            <available file="${component.builddir}/lang" type="dir" />
+    	    <then>
+    	    	<for param="file">
+    	    	    <path>
+    	    	      <fileset dir="${component.builddir}/lang" includes="*.js"/>
+    	    	    </path>
+    	    	    <sequential>
+    	    	       <basename file="@{file}" property="@{file}" suffix=".js" />
+    	    	       <yuicompress src="@{file}" dest="${component.builddir}/lang/${@{file}}-min.js" args="${yuicompressor.js.args.internal}" />
+    	    	    </sequential>
+    	    	</for>
+    	    </then>
+        </if>
     </target>
 
     <target name="lint" description="Run jslint over the local build files (default settings)" unless="lint.skip">

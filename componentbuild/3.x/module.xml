@@ -61,12 +61,10 @@
         <for list="${component.lang}" param="lang" trim="true">
             <sequential>
             	<addlang dir="${component.lang.base}" module="${component}" lang="@{lang}" dest="${component.builddir}/lang" />
-                <yuicompress src="${component.builddir}/lang/${component}_@{lang}.js" dest="${component.builddir}/lang/${component}_@{lang}-min.js" args="${yuicompressor.js.args.internal}" />
             </sequential>
         </for>
 
     	<addlang dir="${component.lang.base}" module="${component}" lang="" dest="${component.builddir}/lang/" />
-        <yuicompress src="${component.builddir}/lang/${component}.js" dest="${component.builddir}/lang/${component}-min.js" args="${yuicompressor.js.args.internal}" />
 
     </target>
 
@@ -76,16 +74,10 @@
                 <concat destfile="${rollup.builddir}/lang/${rollup.component}_@{lang}.js" append="true" fixlastline="true">
                     <fileset dir="${component.builddir}/lang" includes="*_@{lang}.js" />
                 </concat>
-                <concat destfile="${rollup.builddir}/lang/${rollup.component}_@{lang}-min.js" append="true" fixlastline="true">
-                    <fileset dir="${component.builddir}/lang" includes="*_@{lang}-min.js" />
-                </concat>
             </sequential>
         </for>
     	<concat destfile="${rollup.builddir}/lang/${rollup.component}.js" append="true" fixlastline="true">
             <filelist dir="${component.builddir}/lang" files="${component}.js" />
-        </concat>
-        <concat destfile="${rollup.builddir}/lang/${rollup.component}-min.js" append="true" fixlastline="true">
-            <filelist dir="${component.builddir}/lang" files="${component}-min.js" />
         </concat>
 	</target>
 

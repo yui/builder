@@ -178,22 +178,21 @@
             <if>
                 <equals arg1="@{lang}" arg2="" />
                 <then>
-                    <property name="@{module}@{lang}_strs" value="@{module}.js" />
+                    <property name="@{module}@{lang}_fullname" value="@{module}" />
                 </then>
                 <else>
-                    <property name="@{module}@{lang}_strs" value="@{module}_@{lang}.js" />
+                    <property name="@{module}@{lang}_fullname" value="@{module}_@{lang}" />
                 </else>
             </if>
 
-            <loadfile srcfile="@{dir}/${@{module}@{lang}_strs}" property="@{module}@{lang}-strs-loaded" />
+            <loadfile srcfile="@{dir}/${@{module}@{lang}_fullname}.js" property="@{module}@{lang}-strs-loaded" />
 
             <echo level="info">Wrapping @{dir}/${@{module}@{lang}_strs} in YUI.add, Y.Intl.add</echo>
 
-            <copy file="${builddir}/files/langtemplate.txt" tofile="@{dest}/${@{module}@{lang}_strs}" overwrite="true">
+            <copy file="${builddir}/files/langtemplate.txt" tofile="@{dest}/${@{module}@{lang}_fullname}.js" overwrite="true">
                 <filterset>
-                	<!-- TODO - Integration -->
                 	<filter token="LANG" value="@{lang}" />
-                	<filter token="LANG_MODULE" value="@{module};lang:@{lang}" />
+                	<filter token="LANG_MODULE" value="lang/${@{module}@{lang}_fullname}" />
                     <filter token="STRINGS" value="${@{module}@{lang}-strs-loaded}" />
                     <filter token="YUIVAR" value="${yui.variable}" />
                     <filter token="MODULE" value="@{module}" />
@@ -260,4 +259,71 @@
         </sequential>
     </macrodef>
 
+    <macrodef name="addlangrollup">
+
+    	<attribute name="module" />
+        <attribute name="dir" />
+
+        <sequential>
+            <echo level="info">Registering rollup info for lang files in @{dir} using YUI.add</echo>
+
+        	<for list="${component.rollup.lang}" param="lang" trim="true">
+                <sequential>
+                    <loadfile srcfile="@{dir}/@{module}_@{lang}.js" property="@{module}-@{lang}-code" />
+
+                    <var name="lang.use" value="{use:[" />
+
+                    <for list="${component.lang.use}" param="submod" trim="true">                   
+                       <sequential>
+                             <var name="lang.use" value="${lang.use}'lang/@{submod}_@{lang}'," />
+                       </sequential>
+                    </for>
+
+                	<var name="lang.use" value="${lang.use}]}" />
+
+                    <propertyregex property="@{module}-@{lang}-details"
+                      input="${lang.use}"
+                      regexp="(\,\s*?\])"
+                      replace="]"
+                      casesensitive="false" />
+
+                    <copy file="${builddir}/files/rolluptemplate.txt" tofile="@{dir}/@{module}_@{lang}.js" overwrite="true">
+                        <filterset>
+                            <filter token="CODE" value="${@{module}-@{lang}-code}"/>
+                            <filter token="YUIVAR" value="${yui.variable}" />
+                            <filter token="MODULE" value="lang/@{module}_@{lang}"/>
+                            <filter token="DETAILS" value=", ${@{module}-@{lang}-details}"/>
+                        </filterset>
+                    </copy>
+        		</sequential>
+        	</for>
+
+            <loadfile srcfile="@{dir}/@{module}.js" property="@{module}--code" />
+
+            <var name="lang.use" value="{use:[" />
+            <for list="${component.lang.use}" param="submod" trim="true">                   
+               <sequential>
+                     <var name="lang.use" value="${lang.use}'lang/@{submod}'," />
+               </sequential>
+            </for>
+            <var name="lang.use" value="${lang.use}]}" />
+
+            <propertyregex property="@{module}--details"
+              input="${lang.use}"
+              regexp="(\,\s*?\])"
+              replace="]"
+              casesensitive="false" />
+
+            <copy file="${builddir}/files/rolluptemplate.txt" tofile="@{dir}/@{module}.js" overwrite="true">
+                <filterset>
+                    <filter token="CODE" value="${@{module}--code}"/>
+                    <filter token="YUIVAR" value="${yui.variable}" />
+                    <filter token="MODULE" value="lang/@{module}"/>
+                    <filter token="DETAILS" value=", ${@{module}--details}"/>
+                </filterset>
+            </copy>
+
+        </sequential>
+    </macrodef>
+	
 </project>
