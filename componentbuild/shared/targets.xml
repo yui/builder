@@ -49,8 +49,7 @@
     	    	      <fileset dir="${component.builddir}/lang" includes="*.js"/>
     	    	    </path>
     	    	    <sequential>
-    	    	       <basename file="@{file}" property="@{file}" suffix=".js" />
-    	    	       <yuicompress src="@{file}" dest="${component.builddir}/lang/${@{file}}-min.js" args="${yuicompressor.js.args.internal}" />
+    	    	       <yuicompress src="@{file}" dest="@{file}" args="${yuicompressor.js.args.internal}" />
     	    	    </sequential>
     	    	</for>
     	    </then>

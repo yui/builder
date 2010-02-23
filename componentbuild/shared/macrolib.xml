@@ -187,12 +187,12 @@
 
             <loadfile srcfile="@{dir}/${@{module}@{lang}_fullname}.js" property="@{module}@{lang}-strs-loaded" />
 
-            <echo level="info">Wrapping @{dir}/${@{module}@{lang}_strs} in YUI.add, Y.Intl.add</echo>
+            <echo level="info">Wrapping @{dir}/${@{module}@{lang}_fullname}.js in YUI.add, Y.Intl.add</echo>
 
             <copy file="${builddir}/files/langtemplate.txt" tofile="@{dest}/${@{module}@{lang}_fullname}.js" overwrite="true">
                 <filterset>
-                	<filter token="LANG" value="@{lang}" />
-                	<filter token="LANG_MODULE" value="lang/${@{module}@{lang}_fullname}" />
+                    <filter token="LANG" value="@{lang}" />
+                    <filter token="LANG_MODULE" value="lang/${@{module}@{lang}_fullname}" />
                     <filter token="STRINGS" value="${@{module}@{lang}-strs-loaded}" />
                     <filter token="YUIVAR" value="${yui.variable}" />
                     <filter token="MODULE" value="@{module}" />
