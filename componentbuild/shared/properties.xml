@@ -26,6 +26,8 @@
     <property name="jslintconsole.js" location="${builddir}/lib/jslint/jslint-console.js" />
     <property name="jslintsrc.js" location="${builddir}/lib/jslint/fulljslint.js" />
     <property name="yuicompressor.jar" location="${builddir}/lib/yuicompressor/yuicompressor-2.4.jar" />
+    <property name="yrb2jsonconsole.js" location="${builddir}/lib/yrb2json/yrb2json-console.js" />
+    <property name="yrb2jsonsrc.js" location="${builddir}/lib/yrb2json/yrb2json.js" />
 
     <!-- YUI Compressor arguments for JS and CSS files -->
     <property name="yuicompressor.css.args" value="--type css --line-break 6000" />
@@ -140,6 +142,9 @@
 
 	<!-- The temporary working directory used by the build process -->
     <property name="workingdir" location="${component.builddir}/ant" />
+    
+    <!-- Directory for language resource bundles in JSON format derived from YRB format -->
+    <property name="component.langbuilddir" value="${component.basedir}/build_lang_tmp" />
 
 	<!-- The file which defines the default targets for the particular type of component (module, rollup, css) --> 
     <condition property="targetbase" value="rollup" else="module">
