@@ -151,7 +151,7 @@
         <istrue value="${component.rollup}"/>
     </condition>
 
-    <condition property="targets" value="${builddir}/shared/cssmodule.xml" else="${targetbase}.xml">
+    <condition property="targets" value="../shared/cssmodule.xml" else="${targetbase}.xml">
         <isset property="component.cssfiles" />
     </condition>
 
