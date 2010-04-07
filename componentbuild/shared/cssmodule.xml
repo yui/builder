@@ -2,7 +2,8 @@
 
 <project name="YuiCssModuleTargets">
 
-    <import file="${builddir}/shared/targets.xml" description="Targets common to Rollup/Module" />
+    <dirname property="cssmodule.basedir" file="${ant.file.YuiCssModuleTargets}"/>
+    <import file="${cssmodule.basedir}/../shared/targets.xml" description="Targets common to Rollup/Module" />
 
     <target name="build" depends="buildcore" />
 

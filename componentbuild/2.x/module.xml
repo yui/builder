@@ -2,7 +2,8 @@
 
 <project name="YuiModuleTargets">
 
-    <import file="${builddir}/shared/targets.xml" description="Targets common to Rollup/Module" />
+    <dirname property="module.basedir" file="${ant.file.YuiModuleTargets}"/>
+    <import file="${module.basedir}/../shared/targets.xml" description="Targets common to Rollup/Module" />
 
     <target name="build" depends="buildcore, buildskins" />
     <target name="buildskins" depends="-buildskins" />
