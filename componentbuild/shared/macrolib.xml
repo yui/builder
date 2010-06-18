@@ -69,18 +69,23 @@
         </sequential>
     </macrodef>
 
+    <taskdef
+            name="jscompressor"
+            classname="com.yahoo.platform.yui.compressor.ant.JavaScriptCompressorTask"
+            classpath="${yuicompressor.jar}"/>
+    <taskdef
+            name="csscompressor"
+            classname="com.yahoo.platform.yui.compressor.ant.CssCompressorTask"
+            classpath="${yuicompressor.jar}"/>
+ 
     <macrodef name="yuicompress">
         <attribute name="src" />
         <attribute name="dest" />
         <attribute name="args" />
 
         <sequential>
-            <echo level="info">Running yuicompressor on @{src}</echo>
-            <java jar="${yuicompressor.jar}" fork="true" failonerror="true">
-                <arg line="@{args} -o" />
-                <arg file="@{dest}" />
-                <arg file="@{src}" />
-            </java>
+            <echo level="info">Running yuicompressor [js] on @{src}</echo>
+            <jscompressor srcfile="@{src}" destfile="@{dest}" charset="${yuicompressor.js.charset}" verbose="${yuicompressor.js.verbose}"/>
         </sequential>
     </macrodef>
 
