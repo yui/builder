@@ -120,32 +120,46 @@
         </sequential>
     </macrodef>
 
-    <!-- By default, jslint failure should fail the build.
-         This can be overridden on the command line. -->
-    <property name="jslint.failonerror" value="true"/>
+    <if>
+        <isset property="jslint.skip"/>
+        <then>
+            <macrodef name="jslint">
+                <element name="jsfiles" optional="false" />
+                <sequential>
+                    <echo level="info">Skipping JSLint</echo>
+                </sequential>
+            </macrodef>
+        </then>
+        <else>
+            <!-- By default, jslint failure should fail the build.
+                 This can be overridden on the command line. -->
+            <property name="jslint.failonerror" value="true"/>
+                    
+            <macrodef name="jslint">
+                <element name="jsfiles" optional="false" />
 
-    <macrodef name="jslint">
-        <element name="jsfiles" optional="false" />
-        <sequential>
-            <!-- 
-               Need to find a way to convert fileset to args (script?) to 
-               avoid ' ', which will break for files with ' in them
-               
-               Evaluates to the following java execution line...
-               java -r js.jar jslintconsole.js 'file1.js' 'file2.js' 'file3.js'
-            -->
-            <pathconvert pathsep="' '" property="jsfileargs">
-                <jsfiles />
-            </pathconvert>
+                <sequential>
+                    <!-- 
+                       Need to find a way to convert fileset to args (script?) to 
+                       avoid ' ', which will break for files with ' in them
+                       
+                       Evaluates to the following java execution line...
+                       java -r js.jar jslintconsole.js 'file1.js' 'file2.js' 'file3.js'
+                    -->
+                    <pathconvert pathsep="' '" property="jsfileargs">
+                        <jsfiles />
+                    </pathconvert>
 
-            <java jar="${rhino.jar}" fork="true" failonerror="${jslint.failonerror}">
-                <arg file="${jslintconsole.js}" />
-                <arg value="${jslintsrc.js}" />
-                <arg line="'${jsfileargs}'" />
-            </java>
+                    <java jar="${rhino.jar}" fork="true" failonerror="${jslint.failonerror}">
+                        <arg file="${jslintconsole.js}" />
+                        <arg value="${jslintsrc.js}" />
+                        <arg line="'${jsfileargs}'" />
+                    </java>
 
-        </sequential>
-    </macrodef>
+                </sequential>
+            </macrodef>
+        </else>
+    </if>
 
     <macrodef name="registerversion">
         <attribute name="module" />
