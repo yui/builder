@@ -115,6 +115,10 @@
         </sequential>
     </macrodef>
 
+    <!-- By default, jslint failure should fail the build.
+         This can be overridden on the command line. -->
+    <property name="jslint.failonerror" value="true"/>
+
     <macrodef name="jslint">
         <element name="jsfiles" optional="false" />
         <sequential>
@@ -129,7 +133,7 @@
                 <jsfiles />
             </pathconvert>
 
-            <java jar="${rhino.jar}" fork="true" failonerror="true">
+            <java jar="${rhino.jar}" fork="true" failonerror="${jslint.failonerror}">
                 <arg file="${jslintconsole.js}" />
                 <arg value="${jslintsrc.js}" />
                 <arg line="'${jsfileargs}'" />
