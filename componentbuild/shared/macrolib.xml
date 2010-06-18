@@ -81,11 +81,19 @@
     <macrodef name="yuicompress">
         <attribute name="src" />
         <attribute name="dest" />
-        <attribute name="args" />
-
+        <attribute name="args" /> <!-- not used anymore -->
+        <attribute name="type" default="js"/>
         <sequential>
-            <echo level="info">Running yuicompressor [js] on @{src}</echo>
-            <jscompressor srcfile="@{src}" destfile="@{dest}" charset="${yuicompressor.js.charset}" verbose="${yuicompressor.js.verbose}"/>
+            <echo level="info">Running yuicompressor on @{src}</echo>
+            <if>
+                <equals arg1="@{type}" arg2="css"/>
+                <then>
+                    <csscompressor srcfile="@{src}" destfile="@{dest}" charset="${yuicompressor.css.charset}" verbose="${yuicompressor.css.verbose}"/>
+                </then>
+                <else>
+                    <jscompressor srcfile="@{src}" destfile="@{dest}" charset="${yuicompressor.js.charset}" verbose="${yuicompressor.js.verbose}"/>
+                </else>
+            </if>
         </sequential>
     </macrodef>
 
