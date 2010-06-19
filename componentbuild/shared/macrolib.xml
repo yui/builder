@@ -128,31 +128,8 @@
     </macrodef>
 
     <if>
-        <isset property="jslint.skip"/>
+        <http url="${node.jslint.url}"/>
         <then>
-            <macrodef name="jslint">
-                <element name="jsfiles" optional="false" />
-                <sequential>
-                    <echo level="info">Skipping JSLint</echo>
-                </sequential>
-            </macrodef>
-        </then>
-        <else>
-            <!-- By default, jslint failure should fail the build.
-                 This can be overridden on the command line. -->
-            <property name="jslint.failonerror" value="true"/>
-
-            <!-- Try to start the node jslint server. -->
-            <exec executable="node" spawn="true">
-                <arg value="${builddir}/lib/jslint/jslint-node.js"/>
-            </exec>
-
-            <property name="node.jslint.url" value="http://127.0.0.1:8081/"/>
-<!--
-            <echo level="info">Waiting for node server spinup...</echo>
-            <sleep milliseconds="500"/>
--->
-
             <macrodef name="jslint">
                 <element name="jsfiles" optional="false" />
 
@@ -160,29 +137,34 @@
                     <pathconvert pathsep="' '" property="jsfileargs">
                         <jsfiles />
                     </pathconvert>
-                    <if>
-                        <http url="${node.jslint.url}"/>
-                        <then>
-                            <echo>Using NodeJS</echo>
-                            <foreach list="${jsfileargs}" delimiter="' '" target="-jslint-nodejs" param="node.jslint.filename"/>
-                        </then>
-                        <else>
-                            <echo>Using Rhino</echo>
-                            <!-- 
-                               Need to find a way to convert fileset to args (script?) to 
-                               avoid ' ', which will break for files with ' in them
-                               
-                               Evaluates to the following java execution line...
-                               java -r js.jar jslintconsole.js 'file1.js' 'file2.js' 'file3.js'
-                            -->
+                    <post to="${node.jslint.url}" failonerror="${lint.failonerror}">
+                        <prop name="files" value="${jsfileargs}"/>
+                    </post>
+                </sequential>
+            </macrodef>
+        </then>
+        <else>
+            <macrodef name="jslint">
+                <element name="jsfiles" optional="false" />
 
-                            <java jar="${rhino.jar}" fork="true" failonerror="${jslint.failonerror}">
-                                <arg file="${jslintconsole.js}" />
-                                <arg value="${jslintsrc.js}" />
-                                <arg line="'${jsfileargs}'" />
-                            </java>
-                        </else>
-                    </if>
+                <sequential>
+                    <pathconvert pathsep="' '" property="jsfileargs">
+                        <jsfiles />
+                    </pathconvert>
+                    <echo>Using Rhino</echo>
+                    <!-- 
+                       Need to find a way to convert fileset to args (script?) to 
+                       avoid ' ', which will break for files with ' in them
+                       
+                       Evaluates to the following java execution line...
+                       java -r js.jar jslintconsole.js 'file1.js' 'file2.js' 'file3.js'
+                    -->
+
+                    <java jar="${rhino.jar}" fork="true" failonerror="${jslint.failonerror}">
+                        <arg file="${jslintconsole.js}" />
+                        <arg value="${jslintsrc.js}" />
+                        <arg line="'${jsfileargs}'" />
+                    </java>
                 </sequential>
             </macrodef>
         </else>
@@ -391,20 +373,5 @@
 
         </sequential>
     </macrodef>
-
-    <target name="-jslint-nodejs">
-        <if>
-            <length file="${node.jslint.filename}" when="greater" length="0"/>
-            <then>
-                <loadfile property="node.jslint.file" srcFile="${node.jslint.filename}"/>
-                <post to="${node.jslint.url}" property="node.jslint.response" failonerror="#{jslint.failonerror}">
-                    <prop name="data" value="${node.jslint.file}"/>
-                </post>
-            </then>
-        </if>            
-        <var name="node.jslint.file" unset="true"/>
-        <var name="node.jslint.filename" unset="true"/>
-        <var name="node.jslint.response" unset="true"/>
-    </target>
 	
 </project>

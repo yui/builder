@@ -56,31 +56,44 @@ JSLINT = require("./fulljslint").JSLINT;
 	}
 
     var qs = require("querystring");
+    var fs = require("fs");
+    var EventEmitter = require("events").EventEmitter;
 
     require("http").createServer(function (req, res) {
         var data = "";
         req.addListener("data", function (chunk) {
             data += chunk;
         });
-        req.addListener("end", function () {
-            var code = 200, body;
-            var die = "/kill" === req.url;
-            if (req.method === "POST") {
-                try {
-                    data = qs.parse(data)["data"];
-                    body = test(data);
-                } catch (ex) {
-                    code = 500;
-                    body = ex.message;
-                }
-            } else if (die) {
-                body = "Goodbye.";
-            } else {
-                body = "Ready.";
-            }
+        var proc = new EventEmitter();
+        proc.addListener("end", function (code, body, die) {
             res.writeHead(code, {"Content-type" : "text/plain"});
             res.end(body);
             if (die) process.exit(0);
+        });
+        req.addListener("end", function () {
+            var code = 200, body;
+            var die = "/kill" === req.url;
+            if (die) body = "Goodbye.";
+            else if (req.method === "POST") {
+                var files = qs.parse(data)["files"].split("' '");
+                var results = [];
+                files.forEach(function (file) {
+                    fs.readFile(file, function (err, data) {
+                        data = data.toString("utf8");
+                            require("sys").puts(require("sys").inspect(data));
+                        try {
+                            results.push(test(data));
+                        } catch (ex) {
+                            require("sys").puts(require("sys").inspect(err));
+                            proc.emit("end", 500, err.message);
+                        }
+                        if (results.length == files.length) proc.emit("end", code, results.join("\n"));
+                    });
+                });
+            } else {
+                body = "Ready.";
+            }
+            if (body) proc.emit("end", code, body, die);
         });
     }).listen(PORT, "127.0.0.1");
 
