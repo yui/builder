@@ -35,11 +35,6 @@ JSLINT = require("./fulljslint").JSLINT;
 			}
             body += "\n";
             return body;
-            
-            // Last item is null if JSLint hit a fatal error
-            if (JSLINT.errors && JSLINT.errors[JSLINT.errors.length-1] === null) {
-                throw new Error("Fatal JSLint Exception. Stopped lint");
-            }
 		}
 	}
 	
@@ -80,11 +75,9 @@ JSLINT = require("./fulljslint").JSLINT;
                 files.forEach(function (file) {
                     fs.readFile(file, function (err, data) {
                         data = data.toString("utf8");
-                            require("sys").puts(require("sys").inspect(data));
                         try {
                             results.push(test(data));
                         } catch (ex) {
-                            require("sys").puts(require("sys").inspect(err));
                             proc.emit("end", 500, err.message);
                         }
                         if (results.length == files.length) proc.emit("end", code, results.join("\n"));
