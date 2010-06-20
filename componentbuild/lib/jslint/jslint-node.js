@@ -20,10 +20,9 @@ JSLINT = require("./fulljslint").JSLINT;
 	};
 	
 	function test(js) {
-        if (!js) throw new Error("No JS provided");
+        var body = "", code = 200;
 
-        var body = "";
-		var success = JSLINT(js, OPTS);
+        var success = JSLINT(js, OPTS);
 		if (success) {
 			return "OK";
 		} else {
@@ -34,7 +33,15 @@ JSLINT = require("./fulljslint").JSLINT;
 				}
 			}
             body += "\n";
-            return body;
+
+            // Last item is null if JSLint hit a fatal error
+            if (JSLINT.errors && JSLINT.errors[JSLINT.errors.length-1] === null) {
+                code = 500;
+            }
+            return {
+                "content" : body,
+                "code" : code
+            };
 		}
 	}
 	
@@ -73,16 +80,20 @@ JSLINT = require("./fulljslint").JSLINT;
             var die = "/kill" === req.url;
             if (die) body = "Goodbye.";
             else if (req.method === "POST") {
-                var files = qs.parse(data)["files"].split("' '");
+                var query = qs.parse(data);
+                var files = query["files"].split("' '");
+                var failOnError = query["failonerror"] == "true";
                 var results = [];
                 files.forEach(function (file) {
                     fs.readFile(file, function (err, data) {
-                        data = data.toString("utf8");
-                        try {
-                            results.push(test(data));
-                        } catch (ex) {
-                            proc.emit("end", 500, err.message);
-                        }
+                        var diagnosis = test(data.toString("utf8"));
+                        results.push(diagnosis.content);
+
+                        code = (
+                            failOnError &&
+                            diagnosis.code !== 200
+                        ) ? diagnosis.code : code;
+
                         if (results.length == files.length) proc.emit("end", code, results.join("\n"));
                     });
                 });

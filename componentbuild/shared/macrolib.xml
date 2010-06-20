@@ -141,9 +141,22 @@
                 </or>
                 <then>
                     <property name="node.online" value="true"/>
-                    <post to="${node.jslint.url}" failonerror="${lint.failonerror}">
+                    <post to="${node.jslint.url}" property="node.jslint.response" failonerror="${lint.failonerror}">
                         <prop name="files" value="${jsfileargs}"/>
+                        <prop name="failonerror" value="${lint.failonerror}"/>
                     </post>
+                    <!-- Since Ant doesn't really failonerror for the post task,
+                         handle this ourselves: -->
+                    <if>
+                        <not>
+                            <isset property="node.jslint.response"/>
+                        </not>
+                        <then>
+                            <fail>JSLint failed. To view lint output and continue the build, run ant with -Dlint.failonerror=false.</fail>
+                        </then>
+                    </if>
+                    <!-- Clear property for next run: -->
+                    <var name="node.jslint.response" unset="true"/>
                 </then>
                 <else>
                     <echo>Using Rhino. Install nodejs to improve jslint speed, or skip with -Dlint.skip=true</echo>
