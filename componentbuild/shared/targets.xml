@@ -31,21 +31,30 @@
         <tstamp/>
         <mkdir dir="${component.builddir}" />
         <createdetails />
-        <antcall target="-node-spawn"/>
+        <antcall target="-lint-server"/>
     </target>
 
-    <target name="-node-spawn" description="Start NodeJS Servers" unless="node.spawn">
+    <target name="-lint-server" description="Start JSLint Server" unless="lint.skip">
+        <antcall target="-node">
+            <param name="src" value="${builddir}/lib/jslint/jslint-node.js"/>
+        </antcall>
+    </target>
+
+    <target name="-node" description="Start NodeJS Server" unless="node.spawn">
         <if>
             <not>
                 <http url="${node.jslint.url}"/>
             </not>
             <then>
+                <echo level="info">Attempting to start NodeJS app at: ${src}</echo>
                 <exec executable="node" spawn="true">
-                    <arg value="${builddir}/lib/jslint/jslint-node.js"/>
+                    <arg value="${src}"/>
                 </exec>
+                <!-- Don't fail if node doesn't exist, fails to start, etc.
+                     We will fallback to the slow Rhino engine later. -->
             </then>
         </if>
-        <!-- Don't try to start again: -->
+        <!-- Don't try to start again. -->
         <property name="node.spawn" value="true"/>
     </target>
 
