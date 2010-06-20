@@ -127,31 +127,26 @@
         </sequential>
     </macrodef>
 
-    <if>
-        <http url="${node.jslint.url}"/>
-        <then>
-            <macrodef name="jslint">
-                <element name="jsfiles" optional="false" />
+    <macrodef name="jslint">
+        <element name="jsfiles" optional="false" />
 
-                <sequential>
-                    <pathconvert pathsep="' '" property="jsfileargs">
-                        <jsfiles />
-                    </pathconvert>
+        <sequential>
+            <pathconvert pathsep="' '" property="jsfileargs">
+                <jsfiles />
+            </pathconvert>
+            <if>
+                <or>
+                    <istrue value="${node.online}"/>
+                    <http url="${node.jslint.url}"/>
+                </or>
+                <then>
+                    <property name="node.online" value="true"/>
                     <post to="${node.jslint.url}" failonerror="${lint.failonerror}">
                         <prop name="files" value="${jsfileargs}"/>
                     </post>
-                </sequential>
-            </macrodef>
-        </then>
-        <else>
-            <macrodef name="jslint">
-                <element name="jsfiles" optional="false" />
-
-                <sequential>
-                    <pathconvert pathsep="' '" property="jsfileargs">
-                        <jsfiles />
-                    </pathconvert>
-                    <echo>Using Rhino</echo>
+                </then>
+                <else>
+                    <echo>Using Rhino. Install nodejs to improve jslint speed, or skip with -Dlint.skip=true</echo>
                     <!-- 
                        Need to find a way to convert fileset to args (script?) to 
                        avoid ' ', which will break for files with ' in them
@@ -165,10 +160,10 @@
                         <arg value="${jslintsrc.js}" />
                         <arg line="'${jsfileargs}'" />
                     </java>
-                </sequential>
-            </macrodef>
-        </else>
-    </if>
+                </else>
+            </if>
+        </sequential>
+    </macrodef>
 
     <macrodef name="registerversion">
         <attribute name="module" />
