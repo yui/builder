@@ -31,6 +31,22 @@
         <tstamp/>
         <mkdir dir="${component.builddir}" />
         <createdetails />
+        <antcall target="-node-spawn"/>
+    </target>
+
+    <target name="-node-spawn" description="Start NodeJS Servers" unless="node.spawn">
+        <if>
+            <not>
+                <http url="${node.jslint.url}"/>
+            </not>
+            <then>
+                <exec executable="node" spawn="true">
+                    <arg value="${builddir}/lib/jslint/jslint-node.js"/>
+                </exec>
+            </then>
+        </if>
+        <!-- Don't try to start again: -->
+        <property name="node.spawn" value="true"/>
     </target>
 
     <target name="clean" description="Clean Local Build Directory" unless="clean.skip">
