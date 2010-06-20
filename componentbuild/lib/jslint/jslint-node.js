@@ -54,6 +54,8 @@ JSLINT = require("./fulljslint").JSLINT;
     var fs = require("fs");
     var EventEmitter = require("events").EventEmitter;
 
+    var ticket = 0;
+
     require("http").createServer(function (req, res) {
         var data = "";
         req.addListener("data", function (chunk) {
@@ -66,6 +68,7 @@ JSLINT = require("./fulljslint").JSLINT;
             if (die) process.exit(0);
         });
         req.addListener("end", function () {
+            ticket++;
             var code = 200, body;
             var die = "/kill" === req.url;
             if (die) body = "Goodbye.";
@@ -92,5 +95,12 @@ JSLINT = require("./fulljslint").JSLINT;
 
     require("sys").puts("Server started on port " + PORT);
 
+    (function () {
+        var reap;
+        setInterval(function () {
+            if (reap == ticket) process.exit(0);
+            reap = ticket;
+        }, 10000);
+    })();
 })();
 	
