@@ -69,32 +69,54 @@
         </sequential>
     </macrodef>
 
-    <taskdef
-            name="jscompressor"
-            classname="com.yahoo.platform.yui.compressor.ant.JavaScriptCompressorTask"
-            classpath="${yuicompressor.jar}"/>
-    <taskdef
-            name="csscompressor"
-            classname="com.yahoo.platform.yui.compressor.ant.CssCompressorTask"
-            classpath="${yuicompressor.jar}"/>
+    <if>
+        <istrue value="${yuicompressor.ant}"/>
+        <then>
+            <taskdef
+                    name="jscompressor"
+                    classname="com.yahoo.platform.yui.compressor.ant.JavaScriptCompressorTask"
+                    classpath="${yuicompressor.ant.jar}"/>
+            <taskdef
+                    name="csscompressor"
+                    classname="com.yahoo.platform.yui.compressor.ant.CssCompressorTask"
+                    classpath="${yuicompressor.ant.jar}"/>
  
-    <macrodef name="yuicompress">
-        <attribute name="src" />
-        <attribute name="dest" />
-        <attribute name="args" /> <!-- not used anymore -->
-        <attribute name="type" default="js"/>
-        <sequential>
-            <if>
-                <equals arg1="@{type}" arg2="css"/>
-                <then>
-                    <csscompressor srcfile="@{src}" destfile="@{dest}" linebreak="${yuicompressor.linebreak}" charset="${yuicompressor.css.charset}" verbose="${yuicompressor.css.verbose}"/>
-                </then>
-                <else>
-                    <jscompressor srcfile="@{src}" destfile="@{dest}" linebreak="${yuicompressor.linebreak}" preservesemicolons="true" disableoptimizations="true" charset="${yuicompressor.js.charset}" verbose="${yuicompressor.js.verbose}"/>
-                </else>
-            </if>
-        </sequential>
-    </macrodef>
+            <macrodef name="yuicompress">
+                <attribute name="src" />
+                <attribute name="dest" />
+                <attribute name="args" /> <!-- not used by this task branch -->
+                <attribute name="type" default="js"/>
+                <sequential>
+                    <if>
+                        <equals arg1="@{type}" arg2="css"/>
+                        <then>
+                            <csscompressor srcfile="@{src}" destfile="@{dest}" linebreak="${yuicompressor.linebreak}" charset="${yuicompressor.css.charset}" verbose="${yuicompressor.css.verbose}"/>
+                        </then>
+                        <else>
+                            <jscompressor srcfile="@{src}" destfile="@{dest}" linebreak="${yuicompressor.linebreak}" preservesemicolons="true" disableoptimizations="true" charset="${yuicompressor.js.charset}" verbose="${yuicompressor.js.verbose}"/>
+                        </else>
+                    </if>
+                </sequential>
+            </macrodef>
+        </then>
+        <else>
+            <echo level="info">Using forked yuicompressor, to speed up builds include a yuicompressor.ant.jar.</echo>
+            <macrodef name="yuicompress">
+                <attribute name="src" />
+                <attribute name="dest" />
+                <attribute name="args" />
+                <attribute name="type" default="js"/> <!-- not used by this task branch -->
+                <sequential>
+                    <echo level="info">Running yuicompressor on @{src}</echo>
+                    <java jar="${yuicompressor.jar}" fork="true" failonerror="true">
+                        <arg line="@{args} -o" />
+                        <arg file="@{dest}" />
+                        <arg file="@{src}" />
+                    </java>
+                </sequential>
+            </macrodef>
+        </else>
+    </if>
 
     <macrodef name="concatsource">
         <attribute name="destfile" />
