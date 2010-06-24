@@ -69,33 +69,33 @@
     <target name="deploy" description="Copy files to global location" depends="deploybuild, deployassets, deployskins, deploylang, deploydocs"></target>
 
     <target name="deploybuild" description="Copy built files to global build location">
-        <copy todir="${global.build.component}" preservelastmodified="true">
+        <copy todir="${global.build.component}" overwrite="true" verbose="true">
             <fileset dir="${component.builddir}" includes="*.js" />
         </copy>
     </target>
 
     <target name="deployassets" if="component.assets.exist">
-        <copy todir="${global.build.component.assets}" flatten="${component.assets.flatten}" preservelastmodified="true">
+        <copy todir="${global.build.component.assets}" flatten="${component.assets.flatten}" overwrite="true" verbose="true">
             <fileset dir="${component.assets.base}" includes="${component.assets.files}" excludes="skins/, legacy/" />
         </copy>
 
-        <copy todir="${global.build.component.assets}" flatten="${component.assets.legacy.flatten}" preservelastmodified="true" failonerror="false">
+        <copy todir="${global.build.component.assets}" flatten="${component.assets.legacy.flatten}" preservelastmodified="true" failonerror="false" verbose="true">
             <fileset dir="${component.assets.legacy.base}" includes="${component.assets.legacy.files}" excludes="skins/" />
         </copy>
     </target>
 
     <target name="deployskins" if="skins.exist">
-        <copy todir="${global.build.component.assets}/skins/sam" preservelastmodified="true">
+        <copy todir="${global.build.component.assets}/skins/sam" overwrite="true" verbose="true">
             <fileset dir="${component.builddir}/assets/skins/sam" includes="${component}.css" />
         </copy>
 
-        <copy todir="${global.build.component.assets}/skins/sam" preservelastmodified="true">
+        <copy todir="${global.build.component.assets}/skins/sam" overwrite="true" verbose="true">
             <fileset dir="${component.assets.skins.base}/sam" includes="${component.assets.skins.files}" />
         </copy>
     </target>
 
     <target name="deploylang" description="Copy language bundles to global build location">
-        <copy todir="${global.build.component}/lang" preservelastmodified="true" failonerror="false">
+        <copy todir="${global.build.component}/lang" overwrite="true" failonerror="false" verbose="true">
             <fileset dir="${component.builddir}/lang" includes="*.js" />
         </copy>
     </target>
