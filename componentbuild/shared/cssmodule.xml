@@ -8,7 +8,7 @@
     <target name="build" depends="buildcore" />
 
     <target name="buildcore">
-        <concatsource destfile="${component.builddir}/${component.basefilename}.css" sourcedir="${component.basedir}/css" sourcefiles="${component.cssfiles}" />
+        <concatsource destfile="${component.builddir}/${component.basefilename}.css" sourcedir="${component.cssfiles.base}" sourcefiles="${component.cssfiles}" />
     </target>
 
     <target name="minify">
