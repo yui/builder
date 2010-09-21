@@ -57,6 +57,7 @@
     <property name="component.module" value="${component}" />
     <property name="component.basedir" location="${buildfile.dir}" />
     <property name="component.jsfiles.base" location="${component.basedir}/js" />
+    <property name="component.cssfiles.base" location="${component.basedir}/css" />
 
 	<property name="component.lang.base" location="${component.basedir}/lang" />
 	
