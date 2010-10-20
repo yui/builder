@@ -47,10 +47,23 @@
                 <http url="${node.jslint.url}"/>
             </not>
             <then>
-                <echo level="info">Attempting to start NodeJS app at: ${src}</echo>
-                <exec executable="node" spawn="true" failonerror="false">
-                    <arg value="${src}"/>
+                <!-- You can't set failifexecutionfails if spawn is true. Argh. -->
+                <!-- Check if it's installed first. -->
+                <exec resultproperty="node.status" executable="node" failonerror="false" failifexecutionfails="false" searchpath="true" resolveexecutable="true">
+                    <arg value="-v"/>
                 </exec>
+                <if>
+                    <equals arg1="${node.status}" arg2="0"/>
+                        <then>
+                        <echo level="info">Spawning Node.js app at: ${src}</echo>
+                        <exec executable="node" spawn="true" failonerror="false" searchpath="true" resolveexecutable="true">
+                            <arg value="${src}"/>
+                        </exec>
+                    </then>
+                    <else>
+                        <echo level="info">For faster builds, install Node.js.</echo>
+                    </else>
+                </if>
                 <!-- Don't fail if node doesn't exist, fails to start, etc.
                      We will fallback to the slow Rhino engine later. -->
             </then>
