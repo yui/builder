@@ -72,10 +72,7 @@
     <if>
         <or>
             <istrue value="${yuicompressor.online}"/>
-            <and>
-                <available file="curl" filepath="${env.PATH}"/>
-                <http url="${yuicompressor.url}" errorsBeginAt="500"/>
-            </and>
+            <http url="${yuicompressor.url}" errorsBeginAt="500"/>
         </or>
         <then>
             <property name="yuicompressor.online" value="true"/>
@@ -87,6 +84,7 @@
                 <sequential>
                     <property name="yuicompressor.output" value="@{dest}"/>
                     <property name="yuicompressor.file" value="@{src}"/>
+                    <echo>If this web request fails, try building again with -Dyuicompressor.online=false or install the cURL executable into your PATH.</echo>
                     <exec executable="curl" input="@{src}" outputproperty="yuicompressor.result" failonerror="true">
                         <arg value="--silent"/>
                         <arg line="--data-urlencode "/>
@@ -141,7 +139,7 @@
                 <attribute name="args" />
                 <attribute name="type" default="js"/> <!-- not used by this task branch -->
                 <sequential>
-                    <echo level="info">Running yuicompressor on @{src}</echo>
+                    <echo level="info">Running yuicompressor on @{src} with @{args}</echo>
                     <java jar="${yuicompressor.jar}" fork="true" failonerror="true">
                         <arg line="@{args} -o" />
                         <arg file="@{dest}" />
