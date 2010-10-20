@@ -70,37 +70,71 @@
     </macrodef>
 
     <if>
-        <istrue value="${yuicompressor.ant}"/>
+        <or>
+            <istrue value="${yuicompressor.online}"/>
+            <and>
+                <available file="curl" filepath="${env.PATH}"/>
+                <http url="${yuicompressor.url}" errorsBeginAt="500"/>
+            </and>
+        </or>
         <then>
-            <taskdef
-                    name="jscompressor"
-                    classname="com.yahoo.platform.yui.compressor.ant.JavaScriptCompressorTask"
-                    classpath="${yuicompressor.ant.jar}"/>
-            <taskdef
-                    name="csscompressor"
-                    classname="com.yahoo.platform.yui.compressor.ant.CssCompressorTask"
-                    classpath="${yuicompressor.ant.jar}"/>
- 
+            <property name="yuicompressor.online" value="true"/>
             <macrodef name="yuicompress">
                 <attribute name="src" />
                 <attribute name="dest" />
                 <attribute name="args" /> <!-- not used by this task branch -->
                 <attribute name="type" default="js"/>
                 <sequential>
-                    <if>
-                        <equals arg1="@{type}" arg2="css"/>
-                        <then>
-                            <csscompressor srcfile="@{src}" destfile="@{dest}" linebreak="${yuicompressor.linebreak}" charset="${yuicompressor.css.charset}" verbose="${yuicompressor.css.verbose}"/>
-                        </then>
-                        <else>
-                            <jscompressor srcfile="@{src}" destfile="@{dest}" linebreak="${yuicompressor.linebreak}" preservesemicolons="true" disableoptimizations="true" charset="${yuicompressor.js.charset}" verbose="${yuicompressor.js.verbose}"/>
-                        </else>
-                    </if>
+                    <property name="yuicompressor.output" value="@{dest}"/>
+                    <property name="yuicompressor.file" value="@{src}"/>
+                    <exec executable="curl" input="@{src}" outputproperty="yuicompressor.result" failonerror="true">
+                        <arg value="--silent"/>
+                        <arg line="--data-urlencode "/>
+                        <arg line="@${yuicompressor.file}"/>
+                        <arg line="${yuicompressor.url}?type=@{type}"/>
+                    </exec>
+                    <script language="javascript">
+                        <![CDATA[
+                        var echo;
+                        var project = self.getProject();
+                        var res = project.getProperty("yuicompressor.result");
+                        res = eval("(" + res + ")");
+
+                        function w (str, level) {
+                            var echo = project.createTask("echo");
+                            echo.setMessage(str);
+                            echo.perform();
+                        }
+
+                        if (!res.result) {
+                            var fail = project.createTask("fail");
+                            fail.setMessage("Failed to minify!");
+                            fail.perform();
+                        }
+
+                        function notify (level, errors) {
+                            for (var i = 0, l = errors.length; i < l; i++) {
+                                w(errors[i], level);
+                            }
+                        }
+
+                        notify("error", res.errors);
+                        notify("warning", res.warnings);
+
+                        project.setProperty("yuicompressor.script", res.result);
+
+                        ]]>
+                    </script>
+                    <echo file="@{dest}" message="${yuicompressor.script}"/>
+                    <var name="yuicompressor.output" unset="true"/>
+                    <var name="yuicompressor.script" unset="true"/>
+                    <var name="yuicompressor.file" unset="true"/>
+                    <var name="yuicompressor.result" unset="true"/>
                 </sequential>
             </macrodef>
         </then>
         <else>
-            <echo level="info">Using forked yuicompressor, to speed up builds include a yuicompressor.ant.jar.</echo>
+            <echo level="info">Using forked yuicompressor, to speed up builds make sure the YUI Compressor server is started.</echo>
             <macrodef name="yuicompress">
                 <attribute name="src" />
                 <attribute name="dest" />
