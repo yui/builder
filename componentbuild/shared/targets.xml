@@ -48,7 +48,7 @@
             </not>
             <then>
                 <echo level="info">Attempting to start NodeJS app at: ${src}</echo>
-                <exec executable="node" spawn="true">
+                <exec executable="node" spawn="true" failonerror="false">
                     <arg value="${src}"/>
                 </exec>
                 <!-- Don't fail if node doesn't exist, fails to start, etc.
@@ -66,7 +66,7 @@
             </not>
             <then>
                 <echo level="info">Attempting to start YUI Compressor server.</echo>
-                <java classname="com.yahoo.platform.yui.compressor.Bootstrap" fork="true" spawn="true">
+                <java classname="com.yahoo.platform.yui.compressor.Bootstrap" fork="true" spawn="true" failonerror="false">
                     <arg line="--server"/>
                     <arg line="${yuicompressor.port}"/>
                     <arg line="${yuicompressor.js.args}"/>
