@@ -85,10 +85,10 @@
                     <property name="yuicompressor.output" value="@{dest}"/>
                     <property name="yuicompressor.file" value="@{src}"/>
                     <echo>If this web request fails, try building again with -Dyuicompressor.online=false or install the cURL executable into your PATH.</echo>
-                    <exec executable="curl" input="@{src}" outputproperty="yuicompressor.result" failonerror="true">
+                    <exec executable="curl" input="@{src}" outputproperty="yuicompressor.result" failonerror="true" searchpath="true">
                         <arg value="--silent"/>
-                        <arg line="--data-urlencode "/>
-                        <arg line="@${yuicompressor.file}"/>
+                        <arg line="-T"/>
+                        <arg line="${yuicompressor.file}"/>
                         <arg line="${yuicompressor.url}?type=@{type}"/>
                     </exec>
                     <script language="javascript">
