@@ -131,7 +131,7 @@
                 </then>
                 <else>
                     <echo level="info">Running yuicompressor on @{src} with @{args}</echo>
-                    <java jar="${yuicompressor.jar}" fork="true" failonerror="true">
+                    <java jar="${yuicompressor.java15.jar}" fork="true" failonerror="true">
                         <arg line="@{args} -o" />
                         <arg file="@{dest}" />
                         <arg file="@{src}" />

@@ -26,6 +26,7 @@
     <property name="jslintconsole.js" location="${builddir}/lib/jslint/jslint-console.js" />
     <property name="jslintsrc.js" location="${builddir}/lib/jslint/fulljslint.js" />
     <property name="yuicompressor.jar" location="${builddir}/lib/yuicompressor/yuicompressor-2.4.5pre.jar" />
+    <property name="yuicompressor.java15.jar" location="${builddir}/lib/yuicompressor/yuicompressor-2.4.4.jar" />
     <property name="yrb2jsonconsole.js" location="${builddir}/lib/yrb2json/yrb2json-console.js" />
     <property name="yrb2jsonsrc.js" location="${builddir}/lib/yrb2json/yrb2json.js" />
 
