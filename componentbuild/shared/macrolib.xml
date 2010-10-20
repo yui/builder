@@ -69,19 +69,19 @@
         </sequential>
     </macrodef>
 
-    <if>
-        <or>
-            <istrue value="${yuicompressor.online}"/>
-            <http url="${yuicompressor.url}" errorsBeginAt="500"/>
-        </or>
-        <then>
-            <property name="yuicompressor.online" value="true"/>
-            <macrodef name="yuicompress">
-                <attribute name="src" />
-                <attribute name="dest" />
-                <attribute name="args" /> <!-- not used by this task branch -->
-                <attribute name="type" default="js"/>
-                <sequential>
+    <macrodef name="yuicompress">
+        <attribute name="src" />
+        <attribute name="dest" />
+        <attribute name="args" />
+        <attribute name="type" default="js"/>
+        <sequential>
+            <if>
+                <or>
+                    <istrue value="${yuicompressor.online}"/>
+                    <http url="${yuicompressor.url}" errorsBeginAt="500"/>
+                </or>
+                <then>
+                    <property name="yuicompressor.online" value="true"/>
                     <property name="yuicompressor.output" value="@{dest}"/>
                     <property name="yuicompressor.file" value="@{src}"/>
                     <echo>If this web request fails, try building again with -Dyuicompressor.online=false or install the cURL executable into your PATH.</echo>
@@ -128,27 +128,18 @@
                     <var name="yuicompressor.script" unset="true"/>
                     <var name="yuicompressor.file" unset="true"/>
                     <var name="yuicompressor.result" unset="true"/>
-                </sequential>
-            </macrodef>
-        </then>
-        <else>
-            <echo level="info">Using forked yuicompressor, to speed up builds make sure the YUI Compressor server is started.</echo>
-            <macrodef name="yuicompress">
-                <attribute name="src" />
-                <attribute name="dest" />
-                <attribute name="args" />
-                <attribute name="type" default="js"/> <!-- not used by this task branch -->
-                <sequential>
+                </then>
+                <else>
                     <echo level="info">Running yuicompressor on @{src} with @{args}</echo>
                     <java jar="${yuicompressor.jar}" fork="true" failonerror="true">
                         <arg line="@{args} -o" />
                         <arg file="@{dest}" />
                         <arg file="@{src}" />
                     </java>
-                </sequential>
-            </macrodef>
-        </else>
-    </if>
+                </else>
+            </if>
+        </sequential>
+    </macrodef>
 
     <macrodef name="concatsource">
         <attribute name="destfile" />
