@@ -31,6 +31,53 @@
         <tstamp/>
         <mkdir dir="${component.builddir}" />
         <createdetails />
+        <antcall target="-yuicompressor"/>
+        <antcall target="-lint-server"/>
+    </target>
+
+    <target name="-lint-server" description="Start JSLint Server" unless="lint.skip">
+        <antcall target="-node">
+            <param name="src" value="${builddir}/lib/jslint/jslint-node.js"/>
+        </antcall>
+    </target>
+
+    <target name="-node" description="Start NodeJS Server" unless="node.spawn">
+        <if>
+            <not>
+                <http url="${node.jslint.url}"/>
+            </not>
+            <then>
+                <echo level="info">Attempting to start NodeJS app at: ${src}</echo>
+                <exec executable="node" spawn="true">
+                    <arg value="${src}"/>
+                </exec>
+                <!-- Don't fail if node doesn't exist, fails to start, etc.
+                     We will fallback to the slow Rhino engine later. -->
+            </then>
+        </if>
+        <!-- Don't try to start again. -->
+        <property name="node.spawn" value="true"/>
+    </target>
+
+    <target name="-yuicompressor" description="Start YUI Compressor Server" unless="yuicompressor.spawn">
+        <if>
+            <not>
+                <http url="${yuicompressor.url}"/>
+            </not>
+            <then>
+                <echo level="info">Attempting to start YUI Compressor server.</echo>
+                <java classname="com.yahoo.platform.yui.compressor.Bootstrap" fork="true" spawn="true">
+                    <arg line="--server"/>
+                    <arg line="${yuicompressor.port}"/>
+                    <arg line="${yuicompressor.js.args}"/>
+                    <arg line="${yuicompressor.js.args.internal}"/>
+                    <classpath>
+                        <pathelement location="${yuicompressor.jar}"/>
+                    </classpath>
+                </java>
+            </then>
+        </if>
+        <property name="yuicompressor.spawn" value="true"/>
     </target>
 
     <target name="clean" description="Clean Local Build Directory" unless="clean.skip">

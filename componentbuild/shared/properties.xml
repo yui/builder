@@ -25,16 +25,18 @@
     <property name="rhino.jar" location="${builddir}/lib/rhino/js.jar" />
     <property name="jslintconsole.js" location="${builddir}/lib/jslint/jslint-console.js" />
     <property name="jslintsrc.js" location="${builddir}/lib/jslint/fulljslint.js" />
-    <property name="yuicompressor.jar" location="${builddir}/lib/yuicompressor/yuicompressor-2.4.jar" />
+    <property name="yuicompressor.jar" location="${builddir}/lib/yuicompressor/yuicompressor-2.4.5pre.jar" />
     <property name="yrb2jsonconsole.js" location="${builddir}/lib/yrb2json/yrb2json-console.js" />
     <property name="yrb2jsonsrc.js" location="${builddir}/lib/yrb2json/yrb2json.js" />
 
     <!-- YUI Compressor arguments for JS and CSS files -->
-    <property name="yuicompressor.css.args" value="--type css --line-break 6000" />
-    <property name="yuicompressor.js.args" value="--disable-optimizations --preserve-semi --line-break 6000" />
 
     <property name="yuicompressor.js.charset" value="utf-8" />
     <property name="yuicompressor.css.charset" value="utf-8" />
+
+    <property name="yuicompressor.js.args" value="--disable-optimizations --preserve-semi --line-break 6000" />
+    <property name="yuicompressor.css.args" value="--line-break 6000" />
+    <property name="yuicompressor.port" value="8091"/>
 
     <!-- Enable/Disable YUI Compressor verbosity. NOTE: Checked in build files should not disable this flag -->
     <property name="yuicompressor.js.verbose" value="true" />
@@ -155,5 +157,12 @@
     <condition property="targets" value="../shared/cssmodule.xml" else="${targetbase}.xml">
         <isset property="component.cssfiles" />
     </condition>
+
+    <!-- By default, jslint failure should fail the build.
+         This can be overridden on the command line. -->
+    <property name="lint.failonerror" value="true"/>
+
+    <property name="node.jslint.url" value="http://127.0.0.1:8081/"/>
+    <property name="yuicompressor.url" value="http://127.0.0.1:${yuicompressor.port}/compress"/>
 
 </project>

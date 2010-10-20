@@ -95,7 +95,7 @@
 
     <target name="-concatskins" if="component.skins.exist">
         <concatsource destfile="${component.builddir}/assets/skins/sam/${component}.css" sourcedir="${component.assets.base}" sourcefiles="${component}-core.css, skins/sam/${component}-skin.css" />
-        <yuicompress src="${component.builddir}/assets/skins/sam/${component}.css" dest="${component.builddir}/assets/skins/sam/${component}.css" args="${yuicompressor.css.args.internal}" />
+        <yuicompress type="css" src="${component.builddir}/assets/skins/sam/${component}.css" dest="${component.builddir}/assets/skins/sam/${component}.css" args="${yuicompressor.css.args.internal}" />
     </target>
 
     <target name="-rollupcss" if="rollupskins">

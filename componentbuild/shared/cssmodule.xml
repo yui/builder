@@ -12,7 +12,7 @@
     </target>
 
     <target name="minify">
-        <yuicompress src="${component.builddir}/${component.basefilename}.css" dest="${component.builddir}/${component.basefilename}-min.css" args="${yuicompressor.css.args.internal}" />
+        <yuicompress type="css" src="${component.builddir}/${component.basefilename}.css" dest="${component.builddir}/${component.basefilename}-min.css" args="${yuicompressor.css.args.internal}" />
     </target>
 
     <target name="lint">

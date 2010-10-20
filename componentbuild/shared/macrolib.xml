@@ -69,20 +69,86 @@
         </sequential>
     </macrodef>
 
-    <macrodef name="yuicompress">
-        <attribute name="src" />
-        <attribute name="dest" />
-        <attribute name="args" />
+    <if>
+        <or>
+            <istrue value="${yuicompressor.online}"/>
+            <http url="${yuicompressor.url}" errorsBeginAt="500"/>
+        </or>
+        <then>
+            <property name="yuicompressor.online" value="true"/>
+            <macrodef name="yuicompress">
+                <attribute name="src" />
+                <attribute name="dest" />
+                <attribute name="args" /> <!-- not used by this task branch -->
+                <attribute name="type" default="js"/>
+                <sequential>
+                    <property name="yuicompressor.output" value="@{dest}"/>
+                    <property name="yuicompressor.file" value="@{src}"/>
+                    <echo>If this web request fails, try building again with -Dyuicompressor.online=false or install the cURL executable into your PATH.</echo>
+                    <exec executable="curl" input="@{src}" outputproperty="yuicompressor.result" failonerror="true">
+                        <arg value="--silent"/>
+                        <arg line="--data-urlencode "/>
+                        <arg line="@${yuicompressor.file}"/>
+                        <arg line="${yuicompressor.url}?type=@{type}"/>
+                    </exec>
+                    <script language="javascript">
+                        <![CDATA[
+                        var echo;
+                        var project = self.getProject();
+                        var res = project.getProperty("yuicompressor.result");
+                        res = eval("(" + res + ")");
 
-        <sequential>
-            <echo level="info">Running yuicompressor on @{src}</echo>
-            <java jar="${yuicompressor.jar}" fork="true" failonerror="true">
-                <arg line="@{args} -o" />
-                <arg file="@{dest}" />
-                <arg file="@{src}" />
-            </java>
-        </sequential>
-    </macrodef>
+                        function w (str, level) {
+                            var echo = project.createTask("echo");
+                            echo.setMessage(str);
+                            echo.perform();
+                        }
+
+                        if (!res.result) {
+                            var fail = project.createTask("fail");
+                            fail.setMessage("Failed to minify!");
+                            fail.perform();
+                        }
+
+                        function notify (level, errors) {
+                            for (var i = 0, l = errors.length; i < l; i++) {
+                                w(errors[i], level);
+                            }
+                        }
+
+                        notify("error", res.errors);
+                        notify("warning", res.warnings);
+
+                        project.setProperty("yuicompressor.script", res.result);
+
+                        ]]>
+                    </script>
+                    <echo file="@{dest}" message="${yuicompressor.script}"/>
+                    <var name="yuicompressor.output" unset="true"/>
+                    <var name="yuicompressor.script" unset="true"/>
+                    <var name="yuicompressor.file" unset="true"/>
+                    <var name="yuicompressor.result" unset="true"/>
+                </sequential>
+            </macrodef>
+        </then>
+        <else>
+            <echo level="info">Using forked yuicompressor, to speed up builds make sure the YUI Compressor server is started.</echo>
+            <macrodef name="yuicompress">
+                <attribute name="src" />
+                <attribute name="dest" />
+                <attribute name="args" />
+                <attribute name="type" default="js"/> <!-- not used by this task branch -->
+                <sequential>
+                    <echo level="info">Running yuicompressor on @{src} with @{args}</echo>
+                    <java jar="${yuicompressor.jar}" fork="true" failonerror="true">
+                        <arg line="@{args} -o" />
+                        <arg file="@{dest}" />
+                        <arg file="@{src}" />
+                    </java>
+                </sequential>
+            </macrodef>
+        </else>
+    </if>
 
     <macrodef name="concatsource">
         <attribute name="destfile" />
@@ -117,24 +183,52 @@
 
     <macrodef name="jslint">
         <element name="jsfiles" optional="false" />
+
         <sequential>
-            <!-- 
-               Need to find a way to convert fileset to args (script?) to 
-               avoid ' ', which will break for files with ' in them
-               
-               Evaluates to the following java execution line...
-               java -r js.jar jslintconsole.js 'file1.js' 'file2.js' 'file3.js'
-            -->
             <pathconvert pathsep="' '" property="jsfileargs">
                 <jsfiles />
             </pathconvert>
+            <if>
+                <or>
+                    <istrue value="${node.online}"/>
+                    <http url="${node.jslint.url}"/>
+                </or>
+                <then>
+                    <property name="node.online" value="true"/>
+                    <post to="${node.jslint.url}" property="node.jslint.response" failonerror="${lint.failonerror}">
+                        <prop name="files" value="${jsfileargs}"/>
+                        <prop name="failonerror" value="${lint.failonerror}"/>
+                    </post>
+                    <!-- Since Ant doesn't really failonerror for the post task,
+                         handle this ourselves: -->
+                    <if>
+                        <not>
+                            <isset property="node.jslint.response"/>
+                        </not>
+                        <then>
+                            <fail>JSLint failed. To view lint output and continue the build, run ant with -Dlint.failonerror=false.</fail>
+                        </then>
+                    </if>
+                    <!-- Clear property for next run: -->
+                    <var name="node.jslint.response" unset="true"/>
+                </then>
+                <else>
+                    <echo>Using Rhino. Install nodejs to improve jslint speed, or skip with -Dlint.skip=true</echo>
+                    <!-- 
+                       Need to find a way to convert fileset to args (script?) to 
+                       avoid ' ', which will break for files with ' in them
+                       
+                       Evaluates to the following java execution line...
+                       java -r js.jar jslintconsole.js 'file1.js' 'file2.js' 'file3.js'
+                    -->
 
-            <java jar="${rhino.jar}" fork="true" failonerror="true">
-                <arg file="${jslintconsole.js}" />
-                <arg value="${jslintsrc.js}" />
-                <arg line="'${jsfileargs}'" />
-            </java>
-
+                    <java jar="${rhino.jar}" fork="true" failonerror="${jslint.failonerror}">
+                        <arg file="${jslintconsole.js}" />
+                        <arg value="${jslintsrc.js}" />
+                        <arg line="'${jsfileargs}'" />
+                    </java>
+                </else>
+            </if>
         </sequential>
     </macrodef>
 
