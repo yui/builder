@@ -17,7 +17,8 @@ load(jslintsrc);
 		browser : true,
 		//laxLineEnd : true,
         	undef: true,
-		newcap: false
+		newcap: false,
+		predef:["YUI"]
 	};
 	
 	function test(jsFile) {

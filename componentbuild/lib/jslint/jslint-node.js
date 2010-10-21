@@ -16,7 +16,8 @@ JSLINT = require("./fulljslint").JSLINT;
 		browser : true,
 		//laxLineEnd : true,
         undef: true,
-		newcap: false
+		newcap: false,
+		predef:["YUI"]
 	};
 	
 	function test(js) {
