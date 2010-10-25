@@ -33,6 +33,7 @@
             <arrayliteral from="component.supersedes" to="component.details.supersedes" key="supersedes" />
             <arrayliteral from="component.requires" to="component.details.requires" key="requires" />
             <arrayliteral from="component.optional" to="component.details.optional" key="optional" />
+            <arrayliteral from="component.after" to="component.details.after" key="after" />
         	<arrayliteral from="component.lang" to="component.details.lang" key="lang" />
             <if>
                 <isset property="component.skinnable" />
