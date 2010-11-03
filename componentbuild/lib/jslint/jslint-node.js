@@ -1,9 +1,9 @@
 /**
  * Javascript Shell Script to Load and JSLint js files through Rhino Javascript Shell
  * The jslint source file is expected as the first argument, followed by the list of JS files to JSLint
- * 
- * e.g. 
- * 	java -j js.jar /tools/fulljslint.js testFile1.js testFile2.js testFile3.js
+ *
+ * e.g.
+ *  java -j js.jar /tools/fulljslint.js testFile1.js testFile2.js testFile3.js
  **/
 
 JSLINT = require("./fulljslint").JSLINT;
@@ -12,27 +12,27 @@ JSLINT = require("./fulljslint").JSLINT;
 
     var PORT = parseInt(process.argv[2]) || 8081;
 
-	var OPTS = {
-		browser : true,
-		//laxLineEnd : true,
+    var OPTS = {
+        browser : true,
+        //laxLineEnd : true,
         undef: true,
-		newcap: false,
-		predef:["YUI"]
-	};
-	
-	function test(js) {
+        newcap: false,
+        predef:["YUI", "window", "YUI_config", "YAHOO", "YAHOO_config", "opera", "exports", "document", "navigator", "console"]
+    };
+
+    function test(js) {
         var body = "", code = 200;
 
         var success = JSLINT(js, OPTS);
-		if (success) {
-			return "OK";
-		} else {
-			for (var i=0; i < JSLINT.errors.length; ++i) {
-				var e = JSLINT.errors[i];
-				if (e) {
-					body += ("\t" + e.line + ", " + e.character + ": " + e.reason + "\n\t" + clean(e.evidence) + "\n");
-				}
-			}
+        if (success) {
+            return "OK";
+        } else {
+            for (var i=0; i < JSLINT.errors.length; ++i) {
+                var e = JSLINT.errors[i];
+                if (e) {
+                    body += ("\t" + e.line + ", " + e.character + ": " + e.reason + "\n\t" + clean(e.evidence) + "\n");
+                }
+            }
             body += "\n";
 
             // Last item is null if JSLint hit a fatal error
@@ -43,20 +43,20 @@ JSLINT = require("./fulljslint").JSLINT;
                 "content" : body,
                 "code" : code
             };
-		}
-	}
-	
-	function clean(str) {
-		var trimmed = "";
-		if (str) {
-			if(str.length <= 500) {
-				trimmed = str.replace(/^\s*(\S*(\s+\S+)*)\s*$/, "$1");
-			} else {
-				trimmed = "[Code Evidence Omitted: Greater than 500 chars]";
-			}
-		}
-		return trimmed;
-	}
+        }
+    }
+
+    function clean(str) {
+        var trimmed = "";
+        if (str) {
+            if(str.length <= 500) {
+                trimmed = str.replace(/^\s*(\S*(\s+\S+)*)\s*$/, "$1");
+            } else {
+                trimmed = "[Code Evidence Omitted: Greater than 500 chars]";
+            }
+        }
+        return trimmed;
+    }
 
     var qs = require("querystring");
     var fs = require("fs");
@@ -115,4 +115,4 @@ JSLINT = require("./fulljslint").JSLINT;
         }, 10000);
     })();
 })();
-	
+
