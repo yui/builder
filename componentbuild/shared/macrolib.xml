@@ -85,6 +85,34 @@
                     <property name="yuicompressor.online" value="true"/>
                     <property name="yuicompressor.output" value="@{dest}"/>
                     <property name="yuicompressor.file" value="@{src}"/>
+
+                    <!-- FIXME The encoding problems lie here.
+
+                         I have not yet ruled out the HTTP server as the
+                         cause of encoding issues. The JSON transformation
+                         could be causing issues, but I doubt it. Still, I'm
+                         looking into that now.
+
+                         The file may be munged by the <echo/> task below
+                         that writes out the extracted script from JSON
+                         in the JS snippet and writes it to the -min file.
+
+                         Your mission, if you choose to accept it, is to
+                         devise a mechanism that:
+                          1. Minifies the file over HTTP
+                          2. Displays warnings and errors in the build output.
+                          3. Fails the build if minification fails.
+                          4. Writes the minified result to a file.
+
+                         I would suggest testing the HTTP server first to
+                         make sure it's not the result of encoding problems.
+
+                         The test you're using should be the yui3 text module.
+                         Things start to look OK until the wordbreak data script.
+                         A diff should yeild minor differences (e.g.
+                         lowercase vars) instead of different Unicode.
+                    -->
+
                     <echo>If this web request fails, try building again with -Dyuicompressor.online=false or install the cURL executable into your PATH.</echo>
                     <exec executable="curl" input="@{src}" outputproperty="yuicompressor.result" failonerror="true" searchpath="true">
                         <arg value="--silent"/>
@@ -124,6 +152,8 @@
 
                         ]]>
                     </script>
+                    <!-- XXX: Encoding failure here? -->
+                    <!-- Setting @encoding on echo didn't work for me, the output was worse. -->
                     <echo file="@{dest}" message="${yuicompressor.script}"/>
                     <var name="yuicompressor.output" unset="true"/>
                     <var name="yuicompressor.script" unset="true"/>
