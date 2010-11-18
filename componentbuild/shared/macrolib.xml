@@ -70,105 +70,20 @@
         </sequential>
     </macrodef>
 
+    <taskdef name="yuicompressor"
+        classname="com.yahoo.platform.yui.compressor.CompressorTask"
+        classpath="${yuicompressor.jar}"/>
+
+    <!-- Maps the legacy yuicompress task into a yuicompressor task. -->
     <macrodef name="yuicompress">
         <attribute name="src" />
         <attribute name="dest" />
         <attribute name="args" />
-        <attribute name="type" default="js"/>
+        <!-- Unused. Type is detected automatically from the @{src} filename. -->
+        <attribute name="type" default="?"/>
+        <!-- If you had to override this, use the type option in args instead. -->
         <sequential>
-            <if>
-                <or>
-                    <istrue value="${yuicompressor.online}"/>
-                    <http url="${yuicompressor.url}" errorsBeginAt="500"/>
-                </or>
-                <then>
-                    <property name="yuicompressor.online" value="true"/>
-                    <property name="yuicompressor.output" value="@{dest}"/>
-                    <property name="yuicompressor.file" value="@{src}"/>
-
-                    <!-- FIXME The encoding problems lie here.
-
-                         I have not yet ruled out the HTTP server as the
-                         cause of encoding issues. The JSON transformation
-                         could be causing issues, but I doubt it. Still, I'm
-                         looking into that now.
-
-                         The file may be munged by the <echo/> task below
-                         that writes out the extracted script from JSON
-                         in the JS snippet and writes it to the -min file.
-
-                         Your mission, if you choose to accept it, is to
-                         devise a mechanism that:
-                          1. Minifies the file over HTTP
-                          2. Displays warnings and errors in the build output.
-                          3. Fails the build if minification fails.
-                          4. Writes the minified result to a file.
-
-                         I would suggest testing the HTTP server first to
-                         make sure it's not the result of encoding problems.
-
-                         The test you're using should be the yui3 text module.
-                         Things start to look OK until the wordbreak data script.
-                         A diff should yeild minor differences (e.g.
-                         lowercase vars) instead of different Unicode.
-                    -->
-
-                    <echo>If this web request fails, try building again with -Dyuicompressor.online=false or install the cURL executable into your PATH.</echo>
-                    <exec executable="curl" input="@{src}" outputproperty="yuicompressor.result" failonerror="true" searchpath="true">
-                        <arg value="--silent"/>
-                        <arg line="-T"/>
-                        <arg line="${yuicompressor.file}"/>
-                        <arg line="${yuicompressor.url}?type=@{type}"/>
-                    </exec>
-                    <script language="javascript">
-                        <![CDATA[
-                        var echo;
-                        var project = self.getProject();
-                        var res = project.getProperty("yuicompressor.result");
-                        res = eval("(" + res + ")");
-
-                        function w (str, level) {
-                            var echo = project.createTask("echo");
-                            echo.setMessage(str);
-                            echo.perform();
-                        }
-
-                        if (!res.result) {
-                            var fail = project.createTask("fail");
-                            fail.setMessage("Failed to minify!");
-                            fail.perform();
-                        }
-
-                        function notify (level, errors) {
-                            for (var i = 0, l = errors.length; i < l; i++) {
-                                w(errors[i], level);
-                            }
-                        }
-
-                        notify("error", res.errors);
-                        notify("warning", res.warnings);
-
-                        project.setProperty("yuicompressor.script", res.result);
-
-                        ]]>
-                    </script>
-                    <!-- XXX: Encoding failure here? -->
-                    <!-- Setting @encoding on echo didn't work for me, the output was worse. -->
-                    <echo file="@{dest}" message="${yuicompressor.script}"/>
-                    <var name="yuicompressor.output" unset="true"/>
-                    <var name="yuicompressor.script" unset="true"/>
-                    <var name="yuicompressor.file" unset="true"/>
-                    <var name="yuicompressor.result" unset="true"/>
-                </then>
-                <else>
-                    <echo level="info">Running yuicompressor on @{src} with @{args}</echo>
-                    <java jar="${yuicompressor.java15.jar}" fork="true" failonerror="true">
-                        <arg line="@{args} -o" />
-                        <arg file="@{dest}" />
-                        <arg file="@{src}" />
-                    </java>
-                </else>
-            </if>
+            <yuicompressor input="@{src}" output="@{dest}" options="@{args}"/>
         </sequential>
     </macrodef>
 
