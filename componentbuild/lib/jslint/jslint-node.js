@@ -17,7 +17,7 @@ JSLINT = require("./fulljslint").JSLINT;
         //laxLineEnd : true,
         undef: true,
         newcap: false,
-        predef:["YUI", "window", "YUI_config", "YAHOO", "YAHOO_config",
+        predef:["YUI", "window", "YUI_config", "YAHOO", "YAHOO_config", "Event",
                 "opera", "exports", "document", "navigator", "console", "self"]
     };
 
