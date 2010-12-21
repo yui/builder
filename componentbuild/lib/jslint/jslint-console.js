@@ -18,7 +18,8 @@ load(jslintsrc);
         //laxLineEnd : true,
         undef: true,
         newcap: false,
-        predef:["YUI", "window", "YUI_config", "YAHOO", "YAHOO_config", "opera", "exports", "document", "navigator", "console"]
+        predef:["YUI", "window", "YUI_config", "YAHOO", "YAHOO_config",
+                "opera", "exports", "document", "navigator", "console", "self"]
     };
 
     function test(jsFile) {
