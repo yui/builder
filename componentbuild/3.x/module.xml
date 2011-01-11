@@ -2,7 +2,8 @@
 
 <project name="YuiModuleTargets">
 
-    <import file="${builddir}/shared/targets.xml" description="Targets common to Rollup/Module" />
+    <dirname property="module.basedir" file="${ant.file.YuiModuleTargets}"/>
+    <import file="${module.basedir}/../shared/targets.xml" description="Targets common to Rollup/Module" />
 
     <target name="build" depends="buildcore, -rollupjs, buildskins, buildlangs" />
     <target name="buildskins" depends="-buildskins, -rollupcss" />
@@ -40,7 +41,19 @@
     </target>
 
     <target name="-rollupjs" if="rollup">
-        <echo level="info">Rolling up ${component.basefilename}-debug.js into ${rollup.component.basefilename}-debug.js</echo>
+        <if>
+            <isset property="rollup.sub"/>
+            <then>
+                <echo level="info">Module: Build a rollup of a rollup; moving rollup.sub properties into rollup properties.</echo>
+                <var name="rollup.builddir" unset="true"/>
+                <var name="rollup.component" unset="true"/>
+                <var name="rollup.component.basefilename" unset="true"/>
+                <propertycopy name="rollup.builddir" from="rollup.sub.builddir"/>
+                <propertycopy name="rollup.component" from="rollup.sub.component"/>
+                <propertycopy name="rollup.component.basefilename" from="rollup.sub.component.basefilename"/>
+            </then>
+        </if>
+        <echo level="info">Module: Rolling up ${component.basefilename}-debug.js into ${rollup.component.basefilename}-debug.js</echo>
         <concat destfile="${rollup.builddir}/${rollup.component.basefilename}.js" append="true" fixlastline="true">
             <filelist dir="${component.builddir}" files="${component.basefilename}.js" />
         </concat>
@@ -57,16 +70,13 @@
     <target name="-buildlangs" description="Create language packs in the local component build directory" if="component.langs.exist">
     	<mkdir dir="${component.builddir}/lang" />
 
-    	<!-- TODO: Break compress/concat out into separate pieces -->
         <for list="${component.lang}" param="lang" trim="true">
             <sequential>
             	<addlang dir="${component.lang.base}" module="${component}" lang="@{lang}" dest="${component.builddir}/lang" />
-                <yuicompress src="${component.builddir}/lang/${component}_@{lang}.js" dest="${component.builddir}/lang/${component}_@{lang}-min.js" args="${yuicompressor.js.args.internal}" />
             </sequential>
         </for>
 
     	<addlang dir="${component.lang.base}" module="${component}" lang="" dest="${component.builddir}/lang/" />
-        <yuicompress src="${component.builddir}/lang/${component}.js" dest="${component.builddir}/lang/${component}-min.js" args="${yuicompressor.js.args.internal}" />
 
     </target>
 
@@ -76,22 +86,16 @@
                 <concat destfile="${rollup.builddir}/lang/${rollup.component}_@{lang}.js" append="true" fixlastline="true">
                     <fileset dir="${component.builddir}/lang" includes="*_@{lang}.js" />
                 </concat>
-                <concat destfile="${rollup.builddir}/lang/${rollup.component}_@{lang}-min.js" append="true" fixlastline="true">
-                    <fileset dir="${component.builddir}/lang" includes="*_@{lang}-min.js" />
-                </concat>
             </sequential>
         </for>
     	<concat destfile="${rollup.builddir}/lang/${rollup.component}.js" append="true" fixlastline="true">
             <filelist dir="${component.builddir}/lang" files="${component}.js" />
         </concat>
-        <concat destfile="${rollup.builddir}/lang/${rollup.component}-min.js" append="true" fixlastline="true">
-            <filelist dir="${component.builddir}/lang" files="${component}-min.js" />
-        </concat>
 	</target>
 
     <target name="-concatskins" if="component.skins.exist">
         <concatsource destfile="${component.builddir}/assets/skins/sam/${component}.css" sourcedir="${component.assets.base}" sourcefiles="${component}-core.css, skins/sam/${component}-skin.css" />
-        <yuicompress src="${component.builddir}/assets/skins/sam/${component}.css" dest="${component.builddir}/assets/skins/sam/${component}.css" args="${yuicompressor.css.args.internal}" />
+        <yuicompress type="css" src="${component.builddir}/assets/skins/sam/${component}.css" dest="${component.builddir}/assets/skins/sam/${component}.css" args="${yuicompressor.css.args.internal}" />
     </target>
 
     <target name="-rollupcss" if="rollupskins">
