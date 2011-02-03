@@ -157,9 +157,7 @@
         <isset property="component.cssfiles" />
     </condition>
 
-    <!-- By default, jslint failure should fail the build.
-         This can be overridden on the command line. -->
-    <property name="lint.failonerror" value="true"/>
+    <property name="lint.failonerror" value="false"/>
 
     <property name="node.jslint.url" value="http://127.0.0.1:8081/"/>
     <property name="yuicompressor.url" value="http://127.0.0.1:${yuicompressor.port}/compress"/>
