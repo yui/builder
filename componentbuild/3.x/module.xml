@@ -105,4 +105,28 @@
         </concat>
     </target>
 
+    <!-- Tests -->
+    <target name="tests" depends="-lint-server">
+        <echo level="info">Generating test module for ${component}</echo>
+        <echo level="info">    Test module:                  ${tests.component}</echo>
+        <echo level="info">    Test module source directory: ${tests.srcdir}</echo>
+        <echo level="info">    Test module source files:     ${tests.jsfiles}</echo>
+        <echo level="info">    Test module output directory: ${tests.builddir}</echo>
+        <echo level="info">    Test module file:             ${tests.builddir}/${tests.component}.js</echo>
+        <echo level="info">    </echo>
+
+        <available file="${tests.srcdir}" type="dir" property="tests.srcdir.exists"/>
+        <var name="buildfile" value="${tests.builddir}/${tests.component}.js"/>
+        <arrayliteral from="tests.requires" to="tests.details.requires" key="requires"/>
+        <concatsource destfile="${buildfile}" sourcedir="${tests.srcdir}" sourcefiles="${tests.jsfiles}"/>
+        <addmodule file="${buildfile}" module="${tests.component}" details="{${tests.details.requires}}"/>
+
+        <jslint>
+            <jsfiles>
+                <fileset file="${buildfile}"/>
+            </jsfiles>
+        </jslint>
+
+        <echo level="info">Test module ${tests.component} created</echo>
+    </target>
 </project>
