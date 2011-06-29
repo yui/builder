@@ -128,7 +128,6 @@
                 <dirset dir="${component.assets.base}/skins/" includes="*"/> 
             </path>
             <sequential>
-                <local name="skin.name"/>
                 <basename property="skin.name" file="@{skin.dir}"/>
                 <echo level="info">Deploying Skin files for @{skin.dir} :: ${skin.name}</echo>
                 <copy todir="${global.build.component.assets}/skins/${skin.name}" overwrite="true" verbose="true">
@@ -138,6 +137,7 @@
                 <copy todir="${global.build.component.assets}/skins/${skin.name}" overwrite="true" verbose="true">
                     <fileset dir="${component.assets.skins.base}/${skin.name}" includes="${component.assets.skins.files}" />
                 </copy>
+		<var name="skin.name" unset="true" />
             </sequential> 
         </for>
     </target>
