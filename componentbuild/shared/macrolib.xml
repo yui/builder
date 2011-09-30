@@ -70,22 +70,30 @@
         </sequential>
     </macrodef>
 
-    <taskdef name="yuicompressor"
-        classname="com.yahoo.platform.yui.compressor.CompressorTask"
-        classpath="${yuicompressor.jar}"/>
+    <if>
+        <!-- The yui2 builder-integration script embeds macrolib.xml
+             by itself for other macros, which leaves yuicompressor.jar
+             unset. If that's the case, don't define the compressor tasks. -->
+        <isset property="yuicompressor.jar"/>
+        <then>
+            <taskdef name="yuicompressor"
+                classname="com.yahoo.platform.yui.compressor.CompressorTask"
+                classpath="${yuicompressor.jar}"/>
 
-    <!-- Maps the legacy yuicompress task into a yuicompressor task. -->
-    <macrodef name="yuicompress">
-        <attribute name="src" />
-        <attribute name="dest" />
-        <attribute name="args" />
-        <!-- Unused. Type is detected automatically from the @{src} filename. -->
-        <attribute name="type" default="?"/>
-        <!-- If you had to override this, use the type option in args instead. -->
-        <sequential>
-            <yuicompressor input="@{src}" output="@{dest}" options="@{args}"/>
-        </sequential>
-    </macrodef>
+            <!-- Maps the legacy yuicompress task into a yuicompressor task. -->
+            <macrodef name="yuicompress">
+                <attribute name="src" />
+                <attribute name="dest" />
+                <attribute name="args" />
+                <!-- Unused. Type is detected automatically from the @{src} filename. -->
+                <attribute name="type" default="?"/>
+                <!-- If you had to override this, use the type option in args instead. -->
+                <sequential>
+                    <yuicompressor input="@{src}" output="@{dest}" options="@{args}"/>
+                </sequential>
+            </macrodef>
+        </then>
+    </if>
 
     <macrodef name="concatsource">
         <attribute name="destfile" />

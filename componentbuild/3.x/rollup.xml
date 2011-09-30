@@ -77,4 +77,29 @@
             </then>
     	</if>
     </target>
+
+    <target name="tests">
+        <subant target="tests" inheritall="false" >
+            <filelist dir="${buildfile.dir}" files="${component.rollup.modules.buildfiles}" />
+            <property name="rollup" value="true" />
+            <property name="rollup.component" value="${tests.component}" />
+        </subant>
+
+        <arrayliteral from="tests.rollup.modules" to="tests.details.use" key="use"/>
+        <propertyregex property="tests.rollup.module.files"
+                       override="true"
+                       input="${tests.rollup.modules}"
+                       casesensitive="false"
+                       regexp="([^\,\s]+)"
+                       replace="\1.js"
+                        />
+
+        <concat destfile="${tests.builddir}/${tests.component}.js" append="true" fixlastline="true">
+            <filelist dir="${tests.builddir}" files="${tests.rollup.module.files}"/>
+        </concat>
+
+        <addrollup module="${tests.component}" file="${tests.builddir}/${tests.component}.js" details="{${tests.details.use}}" />
+
+        <echo level="info">Rollup test module ${tests.component} created</echo>
+    </target>
 </project>

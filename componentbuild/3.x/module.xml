@@ -64,7 +64,18 @@
 
     <!-- SKINS -->
     <target name="-buildskins" depends="-concatskins" description="Create skin rollup in local component build directory" if="component.skins.exist">
-        <fixcrlf srcdir="${component.builddir}/assets/skins/sam" includes="${component}.css" eol="${buildfiles.eol}" />
+        <for param="skin.dir">
+            <path>
+                <dirset dir="${component.assets.base}/skins/" includes="*"/> 
+            </path>
+            <sequential>
+                <basename property="skin.name" file="@{skin.dir}"/>
+                <echo level="info">Fixing CRLF for Skin files for @{skin.dir} :: ${skin.name}</echo>
+                <fixcrlf srcdir="${component.builddir}/assets/skins/${skin.name}" includes="${component}.css" eol="${buildfiles.eol}" />
+                <var name="skin.name" unset="true" /> 
+            </sequential> 
+        </for>
+        <!--fixcrlf srcdir="${component.builddir}/assets/skins/sam" includes="${component}.css" eol="${buildfiles.eol}" /-->
     </target>
 
     <target name="-buildlangs" description="Create language packs in the local component build directory" if="component.langs.exist">
@@ -94,15 +105,66 @@
 	</target>
 
     <target name="-concatskins" if="component.skins.exist">
-        <concatsource destfile="${component.builddir}/assets/skins/sam/${component}.css" sourcedir="${component.assets.base}" sourcefiles="${component}-core.css, skins/sam/${component}-skin.css" />
-        <yuicompress type="css" src="${component.builddir}/assets/skins/sam/${component}.css" dest="${component.builddir}/assets/skins/sam/${component}.css" args="${yuicompressor.css.args.internal}" />
+        <echo level="info">Concating Skins</echo>
+        <for param="skin.dir">
+            <path>
+                <dirset dir="${component.assets.base}/skins/" includes="*"/> 
+            </path>
+            <sequential>
+                <basename property="skin.name" file="@{skin.dir}"/>
+                <echo level="info">Concating Skin files for @{skin.dir} :: ${skin.name}</echo>
+                <concatsource destfile="${component.builddir}/assets/skins/${skin.name}/${component}.css" sourcedir="${component.assets.base}" sourcefiles="${component}-core.css, skins/${skin.name}/${component}-skin.css" />
+                <yuicompress type="css" src="${component.builddir}/assets/skins/${skin.name}/${component}.css" dest="${component.builddir}/assets/skins/${skin.name}/${component}.css" args="${yuicompressor.css.args.internal}" />
+                <var name="skin.name" unset="true" />
+            </sequential> 
+        </for>
+        
+        <!--concatsource destfile="${component.builddir}/assets/skins/sam/${component}.css" sourcedir="${component.assets.base}" sourcefiles="${component}-core.css, skins/sam/${component}-skin.css" />
+        <yuicompress type="css" src="${component.builddir}/assets/skins/sam/${component}.css" dest="${component.builddir}/assets/skins/sam/${component}.css" args="${yuicompressor.css.args.internal}" /-->
     </target>
 
     <target name="-rollupcss" if="rollupskins">
         <echo level="info">Rolling up ${component}.css into ${rollup.component}.css</echo>
-        <concat destfile="${rollup.builddir}/assets/skins/sam/${rollup.component}.css" append="true" fixlastline="true">
+        <for param="skin.dir">
+            <path>
+                <dirset dir="${component.assets.base}/skins/" includes="*"/> 
+            </path>
+            <sequential>
+                <basename property="skin.name" file="@{skin.dir}"/>
+                <echo level="info">Concating Skin files for @{skin.dir} :: ${skin.name}</echo>
+                <concat destfile="${rollup.builddir}/assets/skins/${skin.name}/${rollup.component}.css" append="true" fixlastline="true">
+                    <filelist dir="${component.builddir}/assets/skins/${skin.name}" files="${component}.css" />
+                </concat>
+                <var name="skin.name" unset="true" />
+            </sequential> 
+        </for>
+        <!--concat destfile="${rollup.builddir}/assets/skins/sam/${rollup.component}.css" append="true" fixlastline="true">
             <filelist dir="${component.builddir}/assets/skins/sam" files="${component}.css" />
-        </concat>
+        </concat-->
     </target>
 
+    <!-- Tests -->
+    <target name="tests" depends="-lint-server">
+        <echo level="info">Generating test module for ${component}</echo>
+        <echo level="info">    Test module:                  ${tests.component}</echo>
+        <echo level="info">    Test module source directory: ${tests.srcdir}</echo>
+        <echo level="info">    Test module source files:     ${tests.jsfiles}</echo>
+        <echo level="info">    Test module output directory: ${tests.builddir}</echo>
+        <echo level="info">    Test module file:             ${tests.builddir}/${tests.component}.js</echo>
+        <echo level="info">    </echo>
+
+        <available file="${tests.srcdir}" type="dir" property="tests.srcdir.exists"/>
+        <var name="buildfile" value="${tests.builddir}/${tests.component}.js"/>
+        <arrayliteral from="tests.requires" to="tests.details.requires" key="requires"/>
+        <concatsource destfile="${buildfile}" sourcedir="${tests.srcdir}" sourcefiles="${tests.jsfiles}"/>
+        <addmodule file="${buildfile}" module="${tests.component}" details="{${tests.details.requires}}"/>
+
+        <jslint>
+            <jsfiles>
+                <fileset file="${buildfile}"/>
+            </jsfiles>
+        </jslint>
+
+        <echo level="info">Test module ${tests.component} created</echo>
+    </target>
 </project>

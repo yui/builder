@@ -106,6 +106,26 @@
         </and>
     </condition>
 	
+    <!-- component test module properties -->
+    <property name="testsdir" value="./tests"/>
+    <property name="tests.srcdir" value="${testsdir}/src"/>
+    <property name="tests.builddir" value="${testsdir}"/>
+    <property name="tests.component" value="${component}-tests"/>
+    <property name="tests.jsfiles" value="${component}.js"/>
+    <property name="tests.requires" value="${component}, test"/>
+    <if>
+        <istrue value="${component.rollup}"/>
+        <then>
+            <propertyregex property="tests.rollup.modules"
+                           override="true"
+                           input="${component.use}"
+                           casesensitive="false"
+                           regexp="([^\,\s]+)"
+                           replace="\1-tests"
+                            />
+        </then>
+    </if>
+
     <!-- 
          DEPRECATED: component.basefilename and component.releasetype are deprecated 
          We used to mark filenames with suffixes (-beta, -experimental), which we no longer do 
@@ -157,9 +177,7 @@
         <isset property="component.cssfiles" />
     </condition>
 
-    <!-- By default, jslint failure should fail the build.
-         This can be overridden on the command line. -->
-    <property name="lint.failonerror" value="true"/>
+    <property name="lint.failonerror" value="false"/>
 
     <property name="node.jslint.url" value="http://127.0.0.1:8081/"/>
     <property name="yuicompressor.url" value="http://127.0.0.1:${yuicompressor.port}/compress"/>
