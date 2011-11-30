@@ -9,6 +9,7 @@
 
     <target name="buildcore">
         <concatsource destfile="${component.builddir}/${component.basefilename}.css" sourcedir="${component.cssfiles.base}" sourcefiles="${component.cssfiles}" />
+        <stampcss file="${component.builddir}/${component.basefilename}.css" module="${component}" />
     </target>
 
     <target name="minify">

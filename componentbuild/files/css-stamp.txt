@@ -1,0 +1,2 @@
+/* YUI CSS Detection Stamp */
+#yui3-css-stamp.@MODULE@ { display: none; }
