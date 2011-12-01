@@ -380,5 +380,21 @@
 
         </sequential>
     </macrodef>
+
+    <macrodef name="stampcss">
+        <attribute name="module" />
+        <attribute name="file" />
+        <sequential>
+            <loadfile srcfile="${builddir}/files/css-stamp.txt" property="@{module}" >
+                <filterchain>
+                    <replacetokens>
+                        <token key="MODULE" value="@{module}"/>
+                    </replacetokens>
+                </filterchain>
+            </loadfile>
+            <echo level="info">Adding CSS Registration Code to @{file}</echo>
+            <concat destfile="@{file}" append="true" fixlastline="true">${@{module}}</concat>
+        </sequential>
+    </macrodef>    
 	
 </project>
