@@ -18,23 +18,31 @@ JSLINT = require("./fulljslint").JSLINT;
         undef: true,
         newcap: false,
         predef:["YUI", "window", "YUI_config", "YAHOO", "YAHOO_config", "Event",
-                "opera", "exports", "document", "navigator", "console", "self"]
+                "opera", "exports", "document", "navigator", "console", "self", "require",
+                "module", "process", "__dirname", "__filename"]
     };
 
-    function test(js) {
+    function test(js, file) {
         var body = "", code = 200;
 
         var success = JSLINT(js, OPTS);
         if (success) {
-            return "OK";
+            return {
+                "content": '\t[OK] ' + file,
+                code: code
+            };
         } else {
-            for (var i=0; i < JSLINT.errors.length; ++i) {
-                var e = JSLINT.errors[i];
-                if (e) {
-                    body += ("\t" + e.line + ", " + e.character + ": " + e.reason + "\n\t" + clean(e.evidence) + "\n");
+            if (JSLINT.errors.length) {
+                body += '[JSLINT] ' + file + '\n';
+                body += '----------------------------------------------------------\n';
+                for (var i=0; i < JSLINT.errors.length; ++i) {
+                    var e = JSLINT.errors[i];
+                    if (e) {
+                        body += ("\t" + e.line + ", " + e.character + ": " + e.reason + "\n\t" + clean(e.evidence) + "\n");
+                    }
                 }
+                body += '----------------------------------------------------------\n';
             }
-            body += "\n";
 
             // Last item is null if JSLint hit a fatal error
             if (JSLINT.errors && JSLINT.errors[JSLINT.errors.length-1] === null) {
@@ -88,7 +96,7 @@ JSLINT = require("./fulljslint").JSLINT;
                 var results = [];
                 files.forEach(function (file) {
                     fs.readFile(file, function (err, data) {
-                        var diagnosis = test(data.toString("utf8"));
+                        var diagnosis = test(data.toString("utf8"), file);
                         results.push(diagnosis.content);
 
                         code = (
