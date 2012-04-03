@@ -19,7 +19,7 @@
     </target>
 
     <target name="-loggerregex" description="Replace logger statements" unless="component.logger.regex.skip">
-        <echo level="info">Replacing Logger Statements in ${component.builddir}/${component.basefilename}.js</echo>
+        <echo level="verbose">Replacing Logger Statements in ${component.builddir}/${component.basefilename}.js</echo>
         <replaceregexp file="${component.builddir}/${component.basefilename}.js"
                             byline="${component.logger.regex.byline}"
                             match="${component.logger.regex}"
@@ -44,7 +44,7 @@
         <if>
             <isset property="rollup.sub"/>
             <then>
-                <echo level="info">Module: Build a rollup of a rollup; moving rollup.sub properties into rollup properties.</echo>
+                <echo level="verbose">Module: Build a rollup of a rollup; moving rollup.sub properties into rollup properties.</echo>
                 <var name="rollup.builddir" unset="true"/>
                 <var name="rollup.component" unset="true"/>
                 <var name="rollup.component.basefilename" unset="true"/>
@@ -53,7 +53,7 @@
                 <propertycopy name="rollup.component.basefilename" from="rollup.sub.component.basefilename"/>
             </then>
         </if>
-        <echo level="info">Module: Rolling up ${component.basefilename}-debug.js into ${rollup.component.basefilename}-debug.js</echo>
+        <echo level="verbose">Module: Rolling up ${component.basefilename}-debug.js into ${rollup.component.basefilename}-debug.js</echo>
         <concat destfile="${rollup.builddir}/${rollup.component.basefilename}.js" append="true" fixlastline="true">
             <filelist dir="${component.builddir}" files="${component.basefilename}.js" />
         </concat>
@@ -70,7 +70,7 @@
             </path>
             <sequential>
                 <basename property="skin.name" file="@{skin.dir}"/>
-                <echo level="info">Fixing CRLF for Skin files for @{skin.dir} :: ${skin.name}</echo>
+                <echo level="verbose">Fixing CRLF for Skin files for @{skin.dir} :: ${skin.name}</echo>
                 <fixcrlf srcdir="${component.builddir}/assets/skins/${skin.name}" includes="${component}.css" eol="${buildfiles.eol}" />
                 <var name="skin.name" unset="true" /> 
             </sequential> 
@@ -105,14 +105,14 @@
 	</target>
 
     <target name="-concatskins" if="component.skins.exist">
-        <echo level="info">Concating Skins</echo>
+        <echo level="verbose">Concating Skins</echo>
         <for param="skin.dir">
             <path>
                 <dirset dir="${component.assets.base}/skins/" includes="*"/> 
             </path>
             <sequential>
                 <basename property="skin.name" file="@{skin.dir}"/>
-                <echo level="info">Concating Skin files for @{skin.dir} :: ${skin.name}</echo>
+                <echo level="verbose">Concating Skin files for @{skin.dir} :: ${skin.name}</echo>
                 <concatsource destfile="${component.builddir}/assets/skins/${skin.name}/${component}.css" sourcedir="${component.assets.base}" sourcefiles="${component}-core.css, skins/${skin.name}/${component}-skin.css" />
                 <!-- Stamp Skin CSS -->
                 <stampcss file="${component.builddir}/assets/skins/${skin.name}/${component}.css" module="skin-${skin.name}-${component}" />
@@ -126,14 +126,14 @@
     </target>
 
     <target name="-rollupcss" if="rollupskins">
-        <echo level="info">Rolling up ${component}.css into ${rollup.component}.css</echo>
+        <echo level="verbose">Rolling up ${component}.css into ${rollup.component}.css</echo>
         <for param="skin.dir">
             <path>
                 <dirset dir="${component.assets.base}/skins/" includes="*"/> 
             </path>
             <sequential>
                 <basename property="skin.name" file="@{skin.dir}"/>
-                <echo level="info">Concating Skin files for @{skin.dir} :: ${skin.name}</echo>
+                <echo level="verbose">Concating Skin files for @{skin.dir} :: ${skin.name}</echo>
                 <concat destfile="${rollup.builddir}/assets/skins/${skin.name}/${rollup.component}.css" append="true" fixlastline="true">
                     <filelist dir="${component.builddir}/assets/skins/${skin.name}" files="${component}.css" />
                 </concat>
