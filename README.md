@@ -1,6 +1,7 @@
-Welcome to YUI Builder.
+Welcome to YUI Builder
+======================
 
-INTRODUCTION
+Introduction
 ------------
 
 YUI uses ANT to create component build files from individual source files.
@@ -37,14 +38,15 @@ The component build does not currently:
 
    b) Generate API documentation
 
-INSTALLATION
+Installation
 ------------
 
 Below is a brief summary as well as a detailed step-by-step guide 
 for installing the build system, allowing you to build the "src" 
 component code.
 
-SUMMARY
+Summary
+-------
 
 1) Install ANT 1.7 or above, and add ant to your path
 
@@ -56,14 +58,16 @@ SUMMARY
     prompt> cd yui2/src/autocomplete
     prompt> ant all
 
-DETAILED INSTRUCTIONS
+Detailed Instructions
+---------------------
 
 To use the build system, you'll need to install ANT and obtain
 the YUI build infrastructure from github. 
 
 These are both one-time install tasks.
 
-INSTALLING ANT
+Installing Ant
+--------------
 
 1) Download and install ANT 1.7 (or above)
 
@@ -73,7 +77,8 @@ INSTALLING ANT
    your ANT install root, and add the ANT executable to your 
    environment's PATH variable.
 
-INSTALLING YUI BUILD INFRASTRUCTURE
+Installing YUI Build Infrastructure
+-----------------------------------
 
 1) Clone the YUI "builder" project from github:
 
@@ -86,9 +91,9 @@ INSTALLING YUI BUILD INFRASTRUCTURE
    when cloned to the default "builder" directory, parallel 
    to the project source directories:
 
-   <gitroot>/yui2       [ cloned yui2 project ]
-   <gitroot>/yui3       [ cloned yui2 project ]
-   <gitroot>/builder    [ cloned builder project ]
+   <gitroot>/yui2       ( cloned yui2 project )
+   <gitroot>/yui3       ( cloned yui2 project )
+   <gitroot>/builder    ( cloned builder project )
 
    Cloning it to the default location will allow you to 
    build any of the components without having to modify any 
@@ -100,7 +105,7 @@ INSTALLING YUI BUILD INFRASTRUCTURE
    the directory structure mentioned above, to have the build work out 
    of the box.
 
-BUILDING AN EXISTING COMPONENT
+Building An Existing Component
 ------------------------------
 
 With ANT and the YUI build infrastructure installed, you can now build any 
@@ -111,7 +116,8 @@ The build system allows you to build locally, within the component's
 source directory, and also run a full build to update the top level build 
 directory for a component.
 
-FULL BUILD
+Full Build
+----------
 
 To perform a full build for a component, run ant with the "all" target:
 
@@ -156,7 +162,8 @@ So, for autocomplete, the built files can be found in the directory below:
 
     yui2/src/autocomplete/build_tmp
 
-BUILD OUTPUT
+Build Output
+------------
 
 ANT will output build information to the screen, as it runs through the 
 build, which can be redirected to a file if required:
@@ -178,7 +185,7 @@ NOTE: Most components will have warnings which are output during the
 "minify" and "lint" steps, which the component developer has evaluated 
 and determined to have no impact on functionality.
 
-CREATING BUILD FILES FOR A NEW COMPONENT
+Creating Build Files For A New Component
 ----------------------------------------
 
 The builder/componentbuild/templates directory has basic build.xml and 
@@ -218,7 +225,8 @@ If you're creating:
         subcomponenttwo.xml
         subcomponenttwo.properties
 
-FURTHER CUSTOMIZATION
+Further Customization
+---------------------
 
 If required, you can define custom values for any of the properties 
 defined in builder/componentbuild/docs/properties.html to customize the 
@@ -229,4 +237,33 @@ sufficient.
 You can also override or extend existing targets, to customize the actual 
 build process for a component if required. The list of targets and their 
 role is defined in builder/componentbuild/docs/targets.html. 
+
+
+Log Verbosity
+-------------
+
+* `ant all` will give you the default log output, may be a little noisy
+* `ant all -v` will give you full log output (really noisy)
+* `ant all -q` will give you only the jslint output from your build
+
+JSLint/Hint
+-----------
+
+By default, we look for the `node` executable. If found we use a Node.js based
+JSLint server to lint the JS files. If it's not installed, we fall back to
+Rhino (which can be very slow)
+
+If you install the `jshint` (`npm -g i jshint`), we will use that by default.
+
+To skip using this you can pass `-Djshint.skip=true`:
+
+    `ant all -q -Djshint.skip=true`
+
+The default is also to only run jslint/hint on RAW files, skipping min and debug versions.
+
+You can change this by adding `-Dlint.all=true` to your command:
+
+    `ant all -q -Dlint.all=true`
+
+
 
