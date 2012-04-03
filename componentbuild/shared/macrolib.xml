@@ -147,6 +147,14 @@
                 </then>
             </if>
             <if>
+                <not>
+                    <isset property="jshint.version"/>
+                </not>
+                <then>
+                    <echo>Ignore the `java.io.IOException`, that means it can't find `jshint`. We will use Node.js instead of `jshint`</echo>
+                </then>
+            </if>
+            <if>
                 <or>
                     <isset property="jshint.version"/>
                     <istrue value="${jshint.online}"/>
