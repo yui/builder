@@ -104,10 +104,10 @@
         <element name="filters" optional="true" description="Additonal filters to apply to individual files"/>
 
         <sequential>
-            <echo level="info">Concatenating</echo>
-            <echo level="info">    Source Files : @{sourcefiles}</echo>
-            <echo level="info">    In Source Dir : @{sourcedir}</echo>
-            <echo level="info">    To : @{destfile}</echo>
+            <echo level="verbose">Concatenating</echo>
+            <echo level="verbose">    Source Files : @{sourcefiles}</echo>
+            <echo level="verbose">    In Source Dir : @{sourcedir}</echo>
+            <echo level="verbose">    To : @{destfile}</echo>
 
             <delete dir="@{workingdir}" quiet="true"/>
             <copy todir="@{workingdir}">
@@ -134,44 +134,82 @@
                 <jsfiles />
             </pathconvert>
             <if>
+                <not>
+                    <or>
+                        <istrue value="${jshint.online}"/>
+                        <istrue value="${jshint.skip}"/>
+                    </or>
+                </not>
+                <then>
+                    <exec executable="jshint" failifexecutionfails="false" outputproperty="jshint.version">
+                        <arg line="--version"/>
+                    </exec>
+                </then>
+            </if>
+            <if>
                 <or>
-                    <istrue value="${node.online}"/>
-                    <http url="${node.jslint.url}"/>
+                    <isset property="jshint.version"/>
+                    <istrue value="${jshint.online}"/>
                 </or>
                 <then>
-                    <property name="node.online" value="true"/>
-                    <post to="${node.jslint.url}" property="node.jslint.response" failonerror="${lint.failonerror}">
-                        <prop name="files" value="${jsfileargs}"/>
-                        <prop name="failonerror" value="${lint.failonerror}"/>
-                    </post>
-                    <!-- Since Ant doesn't really failonerror for the post task,
-                         handle this ourselves: -->
+                    <property name="jshint.online" value="true"/>
+                    <exec executable="jshint" failifexecutionfails="false" outputproperty="jshint.results" resultproperty="jshint.resultcode" errorproperty="jshint.error" logError="false">
+                        <arg line="'${jsfileargs}'"/>
+                    </exec>
                     <if>
-                        <not>
-                            <isset property="node.jslint.response"/>
-                        </not>
+                        <equals arg1="${jshint.resultcode}" arg2="1" forcestring="true"/>
                         <then>
-                            <fail>JSLint failed. To view lint output and continue the build, run ant with -Dlint.failonerror=false.</fail>
+                            <echo>Using JSHint Version: ${jshint.version}</echo>
+                            <echo>${jshint.results}</echo>
+                            <echo></echo>
                         </then>
                     </if>
-                    <!-- Clear property for next run: -->
-                    <var name="node.jslint.response" unset="true"/>
                 </then>
                 <else>
-                    <echo>Using Rhino. Install nodejs to improve jslint speed, or skip with -Dlint.skip=true</echo>
-                    <!-- 
-                       Need to find a way to convert fileset to args (script?) to 
-                       avoid ' ', which will break for files with ' in them
-                       
-                       Evaluates to the following java execution line...
-                       java -r js.jar jslintconsole.js 'file1.js' 'file2.js' 'file3.js'
-                    -->
+                    <if>
+                        <or>
+                            <istrue value="${node.online}"/>
+                            <http url="${node.jslint.url}"/>
+                        </or>
+                        <then>
+                            <property name="node.online" value="true"/>
+                            <post to="${node.jslint.url}" property="node.jslint.response" failonerror="${lint.failonerror}" verbose="false">
+                                <prop name="files" value="${jsfileargs}"/>
+                                <prop name="failonerror" value="${lint.failonerror}"/>
+                            </post>
+                            <!-- Since Ant doesn't really failonerror for the post task,
+                                 handle this ourselves: -->
+                            <if>
+                                <not>
+                                    <isset property="node.jslint.response"/>
+                                </not>
+                                <then>
+                                    <fail>JSLint failed. To view lint output and continue the build, run ant with -Dlint.failonerror=false.</fail>
+                                </then>
+                                <else>
+                                    <echo>${node.jslint.response}</echo>
+                                </else>
+                            </if>
+                            <!-- Clear property for next run: -->
+                            <var name="node.jslint.response" unset="true"/>
+                        </then>
+                        <else>
+                            <echo>Using Rhino. Install nodejs to improve jslint speed, or skip with -Dlint.skip=true</echo>
+                            <!-- 
+                               Need to find a way to convert fileset to args (script?) to 
+                               avoid ' ', which will break for files with ' in them
+                               
+                               Evaluates to the following java execution line...
+                               java -r js.jar jslintconsole.js 'file1.js' 'file2.js' 'file3.js'
+                            -->
 
-                    <java jar="${rhino.jar}" fork="true" failonerror="${jslint.failonerror}">
-                        <arg file="${jslintconsole.js}" />
-                        <arg value="${jslintsrc.js}" />
-                        <arg line="'${jsfileargs}'" />
-                    </java>
+                            <java jar="${rhino.jar}" fork="true" failonerror="${jslint.failonerror}">
+                                <arg file="${jslintconsole.js}" />
+                                <arg value="${jslintsrc.js}" />
+                                <arg line="'${jsfileargs}'" />
+                            </java>
+                        </else>
+                    </if>
                 </else>
             </if>
         </sequential>
@@ -190,7 +228,7 @@
                     </replacetokens>
                 </filterchain>
             </loadfile>
-            <echo level="info">Adding Version Registration Code to @{file}</echo>
+            <echo level="verbose">Adding Version Registration Code to @{file}</echo>
             <concat destfile="@{file}" append="true" fixlastline="true">${@{module}-@{classname}-version}</concat>
         </sequential>
     </macrodef>
@@ -235,11 +273,11 @@
                         <arg file="@{dir}/${@{module}@{lang}_fullname}.pres" />
                         <arg file="${component.langbuilddir}/${@{module}@{lang}_fullname}.js" />
                     </java>
-                    <echo level="info">Wrapping ${component.langbuilddir}/${@{module}@{lang}_fullname}.js in YUI.add, Y.Intl.add</echo>
+                    <echo level="verbose">Wrapping ${component.langbuilddir}/${@{module}@{lang}_fullname}.js in YUI.add, Y.Intl.add</echo>
                     <loadfile srcfile="${component.langbuilddir}/${@{module}@{lang}_fullname}.js" property="@{module}@{lang}-strs-loaded" encoding="utf-8" />
                 </then>
                 <else>
-                    <echo level="info">Wrapping @{dir}/${@{module}@{lang}_fullname}.js in YUI.add, Y.Intl.add</echo>
+                    <echo level="verbose">Wrapping @{dir}/${@{module}@{lang}_fullname}.js in YUI.add, Y.Intl.add</echo>
                     <loadfile srcfile="@{dir}/${@{module}@{lang}_fullname}.js" property="@{module}@{lang}-strs-loaded" encoding="utf-8" />
                 </else>
             </if>
@@ -274,7 +312,7 @@
                 </else>
             </if>
             <loadfile srcfile="@{file}" property="@{module}-@{file}-code" />
-            <echo level="info">Wrapping @{file} in YUI.add module</echo>
+            <echo level="verbose">Wrapping @{file} in YUI.add module</echo>
             <copy file="${builddir}/files/moduletemplate.txt" tofile="@{file}" overwrite="true">
                 <filterset>
                     <filter token="CODE" value="${@{module}-@{file}-code}" />
@@ -302,7 +340,7 @@
                 </else>
             </if>
             <loadfile srcfile="@{file}" property="@{module}-@{file}-code" />
-            <echo level="info">Adding Rollup @{file} using YUI.add</echo>
+            <echo level="verbose">Adding Rollup @{file} using YUI.add</echo>
             <copy file="${builddir}/files/rolluptemplate.txt" tofile="@{file}" overwrite="true">
                 <filterset>
                     <filter token="CODE" value="${@{module}-@{file}-code}"/>
@@ -320,7 +358,7 @@
         <attribute name="dir" />
 
         <sequential>
-            <echo level="info">Registering rollup info for lang files in @{dir} using YUI.add</echo>
+            <echo level="verbose">Registering rollup info for lang files in @{dir} using YUI.add</echo>
 
         	<for list="${component.rollup.lang}" param="lang" trim="true">
                 <sequential>
@@ -392,7 +430,7 @@
                     </replacetokens>
                 </filterchain>
             </loadfile>
-            <echo level="info">Adding CSS Registration Code to @{file}</echo>
+            <echo level="verbose">Adding CSS Registration Code to @{file}</echo>
             <concat destfile="@{file}" append="true" fixlastline="true">${@{module}}</concat>
         </sequential>
     </macrodef>    

@@ -4,22 +4,22 @@
 
     <echo level="info">Starting Build For ${component}</echo>
 
-    <echo level="info">Ant Properties</echo>
-    <echo level="info">    Home : ${ant.home}</echo>
-    <echo level="info">    Ant Version : ${ant.version}</echo>
-    <echo level="info">    Build File : ${ant.file}</echo>
-    <echo level="info">Local Build Properties</echo>
-    <echo level="info">    version : ${yui.version}</echo>
-    <echo level="info">    srcdir : ${srcdir}</echo>
-    <echo level="info">    builddir : ${builddir}</echo>
-    <echo level="info">    component : ${component}</echo>
-    <echo level="info">    component.basefilename : ${component.basefilename}</echo>
-    <echo level="info">    component.basedir : ${component.basedir}</echo>
-    <echo level="info">    component.builddir : ${component.builddir}</echo>
-    <echo level="info">Global Build Properties</echo>
-    <echo level="info">    global.build.base : ${global.build.base}</echo>
-    <echo level="info">    global.build.component : ${global.build.component}</echo>
-    <echo level="info">    global.build.component.assets : ${global.build.component.assets}</echo>
+    <echo level="verbose">Ant Properties</echo>
+    <echo level="verbose">    Home : ${ant.home}</echo>
+    <echo level="verbose">    Ant Version : ${ant.version}</echo>
+    <echo level="verbose">    Build File : ${ant.file}</echo>
+    <echo level="verbose">Local Build Properties</echo>
+    <echo level="verbose">    version : ${yui.version}</echo>
+    <echo level="verbose">    srcdir : ${srcdir}</echo>
+    <echo level="verbose">    builddir : ${builddir}</echo>
+    <echo level="verbose">    component : ${component}</echo>
+    <echo level="verbose">    component.basefilename : ${component.basefilename}</echo>
+    <echo level="verbose">    component.basedir : ${component.basedir}</echo>
+    <echo level="verbose">    component.builddir : ${component.builddir}</echo>
+    <echo level="verbose">Global Build Properties</echo>
+    <echo level="verbose">    global.build.base : ${global.build.base}</echo>
+    <echo level="verbose">    global.build.component : ${global.build.component}</echo>
+    <echo level="verbose">    global.build.component.assets : ${global.build.component.assets}</echo>
 
     <dirname property="targets.basedir" file="${ant.file.YuiSharedTargets}"/>
     <import file="${targets.basedir}/macrolib.xml" description="Macrodef definitions - jslint, yuicompessor, registerversion" />
@@ -96,28 +96,47 @@
     </target>
 
     <target name="lint" description="Run jslint over the local build files (default settings)" unless="lint.skip">
-        <jslint>
-            <jsfiles>
-                <fileset dir="${component.builddir}" includes="*.js" />
-            </jsfiles>
-        </jslint>
+        <if>
+            <istrue value="${lint.all}" />
+            <then>
+                <!-- Lint all files -->
+                <jslint>
+                    <jsfiles>
+                        <fileset dir="${component.builddir}" includes="*.js" />
+                    </jsfiles>
+                </jslint>
+            </then>
+            <else>
+                <!-- Only lint raw files -->
+                <jslint>
+                    <jsfiles>
+                        <fileset dir="${component.builddir}" includes="*.js">
+                            <none>
+                                <filename name="*-debug.js"/>
+                                <filename name="*-min.js"/>
+                            </none>
+                        </fileset>
+                    </jsfiles>
+                </jslint>
+            </else>
+        </if>
     </target>
 
     <!-- DEPLOY -->
     <target name="deploy" description="Copy files to global location" depends="deploybuild, deployassets, deployskins, deploylang, deploydocs"></target>
 
     <target name="deploybuild" description="Copy built files to global build location">
-        <copy todir="${global.build.component}" overwrite="true" verbose="true">
+        <copy todir="${global.build.component}" overwrite="true" verbose="false">
             <fileset dir="${component.builddir}" includes="*.js" />
         </copy>
     </target>
 
     <target name="deployassets" if="component.assets.exist">
-        <copy todir="${global.build.component.assets}" flatten="${component.assets.flatten}" overwrite="true" verbose="true">
+        <copy todir="${global.build.component.assets}" flatten="${component.assets.flatten}" overwrite="true" verbose="false">
             <fileset dir="${component.assets.base}" includes="${component.assets.files}" excludes="skins/, legacy/" />
         </copy>
 
-        <copy todir="${global.build.component.assets}" flatten="${component.assets.legacy.flatten}" preservelastmodified="true" failonerror="false" verbose="true">
+        <copy todir="${global.build.component.assets}" flatten="${component.assets.legacy.flatten}" preservelastmodified="true" failonerror="false" verbose="false">
             <fileset dir="${component.assets.legacy.base}" includes="${component.assets.legacy.files}" excludes="skins/" />
         </copy>
     </target>
@@ -129,12 +148,12 @@
             </path>
             <sequential>
                 <basename property="skin.name" file="@{skin.dir}"/>
-                <echo level="info">Deploying Skin files for @{skin.dir} :: ${skin.name}</echo>
-                <copy todir="${global.build.component.assets}/skins/${skin.name}" overwrite="true" verbose="true">
+                <echo level="verbose">Deploying Skin files for @{skin.dir} :: ${skin.name}</echo>
+                <copy todir="${global.build.component.assets}/skins/${skin.name}" overwrite="true" verbose="false">
                     <fileset dir="${component.builddir}/assets/skins/${skin.name}" includes="${component}.css" />
                 </copy>
 
-                <copy todir="${global.build.component.assets}/skins/${skin.name}" overwrite="true" verbose="true">
+                <copy todir="${global.build.component.assets}/skins/${skin.name}" overwrite="true" verbose="false">
                     <fileset dir="${component.assets.skins.base}/${skin.name}" includes="${component.assets.skins.files}" />
                 </copy>
 		<var name="skin.name" unset="true" />
@@ -143,9 +162,14 @@
     </target>
 
     <target name="deploylang" description="Copy language bundles to global build location">
-        <copy todir="${global.build.component}/lang" overwrite="true" failonerror="false" verbose="true">
-            <fileset dir="${component.builddir}/lang" includes="*.js" />
-        </copy>
+    	<if>
+            <available file="${component.builddir}/lang" type="dir" />
+    	    <then>
+                <copy todir="${global.build.component}/lang" overwrite="true" failonerror="false">
+                    <fileset dir="${component.builddir}/lang" includes="*.js" />
+                </copy>
+            </then>
+        </if>
     </target>
 
     <target name="deploydocs" description="Copy doc files to global doc locations">
