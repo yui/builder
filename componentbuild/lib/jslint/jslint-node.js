@@ -28,7 +28,7 @@ JSLINT = require("./fulljslint").JSLINT;
         var success = JSLINT(js, OPTS);
         if (success) {
             return {
-                "content": '\t[OK] ' + file,
+                "content": '\t[JSLINT] [OK] ' + file,
                 code: code
             };
         } else {
