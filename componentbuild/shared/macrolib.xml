@@ -141,17 +141,16 @@
                     </or>
                 </not>
                 <then>
-                    <exec executable="jshint" failifexecutionfails="false" outputproperty="jshint.version">
-                        <arg line="--version"/>
-                    </exec>
-                </then>
-            </if>
-            <if>
-                <not>
-                    <isset property="jshint.version"/>
-                </not>
-                <then>
-                    <echo>Ignore the `java.io.IOException`, that means it can't find `jshint`. We will use Node.js instead of `jshint`</echo>
+                    <trycatch>
+                        <try>
+                            <exec executable="jshint" failifexecutionfails="true" outputproperty="jshint.version">
+                                <arg line="--version"/>
+                            </exec>
+                        </try>
+                        <catch>
+                            <echo level="debug">Failed to get jshint version. Assuming it's not installed.</echo>
+                        </catch>
+                    </trycatch>
                 </then>
             </if>
             <if>
