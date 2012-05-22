@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <project name="YuiMacroLib">
+    <macrodef name="compilehandlebars">
+        <element name="sourcefiles" optional="false" />
+        <element name="outputfile" optional="false" />
+
+        <sequential>
+            <pathconvert pathsep="' '" property="sourcefilesargs">
+                <sourcefiles />
+            </pathconvert>
+            <exec executable="${handlebars.executable}" failifexecutionfails="true" failonerror="true">
+                <arg line="'${sourcefilesargs}' -f '${outputfile}'" />
+            </exec>
+        </sequential>
+    </macrodef>
 
     <macrodef name="arrayliteral">
         <attribute name="from" />
@@ -289,7 +302,7 @@
                 </else>
             </if>
 
-            <copy file="${builddir}/files/langtemplate.txt" tofile="@{dest}/${@{module}@{lang}_fullname}.js" overwrite="true" outputencoding="utf-8">
+            <copy file="${langtemplate.file}" tofile="@{dest}/${@{module}@{lang}_fullname}.js" overwrite="true" outputencoding="utf-8">
                 <filterset>
                     <filter token="LANG" value="@{lang}" />
                     <filter token="LANG_MODULE" value="lang/${@{module}@{lang}_fullname}" />

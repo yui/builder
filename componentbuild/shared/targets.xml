@@ -2,36 +2,89 @@
 
 <project name="YuiSharedTargets">
 
-    <echo level="info">Starting Build For ${component}</echo>
-
-    <echo level="verbose">Ant Properties</echo>
-    <echo level="verbose">    Home : ${ant.home}</echo>
-    <echo level="verbose">    Ant Version : ${ant.version}</echo>
-    <echo level="verbose">    Build File : ${ant.file}</echo>
-    <echo level="verbose">Local Build Properties</echo>
-    <echo level="verbose">    version : ${yui.version}</echo>
-    <echo level="verbose">    srcdir : ${srcdir}</echo>
-    <echo level="verbose">    builddir : ${builddir}</echo>
-    <echo level="verbose">    component : ${component}</echo>
-    <echo level="verbose">    component.basefilename : ${component.basefilename}</echo>
-    <echo level="verbose">    component.basedir : ${component.basedir}</echo>
-    <echo level="verbose">    component.builddir : ${component.builddir}</echo>
-    <echo level="verbose">Global Build Properties</echo>
-    <echo level="verbose">    global.build.base : ${global.build.base}</echo>
-    <echo level="verbose">    global.build.component : ${global.build.component}</echo>
-    <echo level="verbose">    global.build.component.assets : ${global.build.component.assets}</echo>
-
     <dirname property="targets.basedir" file="${ant.file.YuiSharedTargets}"/>
     <import file="${targets.basedir}/macrolib.xml" description="Macrodef definitions - jslint, yuicompessor, registerversion" />
+    <property name="build.uptodate_file" value="${global.build.component}/.uptodate" />
 
-    <target name="all" depends="local, deploy" description="Build and Deploy to Global Build Directory" />
-    <target name="local" depends="clean, init, build, minify, lint" description="Build and Deploy to Local Build Directory" />
+    <target name="all"  description="Build and Deploy to Global Build Directory">
+        <!-- Check if any file changed since build.uptodate_file was touched -->
+        <uptodate property="build.uptodate" targetfile="${build.uptodate_file}">
+            <srcfiles dir="${component.basedir}" includes="**/*" excludes="build_tmp/" />
+        </uptodate>
+
+        <!-- check whether the component has a templates directory -->
+        <available file="${component.basedir}/templates/" type="dir" property="ilocal.templates.present" value="true"/>
+
+        <if>
+            <isset property="build.uptodate" />
+            <then>
+                <echo level="info">${component} build is uptodate, skipping...</echo>
+            </then>
+            <else>
+                <antcall target="local" />
+                <antcall target="deploy" />
+                <touch file="${build.uptodate_file}" />
+            </else>
+        </if>
+    </target>
+
+    <target name="local" depends="clean, init, build, minify, lint" description="Build and Deploy to Local Build Directory">
+        <echo level="info">Starting Build For ${component}</echo>
+
+        <echo level="verbose">Ant Properties</echo>
+        <echo level="verbose">    Home : ${ant.home}</echo>
+        <echo level="verbose">    Ant Version : ${ant.version}</echo>
+        <echo level="verbose">    Build File : ${ant.file}</echo>
+        <echo level="verbose">Local Build Properties</echo>
+        <echo level="verbose">    version : ${yui.version}</echo>
+        <echo level="verbose">    srcdir : ${srcdir}</echo>
+        <echo level="verbose">    builddir : ${builddir}</echo>
+        <echo level="verbose">    component : ${component}</echo>
+        <echo level="verbose">    component.basefilename : ${component.basefilename}</echo>
+        <echo level="verbose">    component.basedir : ${component.basedir}</echo>
+        <echo level="verbose">    component.builddir : ${component.builddir}</echo>
+        <echo level="verbose">Global Build Properties</echo>
+        <echo level="verbose">    global.build.base : ${global.build.base}</echo>
+        <echo level="verbose">    global.build.component : ${global.build.component}</echo>
+        <echo level="verbose">    global.build.component.assets : ${global.build.component.assets}</echo>
+    </target>
 
     <target name="init">
         <tstamp/>
         <mkdir dir="${component.builddir}" />
         <createdetails />
         <antcall target="-lint-server"/>
+    </target>
+
+    <!-- compiling handlebars templates if present -->
+    <target name="handlebars" description="Precompiles handlebars templates on /templates directory to js file">
+        <if>
+            <available file="${component.template.base}" type="dir" />
+            <then>
+                <echo level="verbose">Precompiling templates for ${component} </echo>
+                <fail>
+                    <condition>
+                        <not><resourcecontains resource="${component.basedir}/build.properties" substring="compiled-templates.js"/></not>
+                    </condition>
+Compiled templates not included in jsfiles!
+
+ERROR:
+The component ${component} uses templates, but
+'${compiled-templates.file}' is not listed in the
+'component.jsfiles' entry of 'build.properties'.
+
+Please, add it to the file:
+${component.basedir}/build.properties
+                </fail>
+        
+                <compilehandlebars>
+                    <sourcefiles>
+                        <fileset dir="${component.template.base}" includes="${component.template.files}" />
+                    </sourcefiles>
+                    <outputfile>${component.jsfiles.base}/${compiled-templates.file}</outputfile>
+                </compilehandlebars>
+            </then>
+        </if>
     </target>
 
     <target name="-lint-server" description="Start JSLint Server" unless="lint.skip">
@@ -73,12 +126,13 @@
 
     <target name="clean" description="Clean Local Build Directory" unless="clean.skip">
        <delete dir="${component.builddir}" />
+       <delete file="${build.uptodate_file}" />
     </target>
 
-    <target name="build" />
+    <target name="build" depends="handlebars" />
 
     <!-- MIN -->
-    <target name="minify" description="Create component-min.js from component.js">
+    <target name="minify" description="Create component-min.js from component.js" unless="minify.skip">
         <yuicompress src="${component.builddir}/${component.basefilename}.js" dest="${component.builddir}/${component.basefilename}-min.js" args="${yuicompressor.js.args.internal}" />
     	<if>
             <available file="${component.builddir}/lang" type="dir" />
