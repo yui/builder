@@ -132,7 +132,7 @@ ${component.basedir}/build.properties
     <target name="build" depends="handlebars" />
 
     <!-- MIN -->
-    <target name="minify" description="Create component-min.js from component.js">
+    <target name="minify" description="Create component-min.js from component.js" unless="minify.skip">
         <yuicompress src="${component.builddir}/${component.basefilename}.js" dest="${component.builddir}/${component.basefilename}-min.js" args="${yuicompressor.js.args.internal}" />
     	<if>
             <available file="${component.builddir}/lang" type="dir" />
