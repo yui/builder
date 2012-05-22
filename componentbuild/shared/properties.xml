@@ -106,6 +106,9 @@
         </and>
     </condition>
 	
+    <!-- Which file will be used for language template loader -->
+    <property name="langtemplate.file" value="${builddir}/files/langtemplate.txt" />
+
     <!-- component test module properties -->
     <property name="testsdir" value="./tests"/>
     <property name="tests.srcdir" value="${testsdir}/src"/>
