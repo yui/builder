@@ -34,6 +34,37 @@
         <antcall target="-lint-server"/>
     </target>
 
+    <!-- compiling handlebars templates if present -->
+    <target name="handlebars" description="Precompiles handlebars templates on /templates directory to js file">
+        <if>
+            <available file="${component.template.base}" type="dir" />
+            <then>
+                <echo level="verbose">Precompiling templates for ${component} </echo>
+                <fail>
+                    <condition>
+                        <not><resourcecontains resource="${component.basedir}/build.properties" substring="compiled-templates.js"/></not>
+                    </condition>
+Compiled templates not included in jsfiles!
+
+ERROR:
+The component ${component} uses templates, but
+'${compiled-templates.file}' is not listed in the
+'component.jsfiles' entry of 'build.properties'.
+
+Please, add it to the file:
+${component.basedir}/build.properties
+                </fail>
+        
+                <compilehandlebars>
+                    <sourcefiles>
+                        <fileset dir="${component.template.base}" includes="${component.template.files}" />
+                    </sourcefiles>
+                    <outputfile>${component.jsfiles.base}/${compiled-templates.file}</outputfile>
+                </compilehandlebars>
+            </then>
+        </if>
+    </target>
+
     <target name="-lint-server" description="Start JSLint Server" unless="lint.skip">
         <antcall target="-node">
             <param name="src" value="${builddir}/lib/jslint/jslint-node.js"/>
@@ -75,7 +106,7 @@
        <delete dir="${component.builddir}" />
     </target>
 
-    <target name="build" />
+    <target name="build" depends="handlebars" />
 
     <!-- MIN -->
     <target name="minify" description="Create component-min.js from component.js">
