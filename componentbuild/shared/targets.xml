@@ -2,30 +2,52 @@
 
 <project name="YuiSharedTargets">
 
-    <echo level="info">Starting Build For ${component}</echo>
-
-    <echo level="verbose">Ant Properties</echo>
-    <echo level="verbose">    Home : ${ant.home}</echo>
-    <echo level="verbose">    Ant Version : ${ant.version}</echo>
-    <echo level="verbose">    Build File : ${ant.file}</echo>
-    <echo level="verbose">Local Build Properties</echo>
-    <echo level="verbose">    version : ${yui.version}</echo>
-    <echo level="verbose">    srcdir : ${srcdir}</echo>
-    <echo level="verbose">    builddir : ${builddir}</echo>
-    <echo level="verbose">    component : ${component}</echo>
-    <echo level="verbose">    component.basefilename : ${component.basefilename}</echo>
-    <echo level="verbose">    component.basedir : ${component.basedir}</echo>
-    <echo level="verbose">    component.builddir : ${component.builddir}</echo>
-    <echo level="verbose">Global Build Properties</echo>
-    <echo level="verbose">    global.build.base : ${global.build.base}</echo>
-    <echo level="verbose">    global.build.component : ${global.build.component}</echo>
-    <echo level="verbose">    global.build.component.assets : ${global.build.component.assets}</echo>
-
     <dirname property="targets.basedir" file="${ant.file.YuiSharedTargets}"/>
     <import file="${targets.basedir}/macrolib.xml" description="Macrodef definitions - jslint, yuicompessor, registerversion" />
+    <property name="build.uptodate_file" value="${global.build.component}/.uptodate" />
 
-    <target name="all" depends="local, deploy" description="Build and Deploy to Global Build Directory" />
-    <target name="local" depends="clean, init, build, minify, lint" description="Build and Deploy to Local Build Directory" />
+    <target name="all"  description="Build and Deploy to Global Build Directory">
+        <!-- Check if any file changed since build.uptodate_file was touched -->
+        <uptodate property="build.uptodate" targetfile="${build.uptodate_file}">
+            <srcfiles dir="${component.basedir}" includes="**/*" excludes="build_tmp/" />
+        </uptodate>
+
+        <!-- check whether the component has a templates directory -->
+        <available file="${component.basedir}/templates/" type="dir" property="ilocal.templates.present" value="true"/>
+
+        <if>
+            <isset property="build.uptodate" />
+            <then>
+                <echo level="info">${component} build is uptodate, skipping...</echo>
+            </then>
+            <else>
+                <antcall target="local" />
+                <antcall target="deploy" />
+                <touch file="${build.uptodate_file}" />
+            </else>
+        </if>
+    </target>
+
+    <target name="local" depends="clean, init, build, minify, lint" description="Build and Deploy to Local Build Directory">
+        <echo level="info">Starting Build For ${component}</echo>
+
+        <echo level="verbose">Ant Properties</echo>
+        <echo level="verbose">    Home : ${ant.home}</echo>
+        <echo level="verbose">    Ant Version : ${ant.version}</echo>
+        <echo level="verbose">    Build File : ${ant.file}</echo>
+        <echo level="verbose">Local Build Properties</echo>
+        <echo level="verbose">    version : ${yui.version}</echo>
+        <echo level="verbose">    srcdir : ${srcdir}</echo>
+        <echo level="verbose">    builddir : ${builddir}</echo>
+        <echo level="verbose">    component : ${component}</echo>
+        <echo level="verbose">    component.basefilename : ${component.basefilename}</echo>
+        <echo level="verbose">    component.basedir : ${component.basedir}</echo>
+        <echo level="verbose">    component.builddir : ${component.builddir}</echo>
+        <echo level="verbose">Global Build Properties</echo>
+        <echo level="verbose">    global.build.base : ${global.build.base}</echo>
+        <echo level="verbose">    global.build.component : ${global.build.component}</echo>
+        <echo level="verbose">    global.build.component.assets : ${global.build.component.assets}</echo>
+    </target>
 
     <target name="init">
         <tstamp/>
@@ -104,6 +126,7 @@ ${component.basedir}/build.properties
 
     <target name="clean" description="Clean Local Build Directory" unless="clean.skip">
        <delete dir="${component.builddir}" />
+       <delete file="${build.uptodate_file}" />
     </target>
 
     <target name="build" depends="handlebars" />
