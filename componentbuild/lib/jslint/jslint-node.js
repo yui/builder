@@ -114,7 +114,7 @@ JSLINT = require("./fulljslint").JSLINT;
         });
     }).listen(PORT, "127.0.0.1");
 
-    require("sys").puts("Server started on port " + PORT);
+    console.log("Server started on port " + PORT);
 
     (function () {
         var reap;
