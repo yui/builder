@@ -2,6 +2,13 @@
 
 <project name="YuiMacroLib">
 
+    <!-- ANT contrib library for loops, if/else support, with property fix for FOR task -->
+    <taskdef resource="antcontrib.properties">
+        <classpath>
+            <pathelement location="${builddir}/lib/ant-contrib/ant-contrib-1.0b3-modified.jar" />
+        </classpath>
+    </taskdef>
+
     <macrodef name="arrayliteral">
         <attribute name="from" />
         <attribute name="to" />
@@ -34,7 +41,7 @@
             <arrayliteral from="component.requires" to="component.details.requires" key="requires" />
             <arrayliteral from="component.optional" to="component.details.optional" key="optional" />
             <arrayliteral from="component.after" to="component.details.after" key="after" />
-        	<arrayliteral from="component.lang" to="component.details.lang" key="lang" />
+            <arrayliteral from="component.lang" to="component.details.lang" key="lang" />
             <if>
                 <isset property="component.skinnable" />
                 <then>
@@ -202,10 +209,10 @@
                         </then>
                         <else>
                             <echo>Using Rhino. Install nodejs to improve jslint speed, or skip with -Dlint.skip=true</echo>
-                            <!-- 
-                               Need to find a way to convert fileset to args (script?) to 
+                            <!--
+                               Need to find a way to convert fileset to args (script?) to
                                avoid ' ', which will break for files with ' in them
-                               
+
                                Evaluates to the following java execution line...
                                java -r js.jar jslintconsole.js 'file1.js' 'file2.js' 'file3.js'
                             -->
@@ -217,6 +224,35 @@
                             </java>
                         </else>
                     </if>
+                </else>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="node">
+        <attribute name="spawn" default="false" />
+        <attribute name="resultproperty" default="" description="ignored if spawn is true" />
+        <attribute name="failonerror" default="false" />
+        <attribute name="failifexecutionfails" default="true" description="ignored if spawn is true" />
+        <element name="exec-elements" implicit="true" optional="true" />
+        <sequential>
+            <if>
+                <istrue value="@{spawn}" />
+                <then>
+                    <exec executable="${node.executable}" spawn="true"
+                            failonerror="@{failonerror}"
+                            searchpath="true" resolveexecutable="true">
+                        <env key="PATH" path="${env.PATH}:${node.path}" />
+                        <exec-elements />
+                    </exec>
+                </then>
+                <else>
+                    <exec executable="${node.executable}" resultproperty="@{resultproperty}"
+                            failonerror="@{failonerror}" failifexecutionfails="@{failifexecutionfails}"
+                            searchpath="true" resolveexecutable="true">
+                        <env key="PATH" path="${env.PATH}:${node.path}" />
+                        <exec-elements />
+                    </exec>
                 </else>
             </if>
         </sequential>
@@ -246,7 +282,7 @@
         <attribute name="module" />
         <attribute name="dest" />
         <attribute name="lang" default="" />
-    	<attribute name="details" default = ""/>
+        <attribute name="details" default = ""/>
 
         <sequential>
             <if>
@@ -268,7 +304,7 @@
                     <property name="@{module}@{lang}_fullname" value="@{module}_@{lang}" />
                 </else>
             </if>
-            
+
             <if>
                 <available file="@{dir}/${@{module}@{lang}_fullname}.pres" />
                 <then>
@@ -302,7 +338,7 @@
         </sequential>
 
     </macrodef>
-	
+
     <macrodef name="addmodule">
         <attribute name="file" />
         <attribute name="module" />
@@ -361,25 +397,25 @@
 
     <macrodef name="addlangrollup">
 
-    	<attribute name="module" />
+        <attribute name="module" />
         <attribute name="dir" />
 
         <sequential>
             <echo level="verbose">Registering rollup info for lang files in @{dir} using YUI.add</echo>
 
-        	<for list="${component.rollup.lang}" param="lang" trim="true">
+            <for list="${component.rollup.lang}" param="lang" trim="true">
                 <sequential>
                     <loadfile srcfile="@{dir}/@{module}_@{lang}.js" property="@{module}-@{lang}-code" />
 
                     <var name="lang.use" value="{use:[" />
 
-                    <for list="${component.lang.use}" param="submod" trim="true">                   
+                    <for list="${component.lang.use}" param="submod" trim="true">
                        <sequential>
                              <var name="lang.use" value="${lang.use}'lang/@{submod}_@{lang}'," />
                        </sequential>
                     </for>
 
-                	<var name="lang.use" value="${lang.use}]}" />
+                    <var name="lang.use" value="${lang.use}]}" />
 
                     <propertyregex property="@{module}-@{lang}-details"
                       input="${lang.use}"
@@ -395,13 +431,13 @@
                             <filter token="DETAILS" value=", ${@{module}-@{lang}-details}"/>
                         </filterset>
                     </copy>
-        		</sequential>
-        	</for>
+                </sequential>
+            </for>
 
             <loadfile srcfile="@{dir}/@{module}.js" property="@{module}--code" />
 
             <var name="lang.use" value="{use:[" />
-            <for list="${component.lang.use}" param="submod" trim="true">                   
+            <for list="${component.lang.use}" param="submod" trim="true">
                <sequential>
                      <var name="lang.use" value="${lang.use}'lang/@{submod}'," />
                </sequential>
@@ -440,6 +476,6 @@
             <echo level="verbose">Adding CSS Registration Code to @{file}</echo>
             <concat destfile="@{file}" append="true" fixlastline="true">${@{module}}</concat>
         </sequential>
-    </macrodef>    
-	
+    </macrodef>
+
 </project>

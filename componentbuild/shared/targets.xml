@@ -48,18 +48,16 @@
             <then>
                 <!-- You can't set failifexecutionfails if spawn is true. Argh. -->
                 <!-- Check if it's installed first. -->
-                <exec resultproperty="node.status" executable="${node.executable}" failonerror="false" failifexecutionfails="false" searchpath="true" resolveexecutable="true">
-                    <env key="PATH" path="${env.PATH}:${node.path}"/>
+                <node resultproperty="node.status" failifexecutionfails="false">
                     <arg value="-v"/>
-                </exec>
+                </node>
                 <if>
                     <equals arg1="${node.status}" arg2="0"/>
                         <then>
                         <echo level="info">Spawning Node.js app at: ${src}</echo>
-                        <exec executable="${node.executable}" spawn="true" failonerror="false" searchpath="true" resolveexecutable="true">
-                            <env key="PATH" path="${env.PATH}:${node.path}"/>
+                        <node spawn="true">
                             <arg value="${src}"/>
-                        </exec>
+                        </node>
                     </then>
                     <else>
                         <echo level="info">For faster builds, install Node.js.</echo>
@@ -82,18 +80,18 @@
     <!-- MIN -->
     <target name="minify" description="Create component-min.js from component.js">
         <yuicompress src="${component.builddir}/${component.basefilename}.js" dest="${component.builddir}/${component.basefilename}-min.js" args="${yuicompressor.js.args.internal}" />
-    	<if>
+        <if>
             <available file="${component.builddir}/lang" type="dir" />
-    	    <then>
-    	    	<for param="file">
-    	    	    <path>
-    	    	      <fileset dir="${component.builddir}/lang" includes="*.js"/>
-    	    	    </path>
-    	    	    <sequential>
-    	    	       <yuicompress src="@{file}" dest="@{file}" args="${yuicompressor.js.args.internal}" />
-    	    	    </sequential>
-    	    	</for>
-    	    </then>
+            <then>
+                <for param="file">
+                    <path>
+                      <fileset dir="${component.builddir}/lang" includes="*.js"/>
+                    </path>
+                    <sequential>
+                       <yuicompress src="@{file}" dest="@{file}" args="${yuicompressor.js.args.internal}" />
+                    </sequential>
+                </for>
+            </then>
         </if>
     </target>
 
@@ -146,7 +144,7 @@
     <target name="deployskins" if="skins.exist">
         <for param="skin.dir">
             <path>
-                <dirset dir="${component.assets.base}/skins/" includes="*"/> 
+                <dirset dir="${component.assets.base}/skins/" includes="*"/>
             </path>
             <sequential>
                 <basename property="skin.name" file="@{skin.dir}"/>
@@ -158,15 +156,15 @@
                 <copy todir="${global.build.component.assets}/skins/${skin.name}" overwrite="true" verbose="false">
                     <fileset dir="${component.assets.skins.base}/${skin.name}" includes="${component.assets.skins.files}" />
                 </copy>
-		<var name="skin.name" unset="true" />
-            </sequential> 
+                <var name="skin.name" unset="true" />
+            </sequential>
         </for>
     </target>
 
     <target name="deploylang" description="Copy language bundles to global build location">
-    	<if>
+        <if>
             <available file="${component.builddir}/lang" type="dir" />
-    	    <then>
+            <then>
                 <copy todir="${global.build.component}/lang" overwrite="true" failonerror="false">
                     <fileset dir="${component.builddir}/lang" includes="*.js" />
                 </copy>
