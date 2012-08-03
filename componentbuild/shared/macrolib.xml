@@ -95,6 +95,20 @@
         </then>
     </if>
 
+    <macrodef name="yuicoverage">
+        <attribute name="dest" />
+        <attribute name="src" />
+        <sequential>
+            <java jar="${yuitest-coverage.jar}" failonerror="true" fork="true">
+                <arg value="--charset" />
+                <arg value="utf8" />
+                <arg value="-o" />
+                <arg path="@{dest}" />
+                <arg path="@{src}" />
+            </java>
+        </sequential>
+    </macrodef>
+
     <macrodef name="concatsource">
         <attribute name="destfile" />
         <attribute name="sourcedir" />
