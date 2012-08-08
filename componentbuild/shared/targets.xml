@@ -80,6 +80,15 @@
     <target name="build-coverage" unless="coverage.skip">
         <echo>Creating coverage file for: ${component.builddir}/${component.basefilename}.js</echo>
         <yuicoverage src="${component.builddir}/${component.basefilename}.js" dest="${component.builddir}/${component.basefilename}-coverage.js" />
+        <move file="${component.builddir}/${component.basefilename}-coverage.js" tofile="${component.builddir}/${component.basefilename}-coverage.js.tmp" />
+
+        <move file="${component.builddir}/${component.basefilename}-coverage.js.tmp" tofile="${component.builddir}/${component.basefilename}-coverage.js">
+            <filterchain>
+                <tokenfilter>
+                    <replacestring from="${component.builddir}" to="/build/${component.basefilename}"/>
+                </tokenfilter>
+            </filterchain>
+        </move>
     </target>
 
     <!-- MIN -->
