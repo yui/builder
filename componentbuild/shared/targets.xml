@@ -77,8 +77,13 @@
 
     <target name="build" />
 
+    <target name="build-coverage" unless="coverage.skip">
+        <echo>Creating coverage file for: ${component.builddir}/${component.basefilename}.js</echo>
+        <yuicoverage src="${component.builddir}/${component.basefilename}.js" dest="${component.builddir}/${component.basefilename}-coverage.js" />
+    </target>
+
     <!-- MIN -->
-    <target name="minify" description="Create component-min.js from component.js">
+    <target name="minify" description="Create component-min.js from component.js" depends="build-coverage">
         <yuicompress src="${component.builddir}/${component.basefilename}.js" dest="${component.builddir}/${component.basefilename}-min.js" args="${yuicompressor.js.args.internal}" />
     	<if>
             <available file="${component.builddir}/lang" type="dir" />

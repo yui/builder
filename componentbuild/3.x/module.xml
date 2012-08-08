@@ -5,7 +5,7 @@
     <dirname property="module.basedir" file="${ant.file.YuiModuleTargets}"/>
     <import file="${module.basedir}/../shared/targets.xml" description="Targets common to Rollup/Module" />
 
-    <target name="build" depends="buildcore, -rollupjs, buildskins, buildlangs, build-coverage" />
+    <target name="build" depends="buildcore, -rollupjs, buildskins, buildlangs" />
     <target name="buildskins" depends="-buildskins, -rollupcss" />
     <target name="buildlangs" depends="-buildlangs, -rolluplangs" />
 
@@ -25,11 +25,6 @@
                             match="${component.logger.regex}"
                             replace="${component.logger.regex.replace}"
                             flags="${component.logger.regex.flags}" />
-    </target>
-
-    <target name="build-coverage" unless="coverage.skip">
-        <echo>Creating coverage file for: ${component.builddir}/${component.basefilename}.js</echo>
-        <yuicoverage src="${component.builddir}/${component.basefilename}.js" dest="${component.builddir}/${component.basefilename}-coverage.js" />
     </target>
 
     <!-- DEBUG -->
