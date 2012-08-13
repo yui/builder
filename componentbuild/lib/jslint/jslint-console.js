@@ -19,6 +19,9 @@ load(jslintsrc);
         undef: true,
         newcap: false,
         predef:["YUI", "window", "YUI_config", "YAHOO", "YAHOO_config", "Event",
+                "_yuitest_coverline",
+                "_yuitest_coverage",
+                "_yuitest_coverfunc",
                 "opera", "exports", "document", "navigator", "console", "self"]
     };
 

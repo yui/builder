@@ -19,6 +19,9 @@ JSLINT = require("./fulljslint").JSLINT;
         newcap: false,
         predef:["YUI", "window", "YUI_config", "YAHOO", "YAHOO_config", "Event",
                 "opera", "exports", "document", "navigator", "console", "self", "require",
+                "_yuitest_coverline",
+                "_yuitest_coverfunc",
+                "_yuitest_coverage",
                 "module", "process", "__dirname", "__filename"]
     };
 
