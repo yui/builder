@@ -78,7 +78,7 @@
     <target name="build" />
 
     <target name="build-coverage" unless="coverage.skip">
-        <echo>Creating coverage file for: ${component.builddir}/${component.basefilename}.js</echo>
+        <echo level="info">Creating coverage file for: ${component.builddir}/${component.basefilename}.js</echo>
         <yuicoverage src="${component.builddir}/${component.basefilename}.js" dest="${component.builddir}/${component.basefilename}-coverage.js" />
         <move file="${component.builddir}/${component.basefilename}-coverage.js" tofile="${component.builddir}/${component.basefilename}-coverage.js.tmp" />
 
@@ -116,7 +116,7 @@
                 <!-- Lint all files -->
                 <jslint>
                     <jsfiles>
-                        <fileset dir="${component.builddir}" includes="*.js" />
+                        <fileset dir="${component.builddir}" includes="*.js" excludes="*-coverage.js" />
                     </jsfiles>
                 </jslint>
             </then>
@@ -124,12 +124,7 @@
                 <!-- Only lint raw files -->
                 <jslint>
                     <jsfiles>
-                        <fileset dir="${component.builddir}" includes="*.js">
-                            <none>
-                                <filename name="*-debug.js"/>
-                                <filename name="*-min.js"/>
-                            </none>
-                        </fileset>
+                        <fileset dir="${component.builddir}" includes="*.js" excludes="*-coverage.js, *-debug.js, *-min.js" />
                     </jsfiles>
                 </jslint>
             </else>
