@@ -1,6 +1,8 @@
 Welcome to YUI Builder
 ======================
 
+This repo has been deprecated in favor of [Shifter](http://github.com/yui/shifter).
+
 Introduction
 ------------
 
