@@ -11,6 +11,8 @@
 
     <dirname property="buildfile.dir" file="${ant.file}" />
 
+    <property environment="env"/>
+
     <!--
         builddir : The path to the builder/componentbuild directory from the component build file
         srcdir   : The path to top of the project source directory (e.g. yui2) from the component build file
@@ -180,6 +182,8 @@
 
     <property name="lint.failonerror" value="false"/>
 
+    <property name="node.executable" value="node"/>
+    <property name="node.path" value=""/>
     <property name="node.jslint.url" value="http://127.0.0.1:8081/"/>
     <property name="yuicompressor.url" value="http://127.0.0.1:${yuicompressor.port}/compress"/>
 
