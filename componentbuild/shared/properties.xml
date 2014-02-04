@@ -180,7 +180,8 @@
 
     <property name="lint.failonerror" value="false"/>
 
-    <property name="node.jslint.url" value="http://127.0.0.1:8081/"/>
+    <property name="node.jslint.port" value="8081" />
+    <property name="node.jslint.url" value="http://127.0.0.1:${node.jslint.port}/"/>
     <property name="yuicompressor.url" value="http://127.0.0.1:${yuicompressor.port}/compress"/>
 
 </project>

@@ -53,10 +53,11 @@
                 </exec>
                 <if>
                     <equals arg1="${node.status}" arg2="0"/>
-                        <then>
-                        <echo level="info">Spawning Node.js app at: ${src}</echo>
+                    <then>
+                        <echo level="info">Spawning Node.js app at: ${node.jslint.url} from ${src}</echo>
                         <exec executable="node" spawn="true" failonerror="false" searchpath="true" resolveexecutable="true">
                             <arg value="${src}"/>
+                            <arg value="${node.jslint.port}" />
                         </exec>
                     </then>
                     <else>
