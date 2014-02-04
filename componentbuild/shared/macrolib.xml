@@ -303,7 +303,7 @@
                 </else>
             </if>
 
-            <copy file="${builddir}/files/langtemplate.txt" tofile="@{dest}/${@{module}@{lang}_fullname}.js" overwrite="true" outputencoding="utf-8">
+            <copy file="${langtemplate.file}" tofile="@{dest}/${@{module}@{lang}_fullname}.js" overwrite="true" outputencoding="utf-8">
                 <filterset>
                     <filter token="LANG" value="@{lang}" />
                     <filter token="LANG_MODULE" value="lang/${@{module}@{lang}_fullname}" />
