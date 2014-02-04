@@ -240,8 +240,9 @@
         <attribute name="module" />
         <attribute name="classname" />
         <attribute name="file" />
+        <attribute name="versioncode" default="${builddir}/files/versioncode.txt" />
         <sequential>
-            <loadfile srcfile="${builddir}/files/versioncode.txt" property="@{module}-@{classname}-version" >
+            <loadfile srcfile="@{versioncode}" property="@{module}-@{classname}-version" >
                 <filterchain>
                     <replacetokens>
                         <token key="MODULE" value="@{module}"/>
